@@ -1,653 +1,524 @@
-{% extends "hedefleyici.html" %}
-
-{% block title %}Görevlerim{% endblock %}
-
-{% block styles %}
-{{ super() }}
+<!DOCTYPE html>
+<html class="light" lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bildirimler ve Görevler - ReviseMe</title>
+<meta name="csrf-token" content="{{ csrf_token() if csrf_token else '' }}">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#cfbdff",
+                    "on-primary-container": "#d0beff",
+                    "tertiary-fixed": "#4ffbe6",
+                    "on-error": "#ffffff",
+                    "tertiary": "#00453e",
+                    "outline": "#7a7488",
+                    "on-tertiary-fixed": "#00201c",
+                    "on-surface": "#151c27",
+                    "on-primary-fixed-variant": "#5300cd",
+                    "on-primary-fixed": "#22005d",
+                    "on-surface-variant": "#494456",
+                    "surface-container": "#e7eefe",
+                    "tertiary-container": "#005f56",
+                    "surface-tint": "#6d23f9",
+                    "secondary-fixed-dim": "#d8b9ff",
+                    "secondary-container": "#9547f7",
+                    "outline-variant": "#cbc3d9",
+                    "on-secondary-fixed-variant": "#6200bc",
+                    "surface-container-highest": "#dce2f3",
+                    "inverse-on-surface": "#ebf1ff",
+                    "secondary": "#7b24dc",
+                    "on-secondary": "#ffffff",
+                    "primary": "#4800b2",
+                    "surface-container-low": "#f0f3ff",
+                    "on-tertiary-container": "#1ee0cc",
+                    "on-tertiary-fixed-variant": "#005048",
+                    "error-container": "#ffdad6",
+                    "primary-fixed": "#e8ddff",
+                    "on-background": "#151c27",
+                    "error": "#ba1a1a",
+                    "inverse-surface": "#2a313d",
+                    "inverse-primary": "#cfbdff",
+                    "primary-container": "#6200ee",
+                    "on-secondary-fixed": "#290055",
+                    "on-tertiary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "background": "#f9f9ff",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed-dim": "#17deca",
+                    "surface": "#f9f9ff",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed": "#eddcff",
+                    "surface-container-high": "#e2e8f8",
+                    "on-secondary-container": "#fffbff",
+                    "surface-dim": "#d3daea",
+                    "surface-bright": "#f9f9ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "base": "8px",
+                    "section-gap": "64px",
+                    "gutter": "24px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display-xl": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+            }
+          },
+        },
+      }
+    </script>
 <style>
-    /* Görevlerim sayfasına özel stiller */
-    h2 {
-        color: #232323;
-        font-size: 2.2rem;
-        font-weight: 800;
-        margin-bottom: 0.8rem;
-        margin-top: 2.5rem;
-        text-shadow: 0 0 15px #fff, 0 0 20px #fff;
-    }
-    
-    .card {
-        background-color: rgba(26, 20, 64, 0.8);
-        border: 1px solid rgba(106, 55, 181, 0.3);
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease;
-        color: #FFF;
-        backdrop-filter: blur(5px);
-    }
-    
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 35px rgba(46, 205, 200, 0.3);
-        border-color: var(--accent-turquoise);
-    }
-    
-    .card-title {
-        color: white;
-        text-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
-    }
-    
-    .card-subtitle {
-        color: #CCC !important;
-    }
-    
-    .card-text {
-        color: #EEE;
-    }
-    
-    .text-muted {
-        color: #AAA !important;
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, rgba(106, 55, 181, 0.9), rgba(132, 81, 209, 0.9));
-        border: none;
-        box-shadow: 0 0 15px rgba(106, 55, 181, 0.5);
-    }
-    
-    .btn-primary:hover {
-        background: linear-gradient(135deg, rgba(132, 81, 209, 0.9), rgba(106, 55, 181, 0.9));
-        transform: translateY(-3px);
-    }
-    
-    .btn-outline-primary {
-        color: #FFF;
-        border-color: rgba(106, 55, 181, 0.5);
-    }
-    
-    .btn-outline-primary:hover {
-        background-color: rgba(106, 55, 181, 0.3);
-        color: #FFF;
-        border-color: rgba(106, 55, 181, 0.8);
-    }
-    
-    .btn-outline-success {
-        color: #FFF;
-        border-color: rgba(46, 205, 200, 0.5);
-    }
-    
-    .btn-outline-success:hover {
-        background-color: rgba(46, 205, 200, 0.3);
-        color: #FFF;
-        border-color: rgba(46, 205, 200, 0.8);
-    }
-    
-    .btn-outline-danger {
-        color: #FFF;
-        border-color: rgba(245, 111, 173, 0.5);
-    }
-    
-    .btn-outline-danger:hover {
-        background-color: rgba(245, 111, 173, 0.3);
-        color: #FFF;
-        border-color: rgba(245, 111, 173, 0.8);
-    }
-    
-    .btn-outline-light {
-        color: #FFF;
-        border-color: rgba(255, 255, 255, 0.5);
-    }
-    
-    .btn-outline-light:hover {
-        background-color: rgba(255, 255, 255, 0.2);
-        color: #FFF;
-    }
-    
-    .list-group-item {
-        background-color: rgba(26, 20, 64, 0.5);
-        border: 1px solid rgba(106, 55, 181, 0.2);
-        color: #EEE;
-    }
-    
-    .progress {
-        height: 10px;
-        background-color: rgba(255, 255, 255, 0.1);
-    }
-    
-    .progress-bar {
-        background: linear-gradient(135deg, rgba(46, 205, 200, 0.9), rgba(106, 55, 181, 0.9));
-    }
-    
-    .modal-dialog {
-        margin-top: 5vh !important;
-        margin-bottom: 5vh !important;
-        display: flex;
-        align-items: center;
-        min-height: 90vh;
-    }
-    .modal-content {
-        background: rgba(26, 20, 64, 0.97) !important;
-        color: #fff !important;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(46, 205, 200, 0.08);
-    }
-    .modal, .modal-backdrop {
-        z-index: 99999 !important;
-    }
-    body.modal-open {
-        pointer-events: auto !important;
-    }
-    
-    .form-control {
-        background-color: #fff !important;
-        color: #222 !important;
-        border: 1px solid #ccc !important;
-    }
-    
-    .form-control:focus {
-        background-color: #f5f5f5 !important;
-        color: #222 !important;
-        border-color: #30E8E8 !important;
-        box-shadow: 0 0 0 0.15rem rgba(46,205,200,0.15) !important;
-    }
-    
-    .form-label {
-        color: #333 !important;
-    }
-    
-    .modal-backdrop {
-        z-index: 1040 !important;
-         display: none !important; 
-    }
-    .modal {
-        z-index: 1050 !important;
-    }
-    .modal-content, .modal-dialog, .modal-body, .modal-header, .modal-footer, .form-control {
-        pointer-events: auto !important;
-    }
-    .table {
-        background: rgba(26, 20, 64, 0.85) !important;
-        color: #fff !important;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-    .table th, .table td {
-        background: transparent !important;
-        color: #fff !important;
-        border-color: rgba(106, 55, 181, 0.2) !important;
-    }
-    .table thead th {
-        background: rgba(48, 232, 232, 0.08) !important;
-        color: #30E8E8 !important;
-        font-weight: 700;
-    }
-    .table-hover tbody tr:hover {
-        background: rgba(48, 232, 232, 0.08) !important;
-        color: #30E8E8 !important;
-    }
-    #editTaskModal label,
-    #addTaskModal label {
-        color: #fff !important;
-    }
-    .completed-card {
-        min-height: 120px !important;
-        max-width: 350px !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
-        font-size: 0.95rem !important;
-        padding: 0.5rem 0.5rem 0.25rem 0.5rem !important;
-    }
-    /* Günlük Rapor Modalı için soft ve temaya uygun arka plan */
-    #reportModal .modal-content {
-        background: #f5f6fa !important; /* Soft açık lila-mavi */
-        color: #232323 !important;
-        border-radius: 18px;
-        box-shadow: 0 10px 30px rgba(46, 205, 200, 0.08);
-    }
-    #reportModal .modal-header, #reportModal .modal-body, #reportModal .modal-footer {
-        background: transparent !important;
-        color: #232323 !important;
-    }
-    #reportModal .modal-title {
-        color: #232323 !important;
-        font-weight: 700;
-        letter-spacing: 1px;
-    }
-    #reportModal .btn, #reportModal button, #reportModal .btn-close {
-        background: #fff !important;
-        color: #232323 !important;
-        border: 1px solid #e0c3fc !important;
-        box-shadow: none;
-        border-radius: 8px;
-        transition: background 0.2s, color 0.2s;
-    }
-    #reportModal .btn:hover, #reportModal button:hover {
-        background: #e0c3fc !important;
-        color: #232323 !important;
-    }
-    #reportModal .card, #reportModal .list-group-item, #reportModal .bg-success, #reportModal .bg-danger, #reportModal .bg-info, #reportModal .bg-primary, #reportModal .bg-secondary {
-        background: rgba(255,255,255,0.92) !important;
-        color: #232323 !important;
-        border: 1px solid #e0c3fc !important;
-    }
-    #reportModal .list-group-item.text-muted {
-        color: #888 !important;
-    }
-    #reportModal .badge {
-        background: #e0c3fc !important;
-        color: #232323 !important;
-    }
-    .gorevlerim-bg {
-        background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
-        position: fixed;
-        left: 0; top: 0; width: 100vw; height: 100vh;
-        z-index: -1;
-    }
-</style>
-{% endblock %}
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-gradient-soft-purple {
+            background: linear-gradient(135deg, #fdfbff 0%, #f3f0ff 100%);
+        }
+        /* Modal Custom Styles */
+        .custom-modal-backdrop {
+            position: fixed; top: 0; left: 0; w-full; h-full; background: rgba(0,0,0,0.4); z-index: 1000; display: none;
+        }
+        .custom-modal {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; border-radius: 1rem; width: 90%; max-width: 500px;
+            z-index: 1001; display: none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            padding: 2rem;
+        }
+        .custom-modal.active, .custom-modal-backdrop.active { display: block; }
+    </style>
+    <style> html { font-size: 18px !important; } </style>
+    <style> html { font-size: 18px !important; } </style>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen">
 
-{% block hedefleyici_content %}
-<div class="gorevlerim-bg"></div>
-<div class="container-fluid p-0">
-    <div class="row">
-        <div class="col-12">
-            <h2 style="color:#232323; text-shadow:0 0 15px #fff, 0 0 20px #fff; font-size: 2.2rem; font-weight: 800; text-align: left; margin-bottom: 0.8rem; margin-top: 2.5rem; letter-spacing: 2px;"><i class="fas fa-clipboard-list" style="margin-right: 12px;"></i>Görevlerim</h2>
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTaskModal">
-                            <i class="fas fa-plus-circle me-2"></i>Yeni Görev Ekle
-                        </button>
-                        <button type="button" class="btn btn-info" id="showReportBtn">
-                            <i class="fas fa-file-alt me-2"></i>Günlük Raporu Gör
-                        </button>
-                    </div>
-                    
-                    <!-- Görev Filtreleme -->
-                    <div class="mb-4">
-                        <div class="btn-group" role="group">
-                            <a href="{{ url_for('gorevlerim', filter='all') }}" class="btn btn-sm {% if filter == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">Görevlerim</a>
-                            <a href="{{ url_for('gorevlerim', filter='completed') }}" class="btn btn-sm {% if filter == 'completed' %}btn-primary{% else %}btn-outline-primary{% endif %}">Son Tamamlananlar</a>
-                        </div>
-                    </div>
-                    
-                    <!-- Görev Kartları -->
-                    <div id="taskCards" class="row g-4">
-                        {% set now = now or datetime.utcnow() %}
-                        {% if filter == 'completed' %}
-                            {% set tasks = completed_tasks %}
-                        {% endif %}
-                        {% if tasks and tasks|length > 0 %}
-                            {% for task in tasks %}
-                            <div class="col-12 col-md-6 col-lg-4">
-                                <div class="card shadow-sm border-0 h-100 p-0 completed-card" style="background:rgba(26,20,64,0.92);border-radius:18px;overflow:hidden;position:relative;">
-                                    <div class="card-body d-flex flex-column justify-content-between h-100">
-                                        <div class="d-flex align-items-center mb-2 justify-content-between">
-                                            <div class="d-flex align-items-center">
-                                                <span class="fw-bold fs-6 me-2" style="color:#fff; text-shadow:{% if task.Priority == 'High' %}0 0 6px rgba(255,23,68,0.5),0 0 10px rgba(255,23,68,0.3);{% elif task.Priority == 'Medium' %}0 0 6px rgba(255,214,0,0.5),0 0 10px rgba(255,214,0,0.3);{% else %}0 0 6px rgba(48,232,232,0.5),0 0 10px rgba(48,232,232,0.3);{% endif %};font-size:1.08rem;">{{ task.Title }}</span>
-                                            </div>
-                                            {% if filter != 'completed' %}
-                                            <form class="d-flex align-items-center gap-1 add-subtask-form-frontend ms-3" data-task-id="{{ task.TaskId }}" style="min-width:140px;">
-                                                <input type="text" class="form-control form-control-sm py-1 px-2" name="content" placeholder="Alt görev ekle..." maxlength="255" required style="max-width:110px; font-size:0.92rem; height:28px; border-radius:7px;">
-                                                <button type="submit" class="btn btn-xs btn-outline-primary p-1 d-flex align-items-center justify-content-center" style="width:26px; height:26px; border-radius:7px;"><i class="fas fa-plus" style="font-size:0.95em;"></i></button>
-                                            </form>
-                                            {% endif %}
-                                        </div>
-                                        <div class="mb-2">
-                                            <ul class="list-unstyled mb-2 subtasks-list" data-task-id="{{ task.TaskId }}"></ul>
-                                        </div>
-                                        {% if task.Description %}
-                                        <div class="mb-2 px-3 py-2 rounded" style="background:rgba(255,255,255,0.08);color:#e0e0e0;max-width:100%;word-break:break-word;">
-                                            <i class="fas fa-align-left me-1"></i>{{ task.Description }}
-                                        </div>
-                                        {% endif %}
-                                        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-                                            <span class="badge bg-gradient" style="background:linear-gradient(90deg,#30E8E8,#536976);font-size:1rem;">
-                                                <i class="fas fa-calendar-alt me-1"></i>
-                                                {% if filter == 'completed' %}
-                                                    {{ task.CompletedAt.strftime('%d.%m.%Y %H:%M') if task.CompletedAt else '' }}
-                                                {% else %}
-                                                    {{ task.DueDate.strftime('%d.%m.%Y %H:%M') }}
-                                                {% endif %}
-                                            </span>
-                                            {% if task.Status == 'completed' %}
-                                            <span class="badge bg-success d-flex align-items-center gap-1" style="font-size:1rem;"><i class="fas fa-check-circle"></i> Tamamlandı</span>
-                                            {% elif task.DueDate < now and task.Status != 'completed' %}
-                                            <span class="badge bg-danger d-flex align-items-center gap-1" style="font-size:1rem;"><i class="fas fa-exclamation-triangle"></i> Gecikmiş</span>
-                                            {% else %}
-                                            <span class="badge bg-primary d-flex align-items-center gap-1" style="font-size:1rem;"><i class="fas fa-bolt"></i> Aktif</span>
-                                            {% endif %}
-                                        </div>
-                                        <div class="d-flex justify-content-end align-items-center gap-2 mt-auto">
-                                            {% if filter != 'completed' %}
-                                            <button type="button" class="btn btn-success btn-sm btn-complete-task d-flex align-items-center justify-content-center" data-task-id="{{ task.TaskId }}" title="Tamamla" style="border-radius:50%;width:36px;height:36px;transition:all .2s;"><i class="fas fa-check"></i></button>
-                                            <a href="#" class="btn btn-outline-info btn-sm btn-edit-task d-flex align-items-center justify-content-center" data-task-id="{{ task.TaskId }}" title="Düzenle" style="border-radius:50%;width:36px;height:36px;transition:all .2s;"><i class="fas fa-edit"></i></a>
-                                            {% endif %}
-                                            <button type="button" class="btn btn-outline-danger btn-sm delete-task d-flex align-items-center justify-content-center" data-task-id="{{ task.TaskId }}" title="Sil" style="border-radius:50%;width:36px;height:36px;transition:all .2s;"><i class="fas fa-trash"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                </div>
+<!-- Modals -->
+<div class="custom-modal-backdrop" id="modalBackdrop"></div>
+<!-- Add Task Modal -->
+<div class="custom-modal" id="addTaskDialog">
+    <div class="flex justify-between items-center mb-4 border-b pb-2">
+        <h3 class="text-lg font-bold text-[#6200EE]">Yeni Görev Ekle</h3>
+        <button onclick="closeModal('addTaskDialog')" class="text-gray-400 hover:text-red-500"><i class="fas fa-times"></i></button>
+    </div>
+    <form action="{{ url_for('add_task') }}" method="post" class="space-y-4">
+        <div>
+            <label class="block text-sm font-semibold mb-1 text-gray-700">Başlık</label>
+            <input type="text" name="title" required class="w-full rounded-lg border-gray-300 shadow-sm focus:ring-[#6200EE] focus:border-[#6200EE] text-sm">
+        </div>
+        <div>
+            <label class="block text-sm font-semibold mb-1 text-gray-700">Açıklama</label>
+            <textarea name="description" class="w-full rounded-lg border-gray-300 shadow-sm focus:ring-[#6200EE] focus:border-[#6200EE] text-sm"></textarea>
+        </div>
+        <div>
+            <label class="block text-sm font-semibold mb-1 text-gray-700">Son Tarih</label>
+            <input type="datetime-local" id="due_date" name="due_date" required class="w-full rounded-lg border-gray-300 shadow-sm focus:ring-[#6200EE] focus:border-[#6200EE] text-sm">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-semibold mb-1 text-gray-700">Öncelik</label>
+                <select name="priority" class="w-full rounded-lg border-gray-300 text-sm focus:ring-[#6200EE]">
+                    <option value="Low">Düşük</option>
+                    <option value="Medium" selected>Orta</option>
+                    <option value="High">Yüksek</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold mb-1 text-gray-700">Kategori</label>
+                <select name="category" class="w-full rounded-lg border-gray-300 text-sm focus:ring-[#6200EE]">
+                    <option value="Work">İş</option>
+                    <option value="Personal">Kişisel</option>
+                    <option value="Study">Çalışma</option>
+                    <option value="Other">Diğer</option>
+                </select>
             </div>
         </div>
-    </div>
+        <div class="flex justify-end gap-2 pt-4">
+            <button type="button" onclick="closeModal('addTaskDialog')" class="px-4 py-2 font-semibold text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">İptal</button>
+            <button type="submit" class="px-4 py-2 font-bold text-white bg-[#6200EE] rounded-lg hover:bg-primary transition-colors">Ekle</button>
+        </div>
+    </form>
 </div>
 
-<!-- Yeni Görev Ekleme Modal -->
-<div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addTaskModalLabel">Yeni Görev Ekle</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+<!-- Edit Task Modal -->
+<div class="custom-modal" id="editTaskDialog">
+    <div class="flex justify-between items-center mb-4 border-b pb-2">
+        <h3 class="text-lg font-bold text-[#6200EE]">Görevi Düzenle</h3>
+        <button onclick="closeModal('editTaskDialog')" class="text-gray-400 hover:text-red-500"><i class="fas fa-times"></i></button>
+    </div>
+    <form id="editTaskFormFrontend" class="space-y-4">
+        <input type="hidden" id="editTaskId" name="task_id">
+        <div>
+            <label class="block text-sm font-semibold mb-1 text-gray-700">Başlık</label>
+            <input type="text" id="editTitle" name="title" required class="w-full rounded-lg border-gray-300 shadow-sm focus:ring-[#6200EE] focus:border-[#6200EE] text-sm">
+        </div>
+        <div>
+            <label class="block text-sm font-semibold mb-1 text-gray-700">Açıklama</label>
+            <textarea id="editDescription" name="description" class="w-full rounded-lg border-gray-300 shadow-sm focus:ring-[#6200EE] focus:border-[#6200EE] text-sm"></textarea>
+        </div>
+        <div>
+            <label class="block text-sm font-semibold mb-1 text-gray-700">Son Tarih</label>
+            <input type="datetime-local" id="editDueDate" name="due_date" required class="w-full rounded-lg border-gray-300 shadow-sm focus:ring-[#6200EE] focus:border-[#6200EE] text-sm">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-semibold mb-1 text-gray-700">Öncelik</label>
+                <select id="editPriority" name="priority" class="w-full rounded-lg border-gray-300 text-sm focus:ring-[#6200EE]">
+                    <option value="Low">Düşük</option>
+                    <option value="Medium">Orta</option>
+                    <option value="High">Yüksek</option>
+                </select>
             </div>
-            <div class="modal-body">
-                <form id="addTaskForm" action="{{ url_for('add_task') }}" method="post">
-                    <div class="mb-3">
-                        <label for="title" class="form-label">Görev Başlığı</label>
-                        <input type="text" class="form-control" id="title" name="title" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Açıklama</label>
-                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="due_date" class="form-label">Son Tarih</label>
-                        <input type="datetime-local" class="form-control" id="due_date" name="due_date" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="priority" class="form-label">Öncelik</label>
-                        <select class="form-select" id="priority" name="priority">
-                            <option value="Low">Düşük</option>
-                            <option value="Medium" selected>Orta</option>
-                            <option value="High">Yüksek</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="category" class="form-label">Kategori</label>
-                        <select class="form-select" id="category" name="category">
-                            <option value="Work">İş</option>
-                            <option value="Personal">Kişisel</option>
-                            <option value="Study">Çalışma</option>
-                            <option value="Health">Sağlık</option>
-                            <option value="Other">Diğer</option>
-                        </select>
-                    </div>
-                    <div class="text-end">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                        <button type="submit" class="btn btn-primary">Görev Ekle</button>
-                    </div>
-                </form>
+            <div>
+                <label class="block text-sm font-semibold mb-1 text-gray-700">Kategori</label>
+                <select id="editCategory" name="category" class="w-full rounded-lg border-gray-300 text-sm focus:ring-[#6200EE]">
+                    <option value="Work">İş</option>
+                    <option value="Personal">Kişisel</option>
+                    <option value="Study">Çalışma</option>
+                    <option value="Other">Diğer</option>
+                </select>
             </div>
         </div>
-    </div>
+        <div class="flex justify-end gap-2 pt-4">
+            <button type="button" onclick="closeModal('editTaskDialog')" class="px-4 py-2 font-semibold text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">İptal</button>
+            <button type="submit" class="px-4 py-2 font-bold text-white bg-[#6200EE] rounded-lg hover:bg-primary transition-colors">Değişiklikleri Kaydet</button>
+        </div>
+    </form>
 </div>
 
-<!-- Düzenleme Modalı -->
-<div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editTaskModalLabel">Görev Düzenle</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editTaskForm">
-                    <input type="hidden" id="editTaskId" name="task_id">
-                    <div class="mb-3">
-                        <label for="editTitle" class="form-label">Başlık</label>
-                        <input type="text" class="form-control" id="editTitle" name="title" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editDescription" class="form-label">Açıklama</label>
-                        <textarea class="form-control" id="editDescription" name="description" rows="3"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editDueDate" class="form-label">Son Tarih</label>
-                        <input type="datetime-local" class="form-control" id="editDueDate" name="due_date" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editPriority" class="form-label">Öncelik</label>
-                        <select class="form-select" id="editPriority" name="priority">
-                            <option value="Low">Düşük</option>
-                            <option value="Medium">Orta</option>
-                            <option value="High">Yüksek</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editCategory" class="form-label">Kategori</label>
-                        <select class="form-select" id="editCategory" name="category">
-                            <option value="Work">İş</option>
-                            <option value="Personal">Kişisel</option>
-                            <option value="Study">Çalışma</option>
-                            <option value="Health">Sağlık</option>
-                            <option value="Other">Diğer</option>
-                        </select>
-                    </div>
-                    <div class="text-end">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                        <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
-                    </div>
-                </form>
-            </div>
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full flex flex-col p-6 space-y-8 bg-white dark:bg-slate-900 h-screen w-72 border-r border-[#F3F4F6] dark:border-gray-800 z-40 hidden md:flex">
+<div class="flex items-center gap-3 px-2">
+<div class="w-10 h-10 bg-[#6200EE] rounded-xl flex items-center justify-center text-white">
+<span class="material-symbols-outlined" data-icon="auto_stories">auto_stories</span>
+</div>
+<a href="{{ url_for('index') }}" style="text-decoration: none;">
+<h1 class="text-lg font-black text-[#6200EE]">ReviseMe</h1>
+<p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">High-Tech Revision</p>
+</a>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-[#6200EE] hover:bg-[#F8F5FF] rounded-lg font-medium transition-all" href="{{ url_for('index') }}">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-sm text-label-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-[#F8F5FF] text-[#6200EE] rounded-lg font-medium transition-all" href="{{ url_for('gorevlerim') }}">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-label-sm text-label-sm">Study Plan</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-[#6200EE] hover:bg-[#F8F5FF] rounded-lg font-medium transition-all" href="{{ url_for('index') }}">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-label-sm text-label-sm">Question Bank</span>
+</a>
+<!-- Favoriler Menüsü Eklendi -->
+<a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-[#6200EE] hover:bg-[#F8F5FF] rounded-lg font-medium transition-all" href="{{ url_for('favorites') }}">
+<span class="material-symbols-outlined" data-icon="star" style="color: #ffb400;">star</span>
+<span class="font-label-sm text-label-sm">Favorilerim</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-[#6200EE] hover:bg-[#F8F5FF] rounded-lg font-medium transition-all" href="{{ url_for('hedefleyici') }}">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span class="font-label-sm text-label-sm">Analytics</span>
+</a>
+</nav>
+<div class="pt-6 border-t border-gray-100 flex flex-col gap-3">
+<button onclick="openModal('addTaskDialog')" class="w-full bg-[#6200EE] text-white py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:shadow-lg transition-all active:scale-95">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+                Yeni Görev Ekle
+</button>
+</div>
+</aside>
+
+<div class="md:ml-72 flex-1">
+<!-- TopAppBar Shell -->
+<header class="sticky top-0 z-30 flex items-center justify-between px-8 h-16 w-full bg-white/90 backdrop-blur-md dark:bg-slate-900/90 border-b border-gray-100 dark:border-gray-800 shadow-[0_15px_15px_-5px_rgba(98,0,238,0.04)] font-['Inter'] antialiased text-sm">
+<div class="flex items-center gap-4">
+<h2 class="text-xl font-extrabold tracking-tight text-[#6200EE] dark:text-white">Bildirimler / Planlarım</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden sm:flex items-center bg-gray-50 px-4 py-2 rounded-full border border-gray-100">
+<span class="material-symbols-outlined text-gray-400 text-sm" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-xs w-48 ml-2" placeholder="Görev veya konu ara..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<button class="relative p-2 rounded-full hover:bg-gray-50 transition-all text-[#6200EE] border-b-2 border-[#6200EE] pb-1">
+<span class="material-symbols-outlined" data-icon="notifications" data-weight="fill" style="font-variation-settings: 'FILL' 1;">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+</button>
+<a href="{{ url_for('profile') }}" class="p-2 rounded-full hover:bg-gray-50 transition-all text-gray-500">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</a>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="p-8 max-w-full px-4 md:px-8 mx-auto space-y-base">
+
+{% set overdue_tasks = [] %}
+{% set today_tasks = [] %}
+{% for t in active_tasks %}
+    {% if t.DueDate < now %}
+        {% set _ = overdue_tasks.append(t) %}
+    {% else %}
+        {% set _ = today_tasks.append(t) %}
+    {% endif %}
+{% endfor %}
+
+{% set total = active_tasks|length + completed_tasks|length %}
+{% set percentage = ((completed_tasks|length / total) * 100)|int if total > 0 else 0 %}
+
+<!-- Summary Bento Row -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-gutter mb-section-gap">
+<div class="md:col-span-8 flex flex-col justify-center">
+<h3 class="font-headline-lg text-headline-lg text-on-surface mb-2">Hoş geldin, {{ current_user.Username }}! 👋</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-lg">
+                        Bugün odaklanman gereken <span class="font-bold text-[#6200EE]">{{ today_tasks|length }} aktif görevin</span> ve geçmişten sarkan <span class="font-bold text-error">{{ overdue_tasks|length }} kritik tekrarın/görevin</span> bulunuyor.
+                    </p>
+</div>
+<div class="md:col-span-4 grid grid-cols-2 gap-4">
+<div class="bg-white p-6 rounded-xl shadow-[0_15px_15px_-5px_rgba(98,0,238,0.04)] border border-gray-100 flex flex-col items-center justify-center text-center hover:shadow-lg transition-shadow">
+<span class="text-3xl font-black text-[#6200EE]">{{ today_tasks|length }}</span>
+<span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Bugünün</span>
+</div>
+<div class="bg-error-container/20 p-6 rounded-xl shadow-[0_15px_15px_-5px_rgba(186,26,26,0.04)] border border-error/10 flex flex-col items-center justify-center text-center hover:shadow-lg transition-shadow">
+<span class="text-3xl font-black text-error">{{ overdue_tasks|length }}</span>
+<span class="text-[10px] font-bold text-error/60 uppercase tracking-widest mt-1">Geçmiş / Geciken</span>
+</div>
+</div>
+</section>
+
+<!-- Notification Sections -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-section-gap">
+<!-- Today's Questions (Bugünün Soruları/Görevleri) -->
+<section class="space-y-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#6200EE]" data-icon="today">today</span>
+<h4 class="font-headline-md text-headline-md">Aktif Görevler</h4>
+</div>
+<span class="bg-primary-fixed text-[#6200EE] px-3 py-1 rounded-full text-xs font-bold">{{ today_tasks|length }} Görev</span>
+</div>
+<div class="space-y-4">
+{% for task in today_tasks %}
+<!-- Task Item -->
+<div class="bg-white p-5 rounded-xl border border-gray-100 shadow-[0_15px_15px_-5px_rgba(98,0,238,0.04)] hover:shadow-md transition-all group flex flex-col gap-3">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-lg bg-[#F8F5FF] flex items-center justify-center text-[#6200EE] shrink-0">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<span class="text-[11px] font-bold text-gray-400 uppercase tracking-tighter">{{ task.Category }} {% if task.Priority == 'High' %}• Yüksek Öncelik{% endif %}</span>
+<span class="px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary text-[10px] font-bold border border-tertiary/20">{{ task.DueDate.strftime('%d.%m %H:%M') }}</span>
+</div>
+<h5 class="font-bold text-on-surface line-clamp-1 group-hover:text-[#6200EE] transition-colors">{{ task.Title }}</h5>
+<p class="text-xs text-on-surface-variant line-clamp-1 mt-1">{{ task.Description or 'Detay bulunmuyor.' }}</p>
+</div>
+<div class="flex flex-col gap-2 shrink-0">
+    <button onclick="completeTask({{ task.TaskId }})" class="bg-[#6200EE] text-white px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-primary transition-all active:scale-95 shadow-sm flex items-center justify-center gap-1"><i class="fas fa-check"></i> Tamamla</button>
+</div>
+</div>
+<!-- Actions Footer inside card -->
+<div class="flex gap-2 mt-2 pt-3 border-t border-gray-50 flex-wrap">
+    <button onclick="editTask({{ task.TaskId }})" class="text-xs font-bold text-gray-400 hover:text-blue-500 transition-colors flex items-center gap-1"><i class="fas fa-edit"></i> Düzenle</button>
+    <button onclick="deleteTask({{ task.TaskId }})" class="text-xs font-bold text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1"><i class="fas fa-trash"></i> Sil</button>
+</div>
+</div>
+{% else %}
+<p class="text-gray-400 text-sm italic py-4">Bugün için planlanmış aktif göreviniz bulunmamaktadır.</p>
+{% endfor %}
+</div>
+</section>
+
+<!-- Past Reviews (Geçmiş / Geciken Görevler) -->
+<section class="space-y-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-error" data-icon="history">history</span>
+<h4 class="font-headline-md text-headline-md">Geçmiş Tekrarlar & Gecikenler</h4>
+</div>
+<span class="bg-error-container text-error px-3 py-1 rounded-full text-xs font-bold">{{ overdue_tasks|length }} Kritik</span>
+</div>
+
+<div class="bg-error-container/10 p-6 rounded-2xl border border-error/10 relative overflow-hidden">
+<!-- Abstract urgency background pattern -->
+<div class="absolute -right-4 -top-4 opacity-[0.03]">
+<span class="material-symbols-outlined text-error text-[120px]" data-icon="priority_high">priority_high</span>
+</div>
+
+<div class="space-y-4 relative z-10">
+{% for task in overdue_tasks %}
+<!-- Overdue Item -->
+<div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-error/20 flex flex-col gap-3">
+<div class="flex items-center justify-between gap-4">
+    <div class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 rounded-full bg-error/10 flex items-center justify-center text-error shrink-0">
+        <span class="material-symbols-outlined text-sm" data-icon="warning">warning</span>
+        </div>
+        <div class="min-w-0">
+            <h6 class="font-bold text-sm truncate">{{ task.Title }}</h6>
+            <p class="text-[10px] text-error font-bold uppercase">{{ (now - task.DueDate).days }} gün gecikti</p>
         </div>
     </div>
+    <div class="flex gap-1 shrink-0">
+        <button onclick="editTask({{ task.TaskId }})" class="p-2 text-gray-400 hover:text-blue-500 transition-colors rounded-lg"><i class="fas fa-edit"></i></button>
+        <button onclick="deleteTask({{ task.TaskId }})" class="p-2 text-gray-400 hover:text-red-500 transition-colors rounded-lg"><i class="fas fa-trash"></i></button>
+    </div>
+</div>
+<div class="flex justify-end">
+    <button onclick="completeTask({{ task.TaskId }})" class="bg-error text-white px-3 py-2 rounded-lg text-[10px] font-bold hover:bg-red-700 transition-all shadow-sm flex items-center gap-1"><i class="fas fa-check"></i> Hemen Tamamla</button>
+</div>
+</div>
+{% else %}
+<p class="text-gray-500 text-sm font-medium py-2">Geciken görev veya tekrar bulunmuyor. Harika gidiyorsun! 🎉</p>
+{% endfor %}
 </div>
 
-<!-- Günlük Rapor Modalı -->
-<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="reportModalLabel">Günlük Görev Raporu</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
-      </div>
-      <div class="modal-body" id="reportModalBody">
-        <div class="text-center text-muted py-5">Yükleniyor...</div>
-      </div>
-    </div>
-  </div>
+{% if overdue_tasks|length > 0 %}
+<div class="mt-6 flex items-center gap-2 p-3 bg-error text-white rounded-xl">
+<span class="material-symbols-outlined text-lg" data-icon="warning">warning</span>
+<p class="text-[11px] font-bold">Unutma Eğrisi (Forgetting Curve) etkisini azaltmak için gecikmiş görevlerinizi hemen tamamlayın!</p>
+</div>
+{% endif %}
+</div>
+</section>
+</div>
+
+<!-- Stats/Insight Card -->
+<section class="mt-section-gap">
+<div class="bg-gradient-soft-purple p-8 rounded-3xl border border-primary-fixed-dim/30 flex flex-col md:flex-row items-center gap-8 shadow-sm">
+<div class="relative w-32 h-32 shrink-0">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-[#6200EE]/10" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-width="12"></circle>
+<!-- Dash array logic: max 364.4, scaled based on percentage -->
+{% set circle_offset = 364.4 - (364.4 * percentage / 100) %}
+<circle class="text-[#6200EE]" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-dasharray="364.4" stroke-dashoffset="{{ circle_offset }}" stroke-linecap="round" stroke-width="12"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-2xl font-black text-[#6200EE]">{{ percentage }}%</span>
+<span class="text-[8px] font-bold text-gray-400 uppercase">Tamamlama</span>
+</div>
+</div>
+<div class="flex-1 space-y-4">
+<h4 class="font-headline-md text-headline-md text-on-surface">Performans Özeti</h4>
+<p class="text-on-surface-variant font-body-md">Sistemde kayıtlı toplam <strong>{{ total }}</strong> görevin içinden <strong>{{ completed_tasks|length }}</strong> tanesini tamamladın. Disiplinli çalışmaya devam ederek bu oranı artırabilirsin.</p>
+<div class="flex gap-4 mt-2">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-[#6200EE]"></span>
+<span class="text-xs font-bold text-on-surface-variant">{{ completed_tasks|length }} Tamamlanan</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-[#6200EE]/10 border border-[#6200EE]/30"></span>
+<span class="text-xs font-bold text-on-surface-variant">{{ active_tasks|length }} Kalan</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // CSRF token'ı meta tag'dan al
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        // Görev tamamlanma durumunu güncelleme
-        const taskCheckboxes = document.querySelectorAll('.task-checkbox');
-        taskCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const taskId = this.getAttribute('data-task-id');
-                const isCompleted = this.checked;
-                if (isCompleted) {
-                    fetch(`/complete-task/${taskId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': csrfToken
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            window.location.reload();
-                        } else {
-                            alert('Görev tamamlanırken bir hata oluştu.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Görev tamamlanırken bir hata oluştu.');
-                    });
-                } else {
-                    // İleriye dönük: tamamlanmış görevi tekrar aktif yapmak istenirse buraya eklenebilir
-                    alert('Bir görevi tekrar aktife almak için lütfen düzenle bölümünü kullanın.');
-                    this.checked = true;
-                }
-            });
-        });
-        
-        // Görev silme
-        const deleteButtons = document.querySelectorAll('.delete-task');
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const taskId = this.getAttribute('data-task-id');
-                
-                if (confirm('Bu görevi silmek istediğinizden emin misiniz?')) {
-                    fetch('/delete_task', {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    function openModal(id) {
+        document.getElementById('modalBackdrop').classList.add('active');
+        document.getElementById(id).classList.add('active');
+        if(id === 'addTaskDialog') {
+            const now = new Date();
+            now.setHours(now.getHours() + 1);
+            document.getElementById('due_date').value = now.toISOString().slice(0, 16);
+        }
+    }
+
+    function closeModal(id) {
+        document.getElementById('modalBackdrop').classList.remove('active');
+        document.getElementById(id).classList.remove('active');
+    }
+
+    function deleteTask(taskId) {
+        if(confirm('Bu görevi silmek istediğinize emin misiniz?')) {
+            fetch('/delete_task', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ task_id: taskId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) location.reload();
+                else alert('Görev silinirken bir hata oluştu');
+            }).catch(e => alert('Bağlantı hatası'));
+        }
+    }
+
+    function completeTask(taskId) {
+        fetch(`/complete-task/${taskId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': csrfToken
-                        },
-                        body: JSON.stringify({
-                            task_id: taskId
-                        }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                            window.location.reload();
-            } else {
-                alert('Görev silinirken bir hata oluştu.');
             }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Görev silinirken bir hata oluştu.');
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) location.reload();
+            else alert('Hata oluştu');
         });
     }
-            });
+
+    function editTask(taskId) {
+        $.get('/get_task/' + taskId, function(data) {
+            $('#editTaskId').val(data.TaskId);
+            $('#editTitle').val(data.Title);
+            $('#editDescription').val(data.Description);
+            $('#editDueDate').val(data.DueDate);
+            $('#editPriority').val(data.Priority);
+            $('#editCategory').val(data.Category);
+            openModal('editTaskDialog');
         });
-        
-        // Son tarih olarak varsayılan bir saat sonrasını ayarlama
-        const dueDate = document.getElementById('due_date');
-        if (dueDate) {
-            const now = new Date();
-            now.setHours(now.getHours() + 1);
-            const dateString = now.toISOString().slice(0, 16);
-            dueDate.value = dateString;
-        }
+    }
 
-        const showReportBtn = document.getElementById('showReportBtn');
-        const reportModal = new bootstrap.Modal(document.getElementById('reportModal'));
-        const reportModalBody = document.getElementById('reportModalBody');
-        if (showReportBtn) {
-            showReportBtn.addEventListener('click', function() {
-                reportModalBody.innerHTML = '<div class="text-center text-muted py-5">Yükleniyor...</div>';
-                fetch('/report')
-                    .then(response => response.text())
-                    .then(html => {
-                        // Sadece report.html içeriğinin ana kısmını al
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const reportContent = doc.querySelector('.container');
-                        if (reportContent) {
-                            reportModalBody.innerHTML = reportContent.outerHTML;
-                        } else {
-                            reportModalBody.innerHTML = '<div class="text-danger">Rapor yüklenemedi.</div>';
-                        }
-                    })
-                    .catch(() => {
-                        reportModalBody.innerHTML = '<div class="text-danger">Rapor yüklenemedi.</div>';
-                    });
-                reportModal.show();
-            });
-        }
-    });
-
-// Düzenle butonuna tıklanınca modalı aç ve verileri doldur
-$(document).on('click', '.btn-edit-task', function() {
-    var taskId = $(this).data('task-id');
-    // AJAX ile görev detaylarını al
-    $.get('/get_task/' + taskId, function(data) {
-        $('#editTaskId').val(data.TaskId);
-        $('#editTitle').val(data.Title);
-        $('#editDescription').val(data.Description);
-        $('#editDueDate').val(data.DueDate);
-        $('#editPriority').val(data.Priority);
-        $('#editCategory').val(data.Category);
-        $('#editTaskModal').modal('show');
-    });
-});
-// Form submit
-$('#editTaskForm').submit(function(e) {
-    e.preventDefault();
-    var formData = $(this).serialize();
-    $.post('/edit_task_modal', formData, function(response) {
-        if(response.success){
-            location.reload();
-        } else {
-            alert('Güncelleme sırasında hata oluştu!');
-        }
-    });
-});
-
-// Görev tamamla butonu
-$(document).on('click', '.btn-complete-task', function() {
-    var taskId = $(this).data('task-id');
-    if(confirm('Bu görevi tamamlandı olarak işaretlemek istiyor musunuz?')) {
-        $.post('/complete_task/' + taskId, function(response) {
+    $('#editTaskFormFrontend').submit(function(e) {
+        e.preventDefault();
+        var formData = $(this).serialize();
+        $.post('/edit_task_modal', formData, function(response) {
             if(response.success){
                 location.reload();
             } else {
-                alert('Görev tamamlanırken bir hata oluştu!');
+                alert('Güncelleme sırasında hata oluştu!');
             }
         });
-    }
-});
-
-// Frontend-only alt görevler (subtasks) için localStorage kullan
-function getSubtasks(taskId) {
-    let all = JSON.parse(localStorage.getItem('subtasks') || '{}');
-    return all[taskId] || [];
-}
-function setSubtasks(taskId, subtasks) {
-    let all = JSON.parse(localStorage.getItem('subtasks') || '{}');
-    all[taskId] = subtasks;
-    localStorage.setItem('subtasks', JSON.stringify(all));
-}
-function renderSubtasks(taskId) {
-    var $list = $('.subtasks-list[data-task-id="'+taskId+'"]');
-    $list.empty();
-    let subtasks = getSubtasks(taskId);
-    subtasks.forEach(function(sub, idx) {
-        $list.append('<li class="d-flex align-items-center mb-1">'+
-            '<input type="checkbox" class="form-check-input me-2 subtask-checkbox-frontend" data-task-id="'+taskId+'" data-idx="'+idx+'" '+(sub.done?'checked':'')+'>\n'+
-            '<span class="subtask-content '+(sub.done?'text-decoration-line-through text-muted':'')+'" style="transition:color .2s;">'+sub.text+'</span>'+
-        '</li>');
     });
-}
-// Sayfa yüklenince tüm görevler için alt görevleri render et
-$(function(){
-    $('[data-task-id]').each(function(){
-        var taskId = $(this).data('task-id');
-        renderSubtasks(taskId);
-    });
-});
-// Alt görev ekleme (frontend)
-$(document).on('submit', '.add-subtask-form-frontend', function(e) {
-    e.preventDefault();
-    var $form = $(this);
-    var taskId = $form.data('task-id');
-    var content = $form.find('input[name="content"]').val();
-    let subtasks = getSubtasks(taskId);
-    subtasks.push({text: content, done: false});
-    setSubtasks(taskId, subtasks);
-    renderSubtasks(taskId);
-    $form[0].reset();
-});
-// Alt görev tamamla (frontend)
-$(document).on('change', '.subtask-checkbox-frontend', function() {
-    var taskId = $(this).data('task-id');
-    var idx = $(this).data('idx');
-    let subtasks = getSubtasks(taskId);
-    subtasks[idx].done = $(this).is(':checked');
-    setSubtasks(taskId, subtasks);
-    renderSubtasks(taskId);
-});
 </script>
-{% endblock %} 
+</body>
+</html>

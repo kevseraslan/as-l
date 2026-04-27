@@ -1,284 +1,263 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html class="light" lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Bildirimler - ReviseMe</title>
+    <!-- CSRF Token for fetch requests -->
+    <meta name="csrf-token" content="{{ csrf_token() if csrf_token else '' }}">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4800b2",
+                        "primary-container": "#6200ee",
+                        "on-surface": "#151c27",
+                        "on-surface-variant": "#494456",
+                        "surface-container-low": "#f0f3ff",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "tertiary": "#00453e",
+                    },
+                    fontFamily: {
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        body { background-color: #F8F5FF; font-family: 'Inter', sans-serif;}
+        .bg-gradient-soft-purple {
+            background: linear-gradient(135deg, #fdfbff 0%, #f3f0ff 100%);
+        }
+    </style>
+    <style> html { font-size: 18px !important; } </style>
+    <style> html { font-size: 18px !important; } </style>
+</head>
+<body class="bg-[#F8F5FF] text-on-surface font-body-md">
 
-{% block title %}Bildirimler - ReviseMe{% endblock title %}
+{% set active_page = 'notifications' %}
+{% include 'components/sidebar_modern.html' %}
 
-{% block styles %}
-<style>
-    .notifications-bg {
-        background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
-        position: fixed;
-        left: 0; top: 0; width: 100vw; height: 100vh;
-        z-index: -1;
-    }
-    .notifications-header {
-        color: #232323;
-        font-size: 2.2rem;
-        font-weight: 800;
-        text-align: left;
-        margin-bottom: 0.8rem;
-        margin-top: 2.5rem;
-        letter-spacing: 2px;
-        font-family: 'Nunito', sans-serif;
-        text-shadow: 0 0 15px #fff, 0 0 20px #fff;
-    }
-    .dark-card {
-        background: rgba(26, 20, 64, 0.92) !important;
-        color: #fff !important;
-        border: none !important;
-        box-shadow: 0 10px 30px rgba(46, 205, 200, 0.08);
-        border-radius: 18px;
-    }
-    .dark-card .card-title,
-    .dark-card .card-text,
-    .dark-card .text-muted {
-        color: #fff !important;
-    }
-    .dark-card .btn,
-    .dark-card .btn-outline-primary,
-    .dark-card .btn-outline-warning {
-        color: #fff;
-    }
-    .dark-card .btn-outline-primary:hover {
-        background: #30E8E8;
-        color: #232946;
-    }
-    .dark-card .btn-outline-warning:hover {
-        background: #ffc107;
-        color: #232946;
-    }
-</style>
-{% endblock styles %}
+<!-- Main Content Area -->
+<main class="md:ml-64 min-h-screen flex flex-col relative">
 
-{% block page_content %}
-<div class="notifications-bg"></div>
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="notifications-header mb-0"><i class="fas fa-bell" style="color:#1976ff; margin-right:12px;"></i>Bildirimler</h2>
-        <div>
-            <button class="btn btn-outline-primary me-2" id="refreshNotifications">
-                <i class="fas fa-sync-alt me-1"></i> Yenile
-            </button>
-            <button class="btn btn-outline-danger" id="clearAllNotifications">
-                <i class="fas fa-trash me-1"></i> Tümünü Temizle
-            </button>
-        </div>
-    </div>
+    <!-- Top App Bar -->
+    {% block header_title %}Bildirimler{% endblock %}
+    {% include 'components/header_modern.html' %}
 
-    <div class="row">
-        <!-- Bildirim Özeti -->
-        <div class="col-12 mb-4">
-            <div class="card bg-light border-0 shadow-sm dark-card">
-                <div class="card-body p-4">
-                    <div class="row text-center">
-                        <div class="col-md-6 mb-3 mb-md-0">
-                            <div class="d-flex flex-column align-items-center">
-                                <div class="notification-icon bg-primary text-white rounded-circle mb-2">
-                                    <i class="fas fa-book"></i>
+    <!-- Page Canvas -->
+    <div class="flex-1 p-6 md:p-8 max-w-full px-4 md:px-8 mx-auto w-full space-y-8 pb-32">
+        
+        <!-- Summary Bento Row -->
+        <section class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-16">
+            <div class="md:col-span-8 flex flex-col justify-center">
+                <h3 class="font-headline-lg text-3xl font-bold text-slate-800 mb-2">Hoş geldin, {{ current_user.Name if current_user else 'Öğrenci' }}! 👋</h3>
+                <p class="font-body-md text-slate-500 max-w-lg">
+                    Bugün odaklanman gereken <span class="font-black text-[#6200EE]">{{ today_questions|length }} yeni soru</span> ve geçmişten sarkan <span class="font-black text-error">{{ past_questions|length }} kritik tekrar</span> bulunuyor.
+                </p>
+                <div class="mt-4 flex gap-3">
+                    <button class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors shadow-sm" onclick="window.location.reload();">Yenile</button>
+                    <button id="clearAllNotifications" class="px-4 py-2 bg-red-50 border border-red-100 rounded-lg text-sm font-bold text-red-600 hover:bg-red-100 transition-colors shadow-sm">Tümünü Temizle</button>
+                </div>
+            </div>
+            
+            <div class="md:col-span-4 grid grid-cols-2 gap-4">
+                <div class="bg-white p-6 rounded-xl shadow-[0_15px_15px_-5px_rgba(98,0,238,0.04)] border border-slate-100 flex flex-col items-center justify-center text-center">
+                    <span class="text-4xl font-black text-[#6200EE]">{{ today_questions|length }}</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Bugünün</span>
+                </div>
+                <div class="bg-red-50/50 p-6 rounded-xl shadow-[0_15px_15px_-5px_rgba(186,26,26,0.04)] border border-red-100/50 flex flex-col items-center justify-center text-center">
+                    <span class="text-4xl font-black text-error">{{ past_questions|length }}</span>
+                    <span class="text-[10px] font-bold text-red-400 uppercase tracking-widest mt-1">Geçmiş</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Notification Sections -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            
+            <!-- Today's Questions -->
+            <section class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-[#6200EE]" data-icon="today">today</span>
+                        <h4 class="font-headline-md text-xl font-bold text-slate-800">Bugünün Soruları</h4>
+                    </div>
+                    <span class="bg-purple-50 text-[#6200EE] px-3 py-1 rounded-full text-xs font-bold">{{ today_questions|length }} Soru</span>
+                </div>
+                
+                <div class="space-y-4">
+                    {% if today_questions|length > 0 %}
+                        {% for question in today_questions[:3] %}
+                        <!-- Question Item -->
+                        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-[0_15px_15px_-5px_rgba(98,0,238,0.04)] hover:shadow-md transition-all group">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-[#F8F5FF] flex items-center justify-center text-[#6200EE] shrink-0 font-bold text-lg">
+                                    {{ question.Category_Name[0]|upper if question.Category_Name else 'S' }}
                                 </div>
-                                <h5>{{ today_questions|length }}</h5>
-                                <p class="text-muted mb-0">Bugünkü Sorular</p>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">{{ question.Category_Name if question.Category_Name else 'Genel' }}</span>
+                                        <span class="px-2 py-0.5 rounded-full bg-teal-50 text-teal-600 text-[10px] font-bold border border-teal-100">Tekrar {{ question.RepeatCount + 1 }}</span>
+                                    </div>
+                                    <h5 class="font-bold text-slate-800 truncate group-hover:text-[#6200EE] transition-colors">{{ question.Content|truncate(40) }}</h5>
+                                </div>
+                                <a href="{{ url_for('view_today_question', question_id=question.QuestionId) }}" class="bg-[#6200EE] text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:-translate-y-0.5 transition-transform shadow-md shadow-[#6200EE]/30 active:scale-95 shrink-0">Çöz</a>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3 mb-md-0">
-                            <div class="d-flex flex-column align-items-center">
-                                <div class="notification-icon bg-warning text-white rounded-circle mb-2">
-                                    <i class="fas fa-exclamation"></i>
-                                </div>
-                                <h5>{{ past_questions|length }}</h5>
-                                <p class="text-muted mb-0">Geçmiş Tekrarlar</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Soru Bildirimleri -->
-        <div class="col-12 mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="mb-0"><i class="fas fa-book-open me-2 text-primary"></i>Soru Bildirimleri</h4>
-                <span class="badge bg-primary rounded-pill">{{ today_questions|length + past_questions|length }}</span>
-            </div>
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <div class="card border-0 shadow-sm h-100 dark-card">
-                        <div class="card-body">
-                            <h5 class="card-title text-white mb-3"><i class="fas fa-rocket me-2 text-primary"></i>Bugünkü Sorular</h5>
-                            {% if today_questions|length > 0 %}
-                                <p class="card-text text-white-50">Bugün çözmen gereken <b>{{ today_questions|length }}</b> soru seni bekliyor!</p>
-                                <div class="list-group mb-3">
-                                    {% for question in today_questions[:3] %}
-                                        <a href="{{ url_for('view_today_question', question_id=question.QuestionId) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <i class="fas fa-question-circle text-primary me-2"></i>
-                                                {{ question.Content|truncate(50) }}
-                                            </div>
-                                            <span class="badge bg-primary rounded-pill">Tekrar {{ question.RepeatCount + 1 }}</span>
-                                        </a>
-                                    {% endfor %}
-                                    {% if today_questions|length > 3 %}
-                                        <div class="text-center mt-2">
-                                            <small class="text-muted">ve {{ today_questions|length - 3 }} soru daha...</small>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <a href="{{ url_for('today_questions') }}" class="btn btn-primary w-100">
-                                    <i class="fas fa-arrow-right me-1"></i> Tüm Bugünkü Soruları Görüntüle
-                                </a>
-                            {% else %}
-                                <div class="text-center py-4">
-                                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                                    <p>Harika! Bugün için bekleyen soru bulunmuyor.</p>
-                                    <a href="{{ url_for('add_question') }}" class="btn btn-outline-primary">
-                                        <i class="fas fa-plus me-1"></i> Yeni Soru Ekle
-                                    </a>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card border-0 shadow-sm h-100 dark-card">
-                        <div class="card-header bg-warning text-white">
-                            <h5 class="card-title mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Geçmiş Tekrarlar</h5>
-                        </div>
-                        <div class="card-body">
-                            {% if past_questions|length > 0 %}
-                                <p class="card-text"><b>{{ past_questions|length }}</b> sorunun tekrar günü geçmiş, unutmadan tekrar et!</p>
-                                <div class="list-group mb-3">
-                                    {% for question in past_questions[:3] %}
-                                        <a href="{{ url_for('view_question', question_id=question.QuestionId) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <i class="fas fa-history text-warning me-2"></i>
-                                                {{ question.Content|truncate(50) }}
-                                            </div>
-                                            <span class="badge bg-warning text-dark rounded-pill">{{ question.RepeatCount + 1 }}. tekrar</span>
-                                        </a>
-                                    {% endfor %}
-                                    {% if past_questions|length > 3 %}
-                                        <div class="text-center mt-2">
-                                            <small class="text-muted">ve {{ past_questions|length - 3 }} soru daha...</small>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <a href="{{ url_for('past_questions') }}" class="btn btn-warning w-100">
-                                    <i class="fas fa-arrow-right me-1"></i> Tüm Geçmiş Tekrarları Görüntüle
-                                </a>
-                            {% else %}
-                                <div class="text-center py-4">
-                                    <i class="fas fa-trophy fa-3x text-warning mb-3"></i>
-                                    <p>Tebrikler! Tüm sorularınız zamanında tekrar ediyorsun.</p>
-                                    <a href="{{ url_for('progress') }}" class="btn btn-outline-warning">
-                                        <i class="fas fa-chart-line me-1"></i> İlerlemeni Görüntüle
-                                    </a>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {% if today_questions|length == 0 and past_questions|length == 0 %}
-        <div class="col-12">
-            <div class="card border-0 shadow-sm dark-card">
-                <div class="card-body text-center py-5">
-                    <i class="fas fa-bell-slash fa-4x text-muted mb-3"></i>
-                    <h4>Bildirim Bulunmuyor</h4>
-                    <p class="text-muted">Tüm sorularınız güncel durumda. Yeni bildirimler geldiğinde burada görüntülenecektir.</p>
-                    <div class="mt-3">
-                        <a href="{{ url_for('add_question') }}" class="btn btn-outline-primary me-2">
-                            <i class="fas fa-plus me-1"></i> Yeni Soru Ekle
+                        {% endfor %}
+                        
+                        <a href="{{ url_for('today_questions') }}" class="block w-full py-4 text-center border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 font-bold text-xs hover:border-[#6200EE]/30 hover:text-[#6200EE] transition-all">
+                            Tüm Listeyi Gör
                         </a>
+                    {% else %}
+                        <div class="bg-white p-8 rounded-2xl border border-slate-100 text-center">
+                            <div class="w-16 h-16 mx-auto bg-green-50 text-green-500 rounded-full flex items-center justify-center mb-4">
+                                <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                            </div>
+                            <h6 class="font-bold text-slate-800">Harika gidiyorsun!</h6>
+                            <p class="text-sm font-medium text-slate-500 mt-1">Bugün için planlanan tekrarın yok.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <!-- Past Reviews -->
+            <section class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-error" data-icon="history">history</span>
+                        <h4 class="font-headline-md text-xl font-bold text-slate-800">Geçmiş Tekrarlar</h4>
+                    </div>
+                    <span class="bg-red-50 text-error px-3 py-1 rounded-full text-xs font-bold">{{ past_questions|length }} Kritik</span>
+                </div>
+                
+                <div class="bg-red-50/30 p-6 rounded-3xl border border-red-100 relative overflow-hidden">
+                    <!-- Abstract urgency background pattern -->
+                    <div class="absolute -right-4 -top-4 opacity-[0.03]">
+                        <span class="material-symbols-outlined text-error text-[120px]" data-icon="priority_high">priority_high</span>
+                    </div>
+                    
+                    <div class="space-y-4 relative z-10 block">
+                        {% if past_questions|length > 0 %}
+                            {% for question in past_questions[:3] %}
+                            <!-- Overdue Item -->
+                            <div class="bg-white/80 backdrop-blur-md p-4 rounded-2xl border border-red-100 shadow-sm flex items-center justify-between gap-4 hover:border-red-300 transition-colors">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-error shrink-0 font-bold">
+                                        !
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h6 class="font-bold text-sm text-slate-800 truncate">{{ question.Content|truncate(35) }}</h6>
+                                        <p class="text-[10px] text-error font-bold uppercase mt-0.5">Acil Tekrar (#{{ question.RepeatCount + 1 }})</p>
+                                    </div>
+                                </div>
+                                <a href="{{ url_for('view_question', question_id=question.QuestionId) }}" class="bg-error text-white px-3.5 py-2 rounded-xl text-[10px] font-bold hover:-translate-y-0.5 shadow-md shadow-error/30 transition-all shrink-0 active:scale-95">Hemen Tekrar Et</a>
+                            </div>
+                            {% endfor %}
+                            
+                            <div class="mt-6 flex items-center gap-2 p-4 bg-error text-white rounded-2xl shadow-lg shadow-error/20">
+                                <span class="material-symbols-outlined text-xl" data-icon="warning">warning</span>
+                                <p class="text-xs font-bold leading-tight">Unutma Eğrisi (Forgetting Curve) etkisini azaltmak için hemen tamamla!</p>
+                            </div>
+                            
+                            <a href="{{ url_for('past_questions') }}" class="block text-center text-xs font-bold text-error mt-4 hover:underline">
+                                Tüm Gecikmiş Soruları Gör
+                            </a>
+                        {% else %}
+                            <div class="text-center py-6">
+                                <div class="w-12 h-12 mx-auto bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mb-3">
+                                    <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">emoji_events</span>
+                                </div>
+                                <h6 class="font-bold text-slate-800 text-sm">Hiçbir tekrarı kaçırmadın!</h6>
+                                <p class="text-xs font-medium text-slate-500 mt-1">Gecikmiş bir sorunuz bulunmuyor.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Stats/Insight Card -->
+        <section class="mt-12">
+            <div class="bg-gradient-soft-purple p-8 md:p-10 rounded-[32px] border border-purple-100/50 flex flex-col md:flex-row items-center gap-10 shadow-sm">
+                <div class="relative w-36 h-36 shrink-0">
+                    <svg class="w-full h-full transform -rotate-90">
+                        <circle class="text-[#6200EE]/10" cx="72" cy="72" fill="transparent" r="65" stroke="currentColor" stroke-width="12"></circle>
+                        <circle class="text-[#6200EE]" cx="72" cy="72" fill="transparent" r="65" stroke="currentColor" stroke-dasharray="408.4" stroke-dashoffset="102.1" stroke-linecap="round" stroke-width="12"></circle>
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span class="text-3xl font-black text-[#6200EE]">75%</span>
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Tamamlama</span>
+                    </div>
+                </div>
+                
+                <div class="flex-1 space-y-4 text-center md:text-left">
+                    <h4 class="font-headline-md text-2xl font-bold text-slate-800">Haftalık Performans Analizi</h4>
+                    <p class="text-slate-500 font-medium text-sm leading-relaxed max-w-xl">
+                        Bu hafta planlanan tekrarlarının büyük çoğunluğunu başarıyla erittin. Toplam başarı puanın <span class="bg-emerald-50 text-emerald-600 px-2 rounded font-bold">A+</span> seviyesinde ilerliyor. Bu hızla devam et!
+                    </p>
+                    <div class="flex gap-6 justify-center md:justify-start pt-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3.5 h-3.5 rounded-full bg-[#6200EE]"></span>
+                            <span class="text-xs font-bold text-slate-500">Yapılan (75%)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3.5 h-3.5 rounded-full bg-[#6200EE]/10"></span>
+                            <span class="text-xs font-bold text-slate-400">Kalan (25%)</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        {% endif %}
-    </div>
-</div>
-{% endblock %}
+        </section>
 
-{% block scripts %}
+    </div>
+    
+    {% include 'components/chatbot_widget.html' ignore missing %}
+</main>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Bildirim sayfasını yenile
-        document.getElementById('refreshNotifications').addEventListener('click', function() {
-            const button = this;
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Yenileniyor...';
-            
-            // Sayfayı yenile
-            setTimeout(function() {
-                window.location.reload();
-            }, 500);
-        });
-        
-        // Tüm bildirimleri temizle
-        document.getElementById('clearAllNotifications').addEventListener('click', function() {
-            if (confirm('Tüm bildirimleri temizlemek istediğinize emin misiniz?')) {
-                const button = this;
-                button.disabled = true;
-                button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Temizleniyor...';
-                
-                // Bildirim temizleme isteği gönder
-                fetch('/clear-all-notifications', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token() }}'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showNotification('success', 'Tüm bildirimler başarıyla temizlendi!');
-                        setTimeout(function() {
-                            window.location.reload();
-                        }, 1000);
-                    } else {
-                        showNotification('error', 'Bildirimler temizlenirken bir hata oluştu: ' + data.error);
-                        button.disabled = false;
-                        button.innerHTML = '<i class="fas fa-trash me-1"></i> Tümünü Temizle';
-                    }
-                })
-                .catch(error => {
-                    showNotification('error', 'Bir hata oluştu: ' + error);
-                    button.disabled = false;
-                    button.innerHTML = '<i class="fas fa-trash me-1"></i> Tümünü Temizle';
-                });
-            }
-        });
-        
-        // Bildirim göster
-        function showNotification(type, message) {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
-            alertDiv.style.zIndex = '9999';
-            alertDiv.innerHTML = `
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            `;
-            document.body.appendChild(alertDiv);
-            
-            setTimeout(() => {
-                alertDiv.remove();
-            }, 3000);
+        const btnClear = document.getElementById('clearAllNotifications');
+        if(btnClear) {
+            btnClear.addEventListener('click', function() {
+                if (confirm('Tüm bildirimleri temizlemek istediğinize emin misiniz?')) {
+                    this.classList.add('opacity-50', 'pointer-events-none');
+                    this.innerHTML = 'Siliniyor...';
+                    
+                    const csrfTokenObj = document.querySelector('meta[name="csrf-token"]');
+                    const token = csrfTokenObj ? csrfTokenObj.getAttribute('content') : '';
+
+                    fetch('/clear-all-notifications', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': token
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        alert('Hata: ' + error);
+                        window.location.reload();
+                    });
+                }
+            });
         }
-        
-        // CSS ekle
-        const style = document.createElement('style');
-        style.textContent = `
-            .notification-icon {
-                width: 50px;
-                height: 50px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.5rem;
-            }
-        `;
-        document.head.appendChild(style);
     });
 </script>
-{% endblock %}
+
+</body>
+</html>

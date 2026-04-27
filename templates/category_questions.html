@@ -1,149 +1,303 @@
-{% extends "base.html" %}
-
-{% block title %}{{ category.Name }} Soruları - ReviseMe{% endblock %}
-
-{% block page_content %}
-<div class="container-fluid">
-    <div class="row">
-        <!-- Ana İçerik -->
-        <main class="col-12 px-md-4">
-            <!-- Üst Menü -->
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2" style="color:#232323; text-shadow:0 0 15px #fff, 0 0 20px #fff; font-size: 2.2rem; font-weight: 800; text-align: left; margin-bottom: 0.8rem; margin-top: 2.5rem; letter-spacing: 2px;">{{ category.Name }} Soruları</h1>
-                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left"></i> Geri
-                </a>
-            </div>
-
-            <!-- Topic Filter Dropdown -->
-            <div class="mb-3">
-                <label for="topicFilter" class="form-label">Konuya Göre Filtrele:</label>
-                <select class="form-select" id="topicFilter" onchange="filterQuestions(this.value)">
-                    <option value="">Tüm Konular</option>
-                    {% for topic in all_topics %}
-                        <option value="{{ topic }}" {% if selected_topic == topic %}selected{% endif %}>{{ topic }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <!-- JavaScript for filtering -->
-            <script>
-                function filterQuestions(topic) {
-                    let url = new URL(window.location.href);
-                    if (topic) {
-                        url.searchParams.set('topic', topic);
-                    } else {
-                        url.searchParams.delete('topic');
-                    }
-                    window.location.href = url.toString();
-                }
-            </script>
-
-            <!-- Display questions in cards -->
-            {% if questions %}
-                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                    {% for question in questions %}
-                        <div class="col">
-                            <div class="card h-100">
-                                {% if question.ImagePath %}
-                                <img src="{{ url_for('static', filename=question.ImagePath) }}" class="card-img-top" alt="Soru Görseli" style="height: 200px; object-fit: cover;">
-                                {% else %}
-                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                                    <i class="fas fa-image fa-3x text-muted"></i>
-                                </div>
-                                {% endif %}
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ question.Content[:100] }}{% if question.Content|length > 100 %}...{% endif %}</h5>
-                                    <p class="card-text text-muted"><small>Konu: {{ question.Topic or "Diğer" }}</small></p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="btn-group">
-                                            <a href="{{ url_for('view_question', question_id=question.QuestionId, section='kategori') }}" class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-eye"></i> Görüntüle
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-footer">
-                                    {% if question.DifficultyLevel == 'Kolay' %}
-                                        <span class="text-warning"><i class="fas fa-star"></i> Kolay</span>
-                                    {% elif question.DifficultyLevel == 'Orta' %}
-                                        <span class="text-success"><i class="fas fa-star"></i><i class="fas fa-star"></i> Orta</span>
-                                    {% elif question.DifficultyLevel == 'Zor' %}
-                                        <span class="text-danger"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i> Zor</span>
-                                    {% else %}
-                                        <small class="text-muted">Zorluk Belirtilmemiş</small>
-                                    {% endif %}
-                                </div>
-                                <div class="card-footer text-muted">
-                                    {% set current_repeat_date = None %}
-                                    {% if question.RepeatCount == 0 %}
-                                        {% set current_repeat_date = question.Repeat1Date %}
-                                    {% elif question.RepeatCount == 1 %}
-                                        {% set current_repeat_date = question.Repeat2Date %}
-                                    {% elif question.RepeatCount == 2 %}
-                                        {% set current_repeat_date = question.Repeat3Date %}
-                                    {% endif %}
-
-                                    <small>
-                                        Tekrar Bilgisi:
-                                        {% set current_repeat_number = question.RepeatCount + 1 %}
-                                        {% if current_repeat_number <= 3 %}
-                                            <span class="fw-bold text-primary">Tekrar {{ current_repeat_number }}</span>
-                                        {% else %}
-                                            Tamamlandı
-                                        {% endif %}
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p>Bu kategoride veya seçili konuda soru bulunmamaktadır.</p>
-            {% endif %}
-        </main>
-    </div>
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>{{ category.Name }} Soru Havuzu - ReviseMe</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#005f56",
+                    "tertiary": "#00453e",
+                    "outline-variant": "#cbc3d9",
+                    "surface-tint": "#6d23f9",
+                    "on-tertiary-fixed-variant": "#005048",
+                    "on-background": "#151c27",
+                    "on-secondary-fixed-variant": "#6200bc",
+                    "surface-container-highest": "#dce2f3",
+                    "tertiary-fixed": "#4ffbe6",
+                    "error-container": "#ffdad6",
+                    "surface": "#f9f9ff",
+                    "on-tertiary-container": "#1ee0cc",
+                    "on-tertiary-fixed": "#00201c",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#d0beff",
+                    "on-tertiary-fixed": "#00201c",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#d0beff",
+                    "on-error-container": "#93000a",
+                    "on-primary-fixed": "#22005d",
+                    "inverse-surface": "#2a313d",
+                    "on-surface-variant": "#494456",
+                    "secondary-fixed-dim": "#d8b9ff",
+                    "inverse-on-surface": "#ebf1ff",
+                    "primary-fixed": "#e8ddff",
+                    "tertiary-fixed-dim": "#17deca",
+                    "secondary-container": "#9547f7",
+                    "on-secondary-fixed": "#290055",
+                    "background": "#f9f9ff",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed": "#eddcff",
+                    "surface-container-high": "#e2e8f8",
+                    "secondary": "#7b24dc",
+                    "surface-container-lowest": "#ffffff",
+                    "primary": "#4800b2",
+                    "on-error": "#ffffff",
+                    "inverse-primary": "#cfbdff",
+                    "surface-container-low": "#f0f3ff",
+                    "surface-container": "#e7eefe",
+                    "surface-bright": "#f9f9ff",
+                    "on-secondary-container": "#fffbff",
+                    "primary-fixed-dim": "#cfbdff",
+                    "on-primary-fixed-variant": "#5300cd",
+                    "error": "#ba1a1a",
+                    "outline": "#7a7488",
+                    "surface-dim": "#d3daea",
+                    "surface-variant": "#dce2f3"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "margin-mobile": "16px",
+                    "container-max": "1280px",
+                    "base": "8px",
+                    "section-gap": "64px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "display-xl": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "label-sm": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "display-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f9ff; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f8; border-radius: 10px; }
+        .card-shadow { box-shadow: 0px 15px 15px -10px rgba(98, 0, 238, 0.04); }
+</style>
+    <style> html { font-size: 18px !important; } </style>
+    <style> html { font-size: 18px !important; } </style>
+</head>
+<body class="bg-background text-on-background">
+<!-- SideNavBar -->
+<aside class="hidden lg:flex flex-col fixed left-0 top-0 h-full p-4 space-y-2 w-64 border-r border-gray-200 bg-white shadow-xl z-50">
+<div class="flex items-center gap-3 px-2 mb-8 mt-2">
+<div class="w-10 h-10 bg-primary-container rounded-xl flex items-center justify-center text-white shadow-lg">
+<span class="material-symbols-outlined" data-icon="auto_stories">auto_stories</span>
 </div>
-{% endblock %}
+<div>
+<h1 class="text-lg font-black text-[#6200EE]">ReviseMe</h1>
+<p class="text-[10px] text-slate-500 font-medium uppercase tracking-widest">Mastery through order</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:translate-x-1 transition-all duration-200 rounded-lg font-medium text-sm" href="{{ url_for('index') }}" style="text-decoration:none;">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-violet-50 text-[#6200EE] rounded-lg font-medium text-sm transition-all duration-200" href="{{ url_for('index') }}" style="text-decoration:none;">
+<span class="material-symbols-outlined" data-icon="library_books">library_books</span>
+                Question Pools
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:translate-x-1 transition-all duration-200 rounded-lg font-medium text-sm" href="{{ url_for('gorevlerim') }}" style="text-decoration:none;">
+<span class="material-symbols-outlined" data-icon="quiz">quiz</span>
+                Revision Plan
+            </a>
+<!-- Favoriler Menüsü Eklendi -->
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:translate-x-1 transition-all duration-200 rounded-lg font-medium text-sm" href="{{ url_for('favorites') }}" style="text-decoration:none;">
+<span class="material-symbols-outlined" style="color: #ffb400;">star</span>
+                Favorilerim
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:translate-x-1 transition-all duration-200 rounded-lg font-medium text-sm" href="{{ url_for('hedefleyici') }}" style="text-decoration:none;">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+                Analytics
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:translate-x-1 transition-all duration-200 rounded-lg font-medium text-sm" href="{{ url_for('settings') }}" style="text-decoration:none;">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                Settings
+            </a>
+</nav>
+<div class="pt-4 border-t border-slate-100 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-lg font-medium text-sm" href="{{ url_for('logout') }}" style="text-decoration:none;">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                Logout
+            </a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="lg:ml-64 min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-40 flex justify-between items-center px-6 py-3 w-full bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl" data-icon="search">search</span>
+<input class="w-full bg-slate-50 border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20 placeholder:text-slate-400" placeholder="Search questions, topics or IDs..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-600 hover:bg-violet-50 transition-colors duration-200 rounded-full relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<a href="{{ url_for('settings') }}" class="p-2 text-slate-600 hover:bg-violet-50 transition-colors duration-200 rounded-full inline-block">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</a>
+<div class="h-8 w-px bg-slate-200 mx-1"></div>
+<a href="{{ url_for('profile') }}" class="flex items-center gap-3 ml-2 hover:opacity-80 transition-opacity" style="text-decoration:none;">
+<div class="text-right">
+<p class="text-sm font-bold text-on-background">{{ current_user.Name }} {{ current_user.Surname }}</p>
+<p class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Öğrenci</p>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-primary-fixed bg-slate-200 flex items-center justify-center text-slate-500">
+<span class="material-symbols-outlined">person</span>
+</div>
+</a>
+</div>
+</header>
+<!-- Page Content -->
+<div class="p-8 max-w-full px-4 md:px-8 mx-auto w-full">
+<!-- Header Section -->
+<div class="mb-10">
+<div class="flex items-end gap-2 mb-2">
+<h2 class="font-headline-lg text-headline-lg text-on-background">{{ category.Name }} - Soru Havuzu</h2>
+<span class="px-2 py-1 bg-primary-fixed text-primary text-[12px] font-bold rounded-md mb-1.5">MCQ</span>
+</div>
+<p class="font-body-md text-slate-500 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="database">database</span>
+                    {{ questions|length }} soru listeleniyor
+                </p>
+</div>
+<!-- Filtering Section -->
+<form id="filterForm" method="GET" action="{{ url_for('category_questions', category_id=category.CategoryId) }}">
+<div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm mb-8">
+<div class="flex flex-wrap items-center gap-4">
+<div class="flex-1 min-w-[200px]">
+<label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Konu</label>
+<div class="relative">
+<select name="topic" class="w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:ring-primary/20 focus:border-primary">
+<option value="">Tüm Konular</option>
+{% for topic in all_topics %}
+<option value="{{ topic }}" {% if selected_topic == topic %}selected{% endif %}>{{ topic }}</option>
+{% endfor %}
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<div class="flex items-end self-end gap-2">
+<button type="submit" class="bg-primary text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-primary-container transition-all active:scale-95 border-0">
+<span class="material-symbols-outlined text-lg" data-icon="filter_list">filter_list</span>
+                            Filtrele
+                        </button>
+<a href="{{ url_for('category_questions', category_id=category.CategoryId) }}" class="text-slate-400 p-2.5 hover:text-primary transition-colors inline-block text-center flex items-center" style="text-decoration:none;">
+<span class="material-symbols-outlined" data-icon="refresh">refresh</span>
+</a>
+</div>
+</div>
+</div>
+</form>
 
-{% block scripts %}
-<script>
-function deleteQuestion(questionId) {
-    if (confirm('Bu soruyu silmek istediğinizden emin misiniz?')) {
-        fetch(`/delete_question/${questionId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Soru silinirken bir hata oluştu.');
-            }
-        });
-    }
-}
+<!-- Question Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-12">
+{% for question in questions %}
+    {% set diff_bg = 'bg-slate-50' %}
+    {% set diff_text = 'text-slate-600' %}
+    {% set diff_border = 'border-slate-100' %}
+    {% if question.DifficultyLevel == 'Zor' %}
+        {% set diff_bg = 'bg-red-50' %} {% set diff_text = 'text-red-600' %} {% set diff_border = 'border-red-100' %}
+    {% elif question.DifficultyLevel == 'Orta' %}
+        {% set diff_bg = 'bg-amber-50' %} {% set diff_text = 'text-amber-600' %} {% set diff_border = 'border-amber-100' %}
+    {% elif question.DifficultyLevel == 'Kolay' %}
+        {% set diff_bg = 'bg-emerald-50' %} {% set diff_text = 'text-emerald-600' %} {% set diff_border = 'border-emerald-100' %}
+    {% endif %}
 
-function completeQuestion(questionId) {
-    fetch(`/complete_question/${questionId}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
-        } else {
-            alert('Soru tamamlanırken bir hata oluştu.');
-        }
-    });
-}
-</script>
-{% endblock %} 
+    {% set status_bg = 'bg-slate-100' %}
+    {% set status_text = 'text-slate-500' %}
+    {% set status_icon = 'radio_button_unchecked' %}
+    {% set status_label = 'Çözülecek' %}
+    {% if question.IsCompleted %}
+        {% set status_bg = 'bg-green-500' %} {% set status_text = 'text-white' %} {% set status_icon = 'check_circle' %} {% set status_label = 'Tamamlandı' %}
+    {% elif question.RepeatCount > 0 %}
+        {% set status_bg = 'bg-violet-600' %} {% set status_text = 'text-white' %} {% set status_icon = 'history' %} {% set status_label = 'Devam Ediyor' %}
+    {% endif %}
+
+<div class="bg-white rounded-2xl border border-gray-100 card-shadow overflow-hidden group hover:border-primary/30 transition-all duration-300 flex flex-col">
+<div class="relative h-44 bg-slate-100 overflow-hidden">
+        {% if question.ImagePath %}
+            <img src="{{ url_for('static', filename=question.ImagePath) }}" class="w-full h-full object-cover opacity-90 group-hover:scale-110 transition-transform duration-500" />
+        {% else %}
+            <div class="absolute inset-0 bg-gradient-to-tr from-slate-100 to-slate-200"></div>
+            <div class="w-full h-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-5xl text-slate-300 relative z-10" data-icon="data_object">data_object</span>
+            </div>
+        {% endif %}
+
+<div class="absolute top-3 left-3 flex gap-2">
+<span class="px-3 py-1 {{ diff_bg }} {{ diff_text }} text-[10px] font-black uppercase tracking-widest border {{ diff_border }} rounded-full">{{ question.DifficultyLevel or 'Belirsiz' }}</span>
+</div>
+<div class="absolute bottom-3 left-3">
+<span class="px-3 py-1 {{ status_bg }} {{ status_text }} text-[10px] font-black uppercase tracking-widest rounded-full flex items-center gap-1 shadow-md">
+<span class="material-symbols-outlined text-xs" data-icon="{{ status_icon }}">{{ status_icon }}</span>
+                                {{ status_label }}
+                            </span>
+</div>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<div class="flex gap-2 mb-3">
+{% if question.Topic %}
+<span class="text-[10px] font-bold text-primary uppercase tracking-wider px-2 py-0.5 bg-primary-fixed rounded">{{ question.Topic }}</span>
+{% endif %}
+</div>
+<h3 class="font-headline-md text-body-md text-on-background line-clamp-2 mb-4 group-hover:text-primary transition-colors" title="{{ question.Content }}">{{ question.Content }}</h3>
+<div class="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
+<div class="flex items-center gap-2 text-slate-400 text-xs">
+<span class="material-symbols-outlined text-sm" data-icon="schedule">schedule</span>
+                                Tekrar: {{ question.RepeatCount }}/3
+                            </div>
+<a class="text-primary font-bold text-sm flex items-center gap-1 hover:underline decoration-transparent text-decoration-none" style="text-decoration: none;" href="{{ url_for('view_question', question_id=question.QuestionId) }}">
+                                {{ 'Gözden Geçir' if question.IsCompleted else 'İncele' }}
+                                <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+{% else %}
+<div class="col-span-1 md:col-span-2 xl:col-span-3 text-center py-10 text-slate-500">
+Bu kategoride henüz soru bulunmuyor veya seçilen konuya ait soru yok.
+</div>
+{% endfor %}
+
+</div>
+</div>
+</main>
+</body>
+</html>

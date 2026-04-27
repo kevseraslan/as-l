@@ -1,0 +1,84 @@
+<!-- Sidebar Navigation -->
+<aside id="modern-sidebar" class="hidden md:flex flex-col h-screen fixed left-0 top-0 p-4 z-50 bg-white border-r border-slate-100 w-64 shrink-0 shadow-[15px_0_15px_rgba(98,0,238,0.04)] transition-all duration-300">
+    <div class="mb-8 mt-2 px-4 whitespace-nowrap overflow-hidden flex items-center justify-between">
+        <div>
+            <h1 class="sidebar-text text-2xl font-black text-[#6200EE] tracking-tight transition-opacity duration-200">Akademi Pro</h1>
+            <p class="sidebar-text text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 transition-opacity duration-200">Premium Plan</p>
+        </div>
+        <button id="sidebar-close-mobile" class="md:hidden text-slate-500 hover:text-[#6200EE]">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    
+    <nav class="flex-1 space-y-1 overflow-y-auto overflow-x-hidden eduai-scrollbar pr-1">
+        <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:pl-6 group {% if active_page == 'index' %}bg-purple-50 text-[#6200EE] border-r-4 border-[#6200EE] font-bold shadow-sm{% endif %}" href="{{ url_for('index') }}" title="Ana Sayfa">
+            <span class="material-symbols-outlined text-[20px] shrink-0 group-hover:text-[#6200EE]">dashboard</span>
+            <span class="sidebar-text text-sm font-semibold whitespace-nowrap opacity-100 transition-opacity duration-200">Ana Sayfa</span>
+        </a>
+        
+        <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:pl-6 group {% if active_page == 'notifications' %}bg-purple-50 text-[#6200EE] border-r-4 border-[#6200EE] font-bold shadow-sm{% endif %}" href="{{ url_for('notifications') }}" title="Bildirimler">
+            <span class="material-symbols-outlined text-[20px] shrink-0 group-hover:text-[#6200EE]">notifications</span>
+            <span class="sidebar-text text-sm font-semibold whitespace-nowrap opacity-100 transition-opacity duration-200">Bildirimler</span>
+        </a>
+
+        <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:pl-6 group {% if active_page == 'add_question' %}bg-purple-50 text-[#6200EE] border-r-4 border-[#6200EE] font-bold shadow-sm{% endif %}" href="{{ url_for('add_question') }}" title="Yeni Soru Ekle">
+            <span class="material-symbols-outlined text-[20px] shrink-0 group-hover:text-[#6200EE]">add_circle</span>
+            <span class="sidebar-text text-sm font-semibold whitespace-nowrap opacity-100 transition-opacity duration-200">Yeni Soru Ekle</span>
+        </a>
+        
+        <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:pl-6 group {% if active_page == 'favorites' %}bg-purple-50 text-[#6200EE] border-r-4 border-[#6200EE] font-bold shadow-sm{% endif %}" href="{{ url_for('favorites') }}" title="Favori Sorularım">
+            <span class="material-symbols-outlined text-[20px] shrink-0 group-hover:text-[#6200EE]">star</span>
+            <span class="sidebar-text text-sm font-semibold whitespace-nowrap opacity-100 transition-opacity duration-200">Favori Sorularım</span>
+        </a>
+        
+        <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:pl-6 group {% if active_page == 'today_questions' %}bg-purple-50 text-[#6200EE] border-r-4 border-[#6200EE] font-bold shadow-sm{% endif %}" href="{{ url_for('today_questions') }}" title="Bugünün Soruları">
+            <span class="material-symbols-outlined text-[20px] shrink-0 group-hover:text-[#6200EE]">event_available</span>
+            <span class="sidebar-text text-sm font-semibold whitespace-nowrap opacity-100 transition-opacity duration-200">Bugünün Soruları</span>
+        </a>
+
+        <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:pl-6 group {% if active_page == 'past_questions' %}bg-purple-50 text-[#6200EE] border-r-4 border-[#6200EE] font-bold shadow-sm{% endif %}" href="{{ url_for('past_questions') }}" title="Geçmiş Sorular">
+            <span class="material-symbols-outlined text-[20px] shrink-0 group-hover:text-[#6200EE]">history</span>
+            <span class="sidebar-text text-sm font-semibold whitespace-nowrap opacity-100 transition-opacity duration-200">Geçmiş Sorular</span>
+        </a>
+        
+        <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:pl-6 group {% if active_page == 'hedefleyici' %}bg-purple-50 text-[#6200EE] border-r-4 border-[#6200EE] font-bold shadow-sm{% endif %}" href="{{ url_for('hedefleyici') }}" title="Gelişim Raporu">
+            <span class="material-symbols-outlined text-[20px] shrink-0 group-hover:text-[#6200EE]">trending_up</span>
+            <span class="sidebar-text text-sm font-semibold whitespace-nowrap opacity-100 transition-opacity duration-200">Gelişim Raporu</span>
+        </a>
+        
+        <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:pl-6 group {% if active_page == 'timer' %}bg-purple-50 text-[#6200EE] border-r-4 border-[#6200EE] font-bold shadow-sm{% endif %}" href="{{ url_for('timer') }}" title="Sayaç">
+            <span class="material-symbols-outlined text-[20px] shrink-0 group-hover:text-[#6200EE]">timer</span>
+            <span class="sidebar-text text-sm font-semibold whitespace-nowrap opacity-100 transition-opacity duration-200">Sayaç</span>
+        </a>
+    </nav>
+    
+    <div class="mt-auto pt-6 border-t border-slate-100 whitespace-nowrap overflow-hidden">
+        <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl text-xs font-bold transition-colors" title="Çıkış Yap">
+            <span class="material-symbols-outlined text-[18px] shrink-0">logout</span>
+            <span class="sidebar-text opacity-100 transition-opacity duration-200">Çıkış Yap</span>
+        </a>
+    </div>
+</aside>
+
+<!-- Overlays for mobile -->
+<div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden backdrop-blur-sm transition-opacity opacity-0"></div>
+
+<style>
+/* Collapsed state styles for sidebar */
+#modern-sidebar.collapsed {
+    width: 5rem; /* 80px */
+}
+#modern-sidebar.collapsed .sidebar-text {
+    opacity: 0;
+    pointer-events: none;
+    display: none;
+}
+#modern-sidebar.collapsed a {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    justify-content: center;
+}
+#modern-sidebar.collapsed a:hover {
+    padding-left: 0.75rem; /* prevent hover shifting in collapsed state */
+}
+</style>

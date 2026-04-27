@@ -1,318 +1,353 @@
-{% extends 'base.html' %}
-
-{% block title %}Planlayıcı{% endblock %}
-
-{% block styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-<style>
-    body {
-        background-color: transparent !important;
-        position: relative;
-    }
-    
-    body::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url('/static/images/pastel-background.jpg');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        z-index: -1;
-    }
-    
-    h1 {
-        color: #30E8E8;
-        font-size: 3rem;
-        font-weight: 800;
-        margin-bottom: 1.5rem;
-        text-shadow: 0 0 15px rgba(48, 6, 75, 0.8), 0 0 20px rgba(48, 6, 75, 0.4);
-    }
-    
-    p {
-        color: #FFF;
-        font-size: 1.2rem;
-        text-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
-        margin-bottom: 2rem;
-    }
-    
-    /* Sidebar Styles */
-    .sidebar-wrapper {
-        /* Sadece görsel stil bırakıldı */
-        background: linear-gradient(135deg, #2d225a 0%, #3a2e6e 60%, #232946 100%);
-        box-shadow: 2px 0 8px rgba(0,0,0,0.12);
-        border-right: 1px solid rgba(48,232,232,0.05);
-        transition: all 0.3s ease;
-    }
-    
-    .sidebar-wrapper.sidebar-collapsed {
-        /* sadece style.css'deki layout kuralları geçerli olacak */
-    }
-    
-    .sidebar-wrapper .btn {
-        font-weight: 600;
-        font-size: 1.1rem;
-        border-radius: 8px;
-        border: 1.5px solid #30E8E8;
-        color: #30E8E8;
-        background: transparent;
-        transition: background 0.2s, color 0.2s;
-    }
-    
-    .sidebar-wrapper .btn:hover {
-        background: #30E8E8;
-        color: #232946;
-    }
-    
-    .sidebar-wrapper ul.nav {
-        margin-top: 1.5rem;
-        padding-left: 0;
-    }
-    
-    .sidebar-wrapper .nav-link {
-        color: #fff;
-        font-size: 1.08rem;
-        font-weight: 500;
-        padding: 1rem 1.5rem 1rem 2.2rem;
-        border-left: 4px solid transparent;
-        border-radius: 0 16px 16px 0;
-        margin-bottom: 2px;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        background: transparent;
-        position: relative;
-        z-index: 1031; /* Tıklanabilir olması için yüksek z-index */
-    }
-    
-    .sidebar-wrapper .nav-link i {
-        margin-right: 12px;
-        font-size: 1.2rem;
-        width: 22px;
-        text-align: center;
-    }
-    
-    .sidebar-wrapper .nav-link.active {
-        background: linear-gradient(90deg, rgba(48,232,232,0.18) 0%, rgba(48,232,232,0.08) 100%);
-        color: #30E8E8;
-        border-left: 4px solid #30E8E8;
-        font-weight: 700;
-        box-shadow: 0 2px 8px 0 rgba(48,232,232,0.04);
-    }
-    
-    .sidebar-wrapper .nav-link:hover {
-        background: rgba(48,232,232,0.10);
-        color: #30E8E8;
-        border-left: 4px solid #30E8E8;
-    }
-    
-    .sidebar-wrapper .nav-link:active {
-        background: rgba(48,232,232,0.18);
-        color: #30E8E8;
-    }
-    
-    /* Ana içerik alanı düzenlemesi */
-    .main-content-area {
-        /* Sadece görsel stil bırakıldı */
-        transition: all 0.3s ease;
-        /* display: flex; */
-        /* justify-content: center; */
-    }
-    
-    .main-content-area.sidebar-collapsed {
-        /* sadece style.css'deki layout kuralları geçerli olacak */
-    }
-    
-    #wrapper {
-        display: flex !important;
-        width: 100%;
-        position: relative;
-        overflow-x: hidden;
-    }
-    
-    /* İç içerik için düzenleme */
-    .inner-content-wrapper {
-        max-width: 1200px;
-        width: 100%;
-        padding: 32px 24px;
-        box-sizing: border-box;
-    }
-    
-    /* Simüle edilmiş yıldızlar */
-    @keyframes twinkle {
-        0% { opacity: 0.3; }
-        50% { opacity: 1; }
-        100% { opacity: 0.3; }
-    }
-    
-    .stars {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: -1;
-    }
-    
-    .star {
-        position: absolute;
-        width: 2px;
-        height: 2px;
-        background-color: white;
-        border-radius: 50%;
-    }
-    
-    .star-1 { top: 10%; left: 20%; animation: twinkle 3s infinite ease-in-out; }
-    .star-2 { top: 15%; left: 50%; animation: twinkle 4s infinite ease-in-out; }
-    .star-3 { top: 25%; left: 80%; animation: twinkle 5s infinite ease-in-out; }
-    .star-4 { top: 40%; left: 10%; animation: twinkle 4.5s infinite ease-in-out; }
-    .star-5 { top: 60%; left: 30%; animation: twinkle 3.5s infinite ease-in-out; }
-    .star-6 { top: 75%; left: 60%; animation: twinkle 4s infinite ease-in-out; }
-    .star-7 { top: 85%; left: 90%; animation: twinkle 3s infinite ease-in-out; }
-    
-    /* Sidebar içindeki menü metinleri için stil */
-    .sidebar-collapsed .menu-text {
-        display: none;
-    }
-    
-    /* İçerik konteynerları için stil */
-    .content-container {
-        width: 100%;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 15px;
-    }
-    
-    /* Sidebar kapalıyken ana içeriği ortala ve genişliği sınırla */
-    @media (max-width: 991.98px) {
-        #wrapper:not(.sidebar-collapsed) > .sidebar-wrapper + * {
-            margin: 0 auto !important;
-            max-width: 1200px;
-            width: 100% !important;
-            display: flex;
-            justify-content: center;
+<!DOCTYPE html>
+<html class="light" lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gelişim Raporu - ReviseMe</title>
+<meta name="csrf-token" content="{{ csrf_token() if csrf_token else '' }}">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4800b2",
+                        "primary-container": "#6200ee",
+                        "on-background": "#151c27",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "secondary": "#7b24dc",
+                        "secondary-container": "#9547f7",
+                        "on-surface": "#151c27",
+                        "outline-variant": "#cbc3d9",
+                    },
+                    fontFamily: {
+                        "headline-md": ["Inter"],
+                        "display-xl": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    }
+                }
+            }
         }
-    }
-    
-    .main-content-area.sidebar-collapsed, .main-content-area.sidebar-collapsed .content-container {
-        margin: 0 auto !important;
-        max-width: 1200px;
-        width: 100% !important;
-        display: flex;
-        justify-content: center;
-    }
-</style>
-{% endblock %}
+    </script>
+<style>
+        body { background-color: #F8F5FF; font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        .sidebar-active {
+            background-color: #f8fafc;
+            color: #6200EE;
+            border-left: 4px solid #6200EE;
+            border-radius: 0;
+            border-top-right-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+        }
+    </style>
+    <style> html { font-size: 18px !important; } </style>
+    <style> html { font-size: 18px !important; } </style>
+</head>
+<body class="bg-[#F8F5FF] font-body-md text-on-background min-h-screen">
 
-{% block page_content %}
-    <div id="wrapper">
-        <!-- Hamburger Menu Button -->
-        {# <button id="sidebarToggle" class="hamburger-menu">
-            <i class="fas fa-bars"></i>
-        </button> #}
+<!-- TopAppBar -->
+{% block header_title %}Gelişim Raporu{% endblock %}
+{% include 'components/header_modern.html' %}
 
-        <div class="sidebar-wrapper" id="sidebar-wrapper">
-            {% include 'components/side_menu_hedef.html' %}
+<!-- SideNavBar -->
+{% set active_page = 'hedefleyici' %}
+{% include 'components/sidebar_modern.html' %}
+
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-24 pb-12 px-6 md:px-12 max-w-full px-4 md:px-8 w-full mx-auto space-y-8">
+
+<!-- Page Header -->
+<header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+        <h2 class="text-3xl font-black tracking-tight text-slate-800">Gelişim Raporu</h2>
+        <p class="text-slate-500 font-medium text-sm">Performans verilerine detaylı göz at.</p>
+    </div>
+    <div class="flex items-center gap-4">
+        <div class="hidden md:flex items-center bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm">
+            <span class="material-symbols-outlined text-slate-400 text-sm">search</span>
+            <input class="bg-transparent border-none focus:ring-0 text-sm w-64 placeholder:text-slate-400 font-medium text-slate-700" placeholder="Ders veya konu ara..." type="text"/>
         </div>
-        {% if request.endpoint in ['kitaplarim', 'gorevlerim', 'listening', 'report'] %}
-            {% block hedefleyici_content %}{% endblock %}
-        {% else %}
-        <div class="main-content-area" id="main-content-col">
-            <div class="content-container">
-                <div class="stars">
-                    <div class="star star-1"></div>
-                    <div class="star star-2"></div>
-                    <div class="star star-3"></div>
-                    <div class="star star-4"></div>
-                    <div class="star star-5"></div>
-                    <div class="star star-6"></div>
-                    <div class="star star-7"></div>
+    </div>
+</header>
+
+<!-- Stats Grid -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <!-- Stat 1 -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+        <div class="flex items-center justify-between mb-4">
+            <span class="w-10 h-10 flex items-center justify-center bg-indigo-50 text-[#6200EE] rounded-xl material-symbols-outlined">menu_book</span>
+            <span class="text-xs font-bold text-[#6200EE] bg-indigo-50/50 px-2 py-1 rounded-lg">+12%</span>
+        </div>
+        <div>
+            <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Bu Hafta Çözülen</p>
+            <h3 class="text-3xl font-black text-slate-800">14</h3>
+        </div>
+    </div>
+    <!-- Stat 2 -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+        <div class="flex items-center justify-between mb-4">
+            <span class="w-10 h-10 flex items-center justify-center bg-purple-50 text-purple-600 rounded-xl material-symbols-outlined">calendar_month</span>
+            <span class="text-xs font-bold text-purple-600 bg-purple-50/50 px-2 py-1 rounded-lg">+5%</span>
+        </div>
+        <div>
+            <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Bu Ay Çözülen</p>
+            <h3 class="text-3xl font-black text-slate-800">42</h3>
+        </div>
+    </div>
+    <!-- Stat 3 -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+        <div class="flex items-center justify-between mb-4">
+            <span class="w-10 h-10 flex items-center justify-center bg-emerald-50 text-emerald-600 rounded-xl material-symbols-outlined">task_alt</span>
+            <span class="text-xs font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">0%</span>
+        </div>
+        <div>
+            <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Tamamlanan Görevler</p>
+            <h3 class="text-3xl font-black text-slate-800">8</h3>
+        </div>
+    </div>
+    <!-- Stat 4 -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+        <div class="flex items-center justify-between mb-4">
+            <span class="w-10 h-10 flex items-center justify-center bg-amber-50 text-amber-600 rounded-xl material-symbols-outlined">trending_up</span>
+            <span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded-lg">-3%</span>
+        </div>
+        <div>
+            <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Başarı Oranı</p>
+            <h3 class="text-3xl font-black text-slate-800">%64</h3>
+        </div>
+    </div>
+</section>
+
+<!-- Main Insights Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Performance Circles -->
+    <section class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+        <div class="flex items-center justify-between mb-8">
+            <h2 class="text-xl font-bold text-slate-800">Derslere Göre Tekrar Performansı</h2>
+            <button class="text-xs font-bold text-primary hover:underline uppercase tracking-wider">Tümünü Gör</button>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <!-- Biyoloji -->
+            <div class="flex flex-col items-center">
+                <div class="relative w-28 h-28 flex items-center justify-center mb-4">
+                    <svg class="w-full h-full transform -rotate-90" viewbox="0 0 100 100">
+                        <circle class="text-slate-100" stroke="currentColor" stroke-width="8" fill="transparent" r="40" cx="50" cy="50"></circle>
+                        <circle class="text-emerald-500" stroke="currentColor" stroke-width="8" stroke-dasharray="251.2" stroke-dashoffset="223.3" stroke-linecap="round" fill="transparent" r="40" cx="50" cy="50"></circle>
+                    </svg>
+                    <div class="absolute flex flex-col items-center">
+                        <span class="text-xl font-bold text-emerald-600">%11</span>
+                    </div>
                 </div>
-                <div class="mt-3 mb-2">
-                    <a href="{{ url_for('welcome_options') }}" class="btn btn-outline-light">
-                        <i class="fas fa-arrow-left"></i> Geri Dön
-                    </a>
+                <h4 class="font-bold text-slate-800 text-sm">Biyoloji</h4>
+                <p class="text-[10px] text-slate-500 text-center mt-1 font-medium">%11.1 Tamamlandı</p>
+            </div>
+            <!-- Coğrafya -->
+            <div class="flex flex-col items-center">
+                <div class="relative w-28 h-28 flex items-center justify-center mb-4">
+                    <svg class="w-full h-full transform -rotate-90" viewbox="0 0 100 100">
+                        <circle class="text-red-100" stroke="currentColor" stroke-width="8" fill="transparent" r="40" cx="50" cy="50"></circle>
+                    </svg>
+                    <div class="absolute flex flex-col items-center">
+                        <span class="text-xl font-bold text-red-500">0%</span>
+                    </div>
                 </div>
-                {{ self.hedefleyici_content() }}
+                <h4 class="font-bold text-slate-800 text-sm">Coğrafya</h4>
+                <p class="text-[10px] text-red-400 text-center mt-1 font-medium">%100 Kaçırıldı</p>
+            </div>
+            <!-- Fizik -->
+            <div class="flex flex-col items-center">
+                <div class="relative w-28 h-28 flex items-center justify-center mb-4">
+                    <svg class="w-full h-full transform -rotate-90" viewbox="0 0 100 100">
+                        <circle class="text-slate-100" stroke="currentColor" stroke-width="8" fill="transparent" r="40" cx="50" cy="50"></circle>
+                        <circle class="text-violet-500" stroke="currentColor" stroke-width="8" stroke-dasharray="251.2" stroke-dashoffset="180" stroke-linecap="round" fill="transparent" r="40" cx="50" cy="50"></circle>
+                    </svg>
+                    <div class="absolute flex flex-col items-center">
+                        <span class="text-xl font-bold text-violet-600">%28</span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-slate-800 text-sm">Fizik</h4>
+                <p class="text-[10px] text-slate-500 text-center mt-1 font-medium">%28.4 Tamamlandı</p>
+            </div>
+            <!-- Kimya -->
+            <div class="flex flex-col items-center">
+                <div class="relative w-28 h-28 flex items-center justify-center mb-4">
+                    <svg class="w-full h-full transform -rotate-90" viewbox="0 0 100 100">
+                        <circle class="text-slate-100" stroke="currentColor" stroke-width="8" fill="transparent" r="40" cx="50" cy="50"></circle>
+                    </svg>
+                    <div class="absolute flex flex-col items-center">
+                        <span class="text-xl font-bold text-slate-400">-%</span>
+                    </div>
+                </div>
+                <h4 class="font-bold text-slate-800 text-sm">Kimya</h4>
+                <p class="text-[10px] text-slate-500 text-center mt-1 font-medium">Veri Bekleniyor</p>
             </div>
         </div>
-        {% endif %}
-    </div>
-{% endblock %}
+    </section>
 
-{% block scripts %}
-{#
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Sidebar toggle butonu
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebar = document.getElementById('sidebar-wrapper');
-        const mainContent = document.getElementById('main-content-col');
-        
-        if (sidebarToggle && sidebar && mainContent) {
-            // Toggle sidebar ve içerik alanı
-            function toggleSidebar() {
-                sidebar.classList.toggle('sidebar-collapsed');
-                mainContent.classList.toggle('sidebar-collapsed');
-                
-                // Sidebar durumunu kontrol et ve hamburger menüyü güncelle
-                if (sidebar.classList.contains('sidebar-collapsed')) {
-                    // Sidebar kapalıysa, hamburger menüyü sola ayarla
-                    sidebarToggle.style.left = '15px';
-                } else {
-                    // Sidebar açıksa, hamburger menüyü sidebarın sağına ayarla
-                    sidebarToggle.style.left = '265px';
-                }
-                
-                // Kullanıcı tercihini local storage'a kaydet
-                const isCollapsed = sidebar.classList.contains('sidebar-collapsed');
-                localStorage.setItem('plannerSidebarCollapsed', isCollapsed);
-                
-                // DOM'un yeniden hesaplanmasını için zorla
-                setTimeout(function() {
-                    window.dispatchEvent(new Event('resize'));
-                }, 300); // Animasyon tamamlandıktan sonra
-            }
-            
-            sidebarToggle.addEventListener('click', toggleSidebar);
-            
-            // Sayfa yüklendiğinde kullanıcı tercihini kontrol et
-            const savedState = localStorage.getItem('plannerSidebarCollapsed');
-            if (savedState === 'true') {
-                sidebar.classList.add('sidebar-collapsed');
-                mainContent.classList.add('sidebar-collapsed');
-                sidebarToggle.style.left = '15px';
-            } else {
-                // Sidebar açıksa, hamburger menüyü sidebarın sağına ayarla
-                sidebarToggle.style.left = '265px';
-            }
-            
-            // Mobil cihazlarda responsive davranış
-            function checkWindowSize() {
-                if (window.innerWidth < 768) {
-                    sidebar.classList.add('sidebar-collapsed');
-                    mainContent.classList.add('sidebar-collapsed');
-                    sidebarToggle.style.left = '15px';
-                }
-            }
-            
-            // Sayfa yüklendiğinde ve boyut değiştiğinde kontrol et
-            checkWindowSize();
-            window.addEventListener('resize', checkWindowSize);
-            
-            // Sidebar menü öğelerine tıklanabilirliği iyileştirme
-            const sidebarLinks = sidebar.querySelectorAll('a');
-            sidebarLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.stopPropagation(); // Event'in daha fazla yayılmasını önle
-                });
-            });
-        }
-    });
-</script>
-#}
-{% endblock %} 
+    <!-- Sidebar Panels (Right Column) -->
+    <aside class="space-y-6">
+        <!-- Haftalık Hedef Card -->
+        <div class="bg-[#6200EE] text-white rounded-3xl shadow-lg p-6 relative overflow-hidden">
+            <div class="relative z-10">
+                <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">flag</span>
+                    Haftalık Hedef
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-xs mb-1 font-bold tracking-widest uppercase opacity-80">
+                            <span>Soru Çözümü</span>
+                            <span>42 / 200</span>
+                        </div>
+                        <div class="h-2 bg-indigo-900/30 rounded-full overflow-hidden">
+                            <div class="h-full bg-emerald-400 rounded-full" style="width: 21%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1 font-bold tracking-widest uppercase opacity-80">
+                            <span>Görev</span>
+                            <span>8 / 20</span>
+                        </div>
+                        <div class="h-2 bg-indigo-900/30 rounded-full overflow-hidden">
+                            <div class="h-full bg-amber-400 rounded-full" style="width: 40%"></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="mt-6 w-full py-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl text-xs font-bold transition-colors">
+                    Hedefi Düzenle
+                </button>
+            </div>
+            <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-purple-500/50 rounded-full blur-3xl opacity-50"></div>
+        </div>
+
+        <!-- Öneri Panel -->
+        <div class="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
+            <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-amber-500">lightbulb</span>
+                Sistem Önerisi
+            </h3>
+            <div class="space-y-3">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <p class="text-xs text-slate-700 leading-relaxed font-medium">
+                        <strong class="text-primary">Biyoloji</strong> dersindeki kaçırılan tekrarlar birikiyor. Bugün "Hücre" konusuna zaman ayırmalısın.
+                    </p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <p class="text-xs text-slate-700 leading-relaxed font-medium">
+                        Coğrafya dersi için hiç veri girişi yapmadın. Haftalık oranını artırmak için Coğrafya görevlerini tamamla.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<!-- Activity Feed -->
+<section class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+    <div class="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
+        <h2 class="text-xl font-bold text-slate-800">Son Aktiviteler</h2>
+        <div class="flex gap-2">
+            <button class="px-5 py-2 text-xs bg-indigo-50 text-[#6200EE] rounded-xl font-bold">Tümü</button>
+            <button class="px-5 py-2 text-xs text-slate-500 hover:bg-slate-50 rounded-xl font-bold border border-slate-100">Görevler</button>
+            <button class="px-5 py-2 text-xs text-slate-500 hover:bg-slate-50 rounded-xl font-bold border border-slate-100">Tekrarlar</button>
+        </div>
+    </div>
+    
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="text-slate-400 text-[10px] font-bold uppercase tracking-widest border-b border-slate-100">
+                    <th class="pb-4 px-4">Aktivite</th>
+                    <th class="pb-4 px-4">Ders</th>
+                    <th class="pb-4 px-4">Tarih</th>
+                    <th class="pb-4 px-4 text-center">Durum</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-50">
+                <tr class="hover:bg-slate-50/50 transition-colors group">
+                    <td class="py-4 px-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center text-violet-600">
+                                <span class="material-symbols-outlined text-lg">school</span>
+                            </div>
+                            <span class="font-bold text-slate-700 text-sm">Organik Kimya Testi</span>
+                        </div>
+                    </td>
+                    <td class="py-4 px-4">
+                        <span class="px-3 py-1 bg-violet-50 text-violet-700 border border-violet-100 rounded-lg text-xs font-bold">Kimya</span>
+                    </td>
+                    <td class="py-4 px-4 text-xs text-slate-500 font-medium">Bugün, 14:20</td>
+                    <td class="py-4 px-4">
+                        <div class="flex items-center justify-center gap-1 text-emerald-600 font-bold text-[11px] uppercase bg-emerald-50 py-1.5 px-3 rounded-lg border border-emerald-100 w-max mx-auto">
+                            <span class="material-symbols-outlined text-sm">check_circle</span>
+                            Tamamlandı
+                        </div>
+                    </td>
+                </tr>
+                <tr class="hover:bg-slate-50/50 transition-colors group opacity-80">
+                    <td class="py-4 px-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500">
+                                <span class="material-symbols-outlined text-lg">history</span>
+                            </div>
+                            <span class="font-bold text-slate-700 text-sm">Trigonometri Tekrarı</span>
+                        </div>
+                    </td>
+                    <td class="py-4 px-4">
+                        <span class="px-3 py-1 bg-blue-50 text-blue-700 border border-blue-100 rounded-lg text-xs font-bold">Matematik</span>
+                    </td>
+                    <td class="py-4 px-4 text-xs text-slate-500 font-medium">Dün, 10:15</td>
+                    <td class="py-4 px-4">
+                        <div class="flex items-center justify-center gap-1 text-red-500 font-bold text-[11px] uppercase bg-red-50 py-1.5 px-3 rounded-lg border border-red-100 w-max mx-auto">
+                            <span class="material-symbols-outlined text-sm">cancel</span>
+                            Kaçırıldı
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+</main>
+
+<!-- BottomNavBar for Mobile -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-between items-center z-50">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="{{ url_for('index') }}">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-bold">Panel</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#6200EE]" href="{{ url_for('hedefleyici') }}">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="text-[10px] font-bold">Gelişim</span>
+</a>
+<a href="{{ url_for('add_question') }}" class="bg-[#6200EE] p-3 rounded-full -mt-10 shadow-lg shadow-primary/30 text-white">
+<span class="material-symbols-outlined">add</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="{{ url_for('gorevlerim') }}">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-[10px] font-bold">Plan</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="{{ url_for('past_questions') }}">
+<span class="material-symbols-outlined">history</span>
+<span class="text-[10px] font-bold">Geçmiş</span>
+</a>
+</nav>
+
+{% include 'components/chatbot_widget.html' %}
+</body>
+</html>

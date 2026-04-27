@@ -1,0 +1,220 @@
+<!-- EduAI Floating Chatbot Widget -->
+<style>
+/* Scoped styles for the chatbot widget */
+#eduai-widget-container {
+    font-family: 'Inter', sans-serif;
+}
+.eduai-scrollbar::-webkit-scrollbar { width: 4px; }
+.eduai-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.eduai-scrollbar::-webkit-scrollbar-thumb { background: #dce2f3; border-radius: 10px; }
+.eduai-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbc3d9; }
+</style>
+
+<div id="eduai-widget-container" class="fixed bottom-6 right-6 z-[9999] flex flex-col items-end">
+    
+    <!-- Chat Window (Hidden by default) -->
+    <div id="eduai-chat-window" class="hidden w-[350px] sm:w-[380px] h-[500px] bg-white rounded-2xl shadow-2xl border border-slate-100 flex flex-col overflow-hidden mb-4 transition-all origin-bottom-right">
+        
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-[#6200EE] to-[#8451D1] p-4 flex items-center justify-between text-white shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm tracking-wide">EduAI Asistan</h3>
+                    <p class="text-[10px] text-purple-200 font-medium uppercase tracking-widest">Her zaman yanında</p>
+                </div>
+            </div>
+            <button id="eduai-close-btn" class="p-1 hover:bg-white/20 rounded-lg transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        
+        <!-- Messages Area -->
+        <div id="eduai-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 eduai-scrollbar scroll-smooth">
+            <!-- Welcome Message -->
+            <div class="flex justify-start gap-2 animate-[fadeIn_0.3s_ease-out]">
+                <div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center shrink-0 mt-0.5">
+                    <span class="material-symbols-outlined text-[#6200EE] text-[12px]" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+                </div>
+                <div class="bg-white border border-slate-100 px-4 py-3 rounded-2xl rounded-tl-[4px] shadow-sm max-w-[85%]">
+                    <p class="text-xs font-medium text-slate-700 leading-relaxed">Merhaba! Sana ders programın, konuların veya soruların hakkında nasıl yardımcı olabilirim?</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Input Area -->
+        <div class="p-3 bg-white border-t border-slate-100 shrink-0">
+            <form id="eduai-form" class="relative group bg-slate-50 rounded-xl border border-slate-200 p-1 focus-within:ring-2 focus-within:ring-[#6200EE]/20 focus-within:border-[#6200EE] transition-all flex items-end">
+                <textarea id="eduai-input" required class="flex-1 bg-transparent border-none focus:ring-0 py-2.5 px-3 resize-none text-xs font-medium text-slate-800 placeholder:text-slate-400 placeholder:font-medium min-h-[40px] max-h-24 outline-none eduai-scrollbar" placeholder="Bir soru sor..." rows="1" oninput="this.style.height = '';this.style.height = Math.min(this.scrollHeight, 96) + 'px'"></textarea>
+                <div class="flex gap-1 pb-1 shrink-0 px-1">
+                    <button type="submit" class="p-2 bg-[#6200EE] text-white rounded-lg shadow-sm hover:bg-purple-700 transition-all hover:scale-105 active:scale-95 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">send</span>
+                    </button>
+                </div>
+            </form>
+            <p class="text-center text-[9px] font-bold text-slate-400 mt-2">EduAI hatalı yanıtlar verebilir.</p>
+        </div>
+    </div>
+    
+    <!-- Floating Action Button -->
+    <button id="eduai-toggle-btn" class="w-14 h-14 bg-[#6200EE] text-white rounded-full shadow-lg shadow-purple-500/30 flex items-center justify-center hover:scale-105 hover:bg-purple-700 active:scale-95 transition-all outline-none border-2 border-white">
+        <span id="eduai-icon-open" class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+        <span id="eduai-icon-close" class="material-symbols-outlined text-2xl hidden">keyboard_arrow_down</span>
+    </button>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatWindow = document.getElementById('eduai-chat-window');
+    const toggleBtn = document.getElementById('eduai-toggle-btn');
+    const closeBtn = document.getElementById('eduai-close-btn');
+    const iconOpen = document.getElementById('eduai-icon-open');
+    const iconClose = document.getElementById('eduai-icon-close');
+    const chatForm = document.getElementById('eduai-form');
+    const messageInput = document.getElementById('eduai-input');
+    const chatMessages = document.getElementById('eduai-messages');
+
+    // Toggle Chat Window
+    function toggleChat() {
+        if (chatWindow.classList.contains('hidden')) {
+            // Open
+            chatWindow.classList.remove('hidden');
+            chatWindow.classList.add('flex');
+            chatWindow.animate([
+                { opacity: 0, transform: 'scale(0.9) translateY(20px)' },
+                { opacity: 1, transform: 'scale(1) translateY(0)' }
+            ], { duration: 200, easing: 'ease-out' });
+            
+            iconOpen.classList.add('hidden');
+            iconClose.classList.remove('hidden');
+            messageInput.focus();
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        } else {
+            // Close
+            const animation = chatWindow.animate([
+                { opacity: 1, transform: 'scale(1) translateY(0)' },
+                { opacity: 0, transform: 'scale(0.9) translateY(20px)' }
+            ], { duration: 150, easing: 'ease-in' });
+            
+            animation.onfinish = () => {
+                chatWindow.classList.add('hidden');
+                chatWindow.classList.remove('flex');
+            };
+            
+            iconClose.classList.add('hidden');
+            iconOpen.classList.remove('hidden');
+        }
+    }
+
+    toggleBtn.addEventListener('click', toggleChat);
+    closeBtn.addEventListener('click', toggleChat);
+
+    // Handle Enter mapping for Textarea
+    messageInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            chatForm.dispatchEvent(new Event('submit'));
+        }
+    });
+
+    chatForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        // Add User Bubble
+        appendEduAIMessage(message, false);
+        
+        // Reset Textarea
+        messageInput.value = '';
+        messageInput.style.height = '40px';
+        
+        // Add Loading indicator
+        const loadingId = 'eduai-loading-' + Date.now();
+        appendEduAILoading(loadingId);
+
+        // Fetch AI Response (CSRF token is usually in a meta tag, let's grab if exists)
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+        if (csrfToken) {
+            headers['X-CSRFToken'] = csrfToken.getAttribute('content');
+        }
+
+        fetch('/send-message', {
+            method: 'POST',
+            headers: headers,
+            body: `content=${encodeURIComponent(message)}`
+        })
+        .then(response => {
+            if(!response.ok) throw new Error("Network error");
+            return response.json();
+        })
+        .then(data => {
+            removeEduAILoading(loadingId);
+            if(data.ai_response) {
+                appendEduAIMessage(data.ai_response, true);
+            } else if (data.response) {
+                 appendEduAIMessage(data.response, true);
+            } else {
+                 appendEduAIMessage("Yanıt alınamadı.", true);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            removeEduAILoading(loadingId);
+            appendEduAIMessage('Bağlantı hatası oluştu, lütfen tekrar deneyin.', true);
+        });
+    });
+
+    function appendEduAIMessage(content, isAI) {
+        const messageDiv = document.createElement('div');
+        let formattedContent = content.replace(/\n/g, '<br>');
+        
+        if (isAI) {
+            messageDiv.className = "flex justify-start gap-2 animate-[fadeIn_0.3s_ease-out]";
+            messageDiv.innerHTML = `
+                <div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center shrink-0 mt-0.5">
+                    <span class="material-symbols-outlined text-[#6200EE] text-[12px]" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+                </div>
+                <div class="bg-white border border-slate-100 px-4 py-3 rounded-2xl rounded-tl-[4px] shadow-sm max-w-[85%]">
+                    <p class="text-xs font-medium text-slate-700 leading-relaxed">${formattedContent}</p>
+                </div>
+            `;
+        } else {
+            messageDiv.className = "flex justify-end gap-2 animate-[fadeIn_0.3s_ease-out]";
+            messageDiv.innerHTML = `
+                <div class="bg-[#6200EE] text-white px-4 py-3 rounded-2xl rounded-tr-[4px] shadow-sm max-w-[85%]">
+                    <p class="text-xs font-medium leading-relaxed">${formattedContent}</p>
+                </div>
+            `;
+        }
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    function appendEduAILoading(id) {
+        const messageDiv = document.createElement('div');
+        messageDiv.id = id;
+        messageDiv.className = "flex justify-start gap-2";
+        messageDiv.innerHTML = `
+            <div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center shrink-0 mt-0.5">
+                <span class="material-symbols-outlined text-[#6200EE] text-[12px]" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+            </div>
+            <div class="bg-white border border-slate-100 px-4 py-3 rounded-2xl rounded-tl-[4px] shadow-sm flex gap-1 items-center h-8">
+                <div class="w-1.5 h-1.5 bg-purple-200 rounded-full animate-bounce"></div>
+                <div class="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.15s"></div>
+                <div class="w-1.5 h-1.5 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
+            </div>
+        `;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    function removeEduAILoading(id) {
+        const div = document.getElementById(id);
+        if(div) div.remove();
+    }
+});
+</script>

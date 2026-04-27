@@ -1,89 +1,201 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html class="light" lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Favorilerim - ReviseMe</title>
+<meta name="csrf-token" content="{{ csrf_token() if csrf_token else '' }}">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#17deca",
+                        "surface": "#f9f9ff",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#9547f7",
+                        "surface-tint": "#6d23f9",
+                        "outline-variant": "#cbc3d9",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed": "#00201c",
+                        "on-surface-variant": "#494456",
+                        "tertiary-container": "#005f56",
+                        "primary-fixed": "#e8ddff",
+                        "on-surface": "#151c27",
+                        "primary": "#4800b2",
+                        "on-secondary-fixed-variant": "#6200bc",
+                        "on-error": "#ffffff",
+                        "on-background": "#151c27",
+                        "on-tertiary-container": "#1ee0cc",
+                        "inverse-surface": "#2a313d",
+                        "surface-container-highest": "#dce2f3",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#f9f9ff",
+                        "on-primary-container": "#d0beff",
+                        "secondary-fixed": "#eddcff",
+                        "on-secondary-container": "#fffbff",
+                        "surface-variant": "#dce2f3",
+                        "on-primary-fixed-variant": "#5300cd",
+                        "secondary-fixed-dim": "#d8b9ff",
+                        "surface-container-high": "#e2e8f8",
+                        "primary-fixed-dim": "#cfbdff",
+                        "tertiary-fixed": "#4ffbe6",
+                        "outline": "#7a7488",
+                        "error": "#ba1a1a",
+                        "secondary": "#7b24dc",
+                        "primary-container": "#6200ee",
+                        "on-primary-fixed": "#22005d",
+                        "background": "#f9f9ff",
+                        "tertiary": "#00453e",
+                        "inverse-on-surface": "#ebf1ff",
+                        "on-tertiary-fixed-variant": "#005048",
+                        "surface-dim": "#d3daea",
+                        "surface-container": "#e7eefe",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-container-low": "#f0f3ff",
+                        "inverse-primary": "#cfbdff",
+                        "on-secondary-fixed": "#290055",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sidebar-active {
+            background-color: white;
+            color: #6200EE;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            border-left: 4px solid #6200EE;
+        }
+    </style>
+    <style> html { font-size: 18px !important; } </style>
+    <style> html { font-size: 18px !important; } </style>
+</head>
+<body class="bg-[#F8F5FF] font-body-md text-on-surface min-h-screen flex">
 
-{% block title %}Favorilerim - ReviseMe{% endblock %}
+<!-- Sidebar -->
+{% set active_page = 'favorites' %}
+{% include 'components/sidebar_modern.html' %}
 
-{% block page_content %}
-<div class="favorites-bg" style="min-height: 100vh; width: 100vw; position: absolute; left: 0; top: 0; z-index: -1; background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);"></div>
-<div class="inner-content-wrapper">
-    <div class="favorite-header mb-4"><i class="fas fa-star" style="margin-right: 12px;"></i>Favori Sorularım</div>
-    <!-- Kategori Filtreleme -->
-    <div class="mb-4">
-        <label for="categoryFilter" class="form-label" style="color: #232946; font-weight: 600;">Ders/Kategori Seçin:</label>
-        <select id="categoryFilter" class="form-select dark-input" onchange="filterFavorites()" style="max-width: 300px;">
-            <option value="">Tüm Kategoriler</option>
-            {% for category in categories %}
-            <option value="{{ category.CategoryId }}" {% if selected_category_id and selected_category_id|int == category.CategoryId %}selected{% endif %}>{{ category.Name }}</option>
-            {% endfor %}
-        </select>
+<!-- TopBar & Main Content Shell -->
+<div class="ml-64 flex-1 flex flex-col min-h-screen">
+<!-- TopBar -->
+{% block header_title %}Favoriler{% endblock %}
+{% include 'components/header_modern.html' %}
+
+<!-- Main Content -->
+<main class="p-8 max-w-full px-4 md:px-8 w-full mx-auto space-y-6">
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div>
+        <h3 class="text-3xl font-bold text-on-surface mb-2">Yıldızlı Soruların ✨</h3>
+        <p class="text-slate-500 text-sm">Tekrar etmek üzere kaydettiğin veya özellikle beğendiğin soruların koleksiyonu.</p>
     </div>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        {% for question in questions %}
-        <div class="col">
-            <div class="card h-100 dark-card shadow-lg p-2" style="border-radius: 1.25rem; background: #232946; color: #f8f9fc;">
-                {% if question.ImagePath or question.PhotoPath %}
-                <img src="{{ url_for('static', filename=question.ImagePath or question.PhotoPath) }}" class="card-img-top" alt="Soru Görseli" style="height: 140px; object-fit: cover; border-radius: 1rem 1rem 0 0;">
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title" style="color: #30e8e8;">{{ question.Content[:100] }}{% if question.Content|length > 100 %}...{% endif %}</h5>
-                </div>
-                <div class="card-footer bg-transparent border-0 text-center">
-                    <a href="{{ url_for('view_question', question_id=question.QuestionId) }}" class="btn btn-primary w-100" style="background: linear-gradient(135deg, #30e8e8, #8ec5fc); border: none; font-weight: bold; box-shadow: 0 2px 8px #b2fefa;"> <i class="fas fa-eye"></i> Görüntüle</a>
-                </div>
-            </div>
+    
+    <!-- Filtreleme Alanı -->
+    <div class="bg-white p-2 rounded-xl shadow-sm border border-slate-200 flex items-center gap-3 min-w-[300px]">
+        <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+            <span class="material-symbols-outlined text-xl">filter_list</span>
         </div>
-        {% endfor %}
-        {% if questions|length == 0 %}
-        <div class="alert alert-info mt-3">Favori soru bulunmuyor.</div>
-        {% endif %}
+        <div class="flex-1">
+            <select id="categoryFilter" class="w-full border-none bg-transparent text-sm font-semibold focus:ring-0 cursor-pointer" onchange="filterFavorites()">
+                <option value="">Tüm Dersler/Kategoriler</option>
+                {% for category in categories %}
+                <option value="{{ category.CategoryId }}" {% if selected_category_id and selected_category_id|int == category.CategoryId %}selected{% endif %}>{{ category.Name }}</option>
+                {% endfor %}
+            </select>
+        </div>
     </div>
 </div>
-<style>
-.favorites-bg {
-    background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
-    position: fixed;
-    left: 0; top: 0; width: 100vw; height: 100vh;
-    z-index: -1;
-}
-.favorite-header {
-    background: none;
-    color: #232323;
-    font-family: 'Nunito', sans-serif;
-    font-size: 2.2rem;
-    font-weight: 800;
-    text-align: left;
-    margin-bottom: 0.8rem;
-    margin-top: 2.5rem;
-    letter-spacing: 2px;
-    text-shadow: 0 0 15px #fff, 0 0 20px #fff;
-}
-.dark-card label.form-label {
-    color: #f8f9fc;
-    font-weight: 600;
-}
-.dark-card input.form-control,
-.dark-card select.form-select,
-.dark-card textarea.form-control {
-    border-radius: 0.75rem;
-    border: 1px solid #8ec5fc;
-    background: #232946;
-    color: #f8f9fc;
-}
-.dark-card input.form-control:focus,
-.dark-card select.form-select:focus,
-.dark-card textarea.form-control:focus {
-    border-color: #30e8e8;
-    box-shadow: 0 0 0 0.2rem #8ec5fc44;
-    background: #232946;
-    color: #f8f9fc;
-}
-.dark-card ::placeholder {
-    color: #b2b8d6;
-    opacity: 1;
-}
-</style>
 
-{% block scripts %}
+<!-- Soru Grid Sayfası -->
+{% if questions|length > 0 %}
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+    {% for question in questions %}
+    <div class="bg-white rounded-3xl border border-[#E5E7EB] overflow-hidden shadow-[0_15px_30px_-5px_rgba(98,0,238,0.05)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group relative">
+        
+        <!-- Üst Label / Zorluk ve Yıldız -->
+        <div class="absolute top-4 left-4 right-4 flex justify-between items-center z-10">
+            <div class="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full border border-white text-xs font-bold text-slate-700 shadow-sm flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full {% if question.Difficulty == 'Zor' %}bg-error{% elif question.Difficulty == 'Orta' %}bg-amber-500{% else %}bg-emerald-500{% endif %}"></span>
+                {{ question.Difficulty or 'Orta' }}
+            </div>
+            
+            <button class="w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center text-[#ffb400] hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">star</span>
+            </button>
+        </div>
+
+        <!-- Soru Görseli veya Varsayılan Kapak -->
+        <div class="h-48 w-full bg-slate-50 relative overflow-hidden group-hover:bg-primary-container/5 transition-colors">
+            {% if question.ImagePath or question.PhotoPath %}
+                <img src="{{ url_for('static', filename=question.ImagePath or question.PhotoPath) }}" alt="Soru Görseli" class="w-full h-full object-cover">
+            {% else %}
+                <div class="w-full h-full flex flex-col justify-center items-center opacity-40 group-hover:scale-105 transition-transform duration-500">
+                    <span class="material-symbols-outlined text-6xl text-primary" style="font-variation-settings: 'wght' 200;">quiz</span>
+                </div>
+            {% endif %}
+            <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+        </div>
+
+        <!-- Soru İçeriği -->
+        <div class="p-6 flex-1 flex flex-col">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 text-[10px] uppercase font-bold tracking-widest border border-slate-200">
+                    {{ question.Topic or 'Genel Konu' }}
+                </span>
+            </div>
+            
+            <p class="font-semibold text-slate-800 text-sm flex-1 leading-relaxed line-clamp-3">
+                {{ question.Content or 'Bu sorunun metin içeriği bulunmuyor, çözüme görselden ulaşabilirsiniz.' }}
+            </p>
+
+            <div class="border-t border-slate-100 mt-5 pt-5 flex items-center justify-between">
+                <div class="text-[11px] text-slate-400 font-medium flex items-center gap-1">
+                    <span class="material-symbols-outlined text-xs">calendar_today</span>
+                    Eklenme: {{ question.CreatedAt.strftime('%d.%m.%Y') if question.CreatedAt else 'Bilinmiyor' }}
+                </div>
+                
+                <a href="{{ url_for('view_question', question_id=question.QuestionId) }}" class="px-5 py-2.5 rounded-xl bg-primary-container text-white text-xs font-bold hover:bg-primary transition-all flex items-center gap-2 shadow-md shadow-primary/20 active:scale-95" style="text-decoration:none;">
+                    Görüntüle
+                    <span class="material-symbols-outlined text-sm">visibility</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<!-- Boş Durum -->
+<div class="bg-white rounded-3xl border border-slate-200 p-16 text-center shadow-sm max-w-2xl mx-auto flex flex-col items-center justify-center mt-12">
+    <div class="w-24 h-24 bg-primary/5 rounded-full flex items-center justify-center mb-6">
+        <span class="material-symbols-outlined text-5xl text-primary/40">star</span>
+    </div>
+    <h4 class="text-xl font-bold text-slate-800 mb-2">Henüz Favori Soru Eklenmemiş</h4>
+    <p class="text-slate-500 text-sm max-w-md">Soru bankasındaki değerli soruları inceleyip favorilerinize ekleyebilirsiniz. Filtreler için başka bir kategori seçmeyi de deneyebilirsiniz.</p>
+    <a href="{{ url_for('index') }}" class="mt-8 px-6 py-3 rounded-xl bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:-translate-y-1 transition-transform" style="text-decoration:none;">Soru Bankasına Git</a>
+</div>
+{% endif %}
+
+</main>
+</div>
+
 <script>
+    // Dinamik filtreleme fonksiyonu
     function filterFavorites() {
         var categoryId = document.getElementById("categoryFilter").value;
         var url = "{{ url_for('favorites') }}";
@@ -92,15 +204,6 @@
         }
         window.location.href = url;
     }
-
-    // Sayfa yüklendiğinde mevcut seçimi ayarla (isteğe bağlı, Flask tarafında yapılıyor)
-    // window.onload = function() {
-    //     const urlParams = new URLSearchParams(window.location.search);
-    //     const category = urlParams.get('category');
-    //     if (category) {
-    //         document.getElementById('categoryFilter').value = category;
-    //     }
-    // }
 </script>
-{% endblock %}
-{% endblock %} 
+</body>
+</html>

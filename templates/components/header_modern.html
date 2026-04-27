@@ -1,0 +1,220 @@
+<!-- TopAppBar Modern -->
+<header class="sticky top-0 w-full z-30 bg-white/80 backdrop-blur-md border-b border-slate-100 shadow-sm flex items-center justify-between px-6 md:px-8 h-16 shrink-0 transition-all duration-300">
+    <div class="flex items-center gap-2 md:gap-4">
+        <!-- Sidebar Toggle UI -->
+        <button id="sidebar-toggle-btn" class="p-2 rounded-full hover:bg-slate-100 text-slate-600 transition-colors active:scale-95 flex items-center justify-center -ml-2">
+            <span class="material-symbols-outlined">menu</span>
+        </button>
+        <!-- Page Title (Optional fallback block) -->
+        <h2 class="text-base md:text-lg font-black text-slate-900 tracking-tight line-clamp-1">{% block header_title %}ReviseMe{% endblock %}</h2>
+    </div>
+    
+    <div class="flex items-center gap-3 md:gap-5">
+        <!-- Global Timer Pill -->
+        <a href="{{ url_for('timer') }}" id="global-timer-pill" class="hidden items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 shadow-sm hover:shadow-md transition-all active:scale-95 group">
+            <span class="material-symbols-outlined text-[16px] text-emerald-500 animate-pulse" style="font-variation-settings: 'FILL' 1;">timer</span>
+            <div class="flex flex-col">
+                <span id="global-timer-time" class="text-xs font-black text-emerald-600 leading-none tracking-tight">25:00</span>
+                <span class="text-[9px] font-bold text-emerald-400 uppercase tracking-widest mt-0.5 leading-none group-hover:text-emerald-500 transition-colors">Odaklanma</span>
+            </div>
+        </a>
+
+        <!-- Clock Widget -->
+        <div class="hidden sm:flex items-center gap-2 bg-purple-50/80 px-3 py-1.5 rounded-xl border border-purple-100">
+            <span class="material-symbols-outlined text-[16px] text-[#6200EE]" style="font-variation-settings: 'FILL' 1;">schedule</span>
+            <div class="flex flex-col">
+                <span id="modern-clock" class="text-xs font-bold text-[#6200EE] leading-none tracking-tight"></span>
+                <span id="modern-date" class="text-[9px] font-bold text-purple-400 uppercase tracking-widest mt-0.5 leading-none"></span>
+            </div>
+        </div>
+        
+        <div class="w-px h-8 bg-slate-200 hidden sm:block"></div>
+        
+        <!-- Profile & Settings Actions -->
+        <div class="flex items-center gap-1 md:gap-2">
+            <a href="{{ url_for('settings') }}" class="p-2 hover:bg-slate-100 rounded-full text-slate-500 transition-colors tooltip-wrapper" title="Ayarlar">
+                <span class="material-symbols-outlined">settings</span>
+            </a>
+            <a href="{{ url_for('profile') }}" class="h-9 w-9 rounded-full overflow-hidden border-2 border-slate-200 hover:border-[#6200EE]/50 hover:scale-105 transition-all ml-1 bg-slate-50 flex items-center justify-center" title="Profil">
+                <span class="material-symbols-outlined text-slate-400 w-full text-center" style="font-variation-settings: 'FILL' 1;">person</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Clock Logic
+    function updateModernClock() {
+        const now = new Date();
+        const timeEl = document.getElementById('modern-clock');
+        const dateEl = document.getElementById('modern-date');
+        
+        if (timeEl && dateEl) {
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            timeEl.textContent = `${h}:${m}:${s}`;
+            
+            const options = { weekday: 'short', day: 'numeric', month: 'short' };
+            dateEl.textContent = now.toLocaleDateString('tr-TR', options);
+        }
+    }
+    setInterval(updateModernClock, 1000);
+    updateModernClock();
+
+    // Global Pomodoro Logic
+    window.PomodoroManager = {
+        pill: document.getElementById('global-timer-pill'),
+        timeEl: document.getElementById('global-timer-time'),
+        interval: null,
+        
+        getState: function() {
+            return {
+                isRunning: localStorage.getItem('pm_isRunning') === 'true',
+                endTime: parseInt(localStorage.getItem('pm_endTime') || '0'),
+                timeLeftWhenPaused: parseInt(localStorage.getItem('pm_timeLeft') || '1500'), // default 25min (1500s)
+                totalTime: parseInt(localStorage.getItem('pm_totalTime') || '1500')
+            };
+        },
+        
+        saveState: function(state) {
+            localStorage.setItem('pm_isRunning', state.isRunning);
+            localStorage.setItem('pm_endTime', state.endTime);
+            localStorage.setItem('pm_timeLeft', state.timeLeftWhenPaused);
+            localStorage.setItem('pm_totalTime', state.totalTime);
+        },
+        
+        start: function(customTimeLeft) {
+            let state = this.getState();
+            state.isRunning = true;
+            if(customTimeLeft) {
+                state.timeLeftWhenPaused = customTimeLeft;
+                state.totalTime = customTimeLeft; // Assuming starting a fresh preset sets both
+            }
+            state.endTime = Date.now() + (state.timeLeftWhenPaused * 1000);
+            this.saveState(state);
+            this.tick();
+        },
+        
+        pause: function() {
+            let state = this.getState();
+            if (state.isRunning) {
+                let remaining = Math.max(0, Math.ceil((state.endTime - Date.now()) / 1000));
+                state.timeLeftWhenPaused = remaining;
+                state.isRunning = false;
+                this.saveState(state);
+            }
+            this.tick();
+        },
+        
+        reset: function(totalSeconds) {
+            let state = this.getState();
+            state.isRunning = false;
+            state.timeLeftWhenPaused = totalSeconds;
+            state.totalTime = totalSeconds;
+            this.saveState(state);
+            this.tick();
+        },
+        
+        tick: function() {
+            let state = this.getState();
+            let remaining = state.timeLeftWhenPaused;
+            
+            if (state.isRunning) {
+                remaining = Math.max(0, Math.ceil((state.endTime - Date.now()) / 1000));
+                if (remaining <= 0) {
+                    // Timer finished natively
+                    state.isRunning = false;
+                    state.timeLeftWhenPaused = 0;
+                    this.saveState(state);
+                    alert("Tebrikler! Oturumunuz bitti 🎉"); // Simple alert (ideally sound)
+                }
+            }
+            
+            // Update Global Pill
+            if (this.pill && this.timeEl) {
+                if (state.isRunning) {
+                    this.pill.classList.remove('hidden');
+                    this.pill.classList.add('flex');
+                    let m = Math.floor(remaining / 60);
+                    let s = remaining % 60;
+                    this.timeEl.textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                } else {
+                    this.pill.classList.add('hidden');
+                    this.pill.classList.remove('flex');
+                }
+            }
+            
+            // Notify if a page defines window.onPomodoroTick
+            if (typeof window.onPomodoroTick === 'function') {
+                window.onPomodoroTick(remaining, state.totalTime, state.isRunning);
+            }
+        },
+        
+        init: function() {
+            this.tick();
+            this.interval = setInterval(() => this.tick(), 1000);
+        }
+    };
+    
+    // Start global manager
+    window.PomodoroManager.init();
+
+    // Sidebar Toggle Logic
+    const sidebar = document.getElementById('modern-sidebar');
+    const toggleBtn = document.getElementById('sidebar-toggle-btn');
+    const closeMobileBtn = document.getElementById('sidebar-close-mobile');
+    const overlay = document.getElementById('sidebar-overlay');
+    
+    // Check saved state for desktop
+    if(window.innerWidth >= 768) {
+        const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+        if (isCollapsed && sidebar) {
+            sidebar.classList.add('collapsed');
+        }
+    }
+    
+    function initSidebarToggle() {
+        if (!sidebar || !toggleBtn) return;
+        
+        toggleBtn.addEventListener('click', function() {
+            if(window.innerWidth < 768) {
+                // Mobile behavior: slide in from left, fixed position
+                if(sidebar.classList.contains('hidden')) {
+                    sidebar.classList.remove('hidden');
+                    sidebar.classList.add('fixed', 'left-0', 'top-0', 'h-full', 'z-50');
+                    overlay.classList.remove('hidden');
+                    setTimeout(() => overlay.classList.replace('opacity-0', 'opacity-100'), 10);
+                } else {
+                    closeMobileSidebar();
+                }
+            } else {
+                // Desktop behavior: collapse width
+                sidebar.classList.toggle('collapsed');
+                localStorage.setItem('sidebar-collapsed', sidebar.classList.contains('collapsed'));
+            }
+        });
+        
+        if(closeMobileBtn) {
+            closeMobileBtn.addEventListener('click', closeMobileSidebar);
+        }
+        if(overlay) {
+            overlay.addEventListener('click', closeMobileSidebar);
+        }
+    }
+    
+    function closeMobileSidebar() {
+        if(window.innerWidth < 768) {
+            overlay.classList.replace('opacity-100', 'opacity-0');
+            setTimeout(() => {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('fixed', 'left-0', 'top-0', 'h-full', 'z-50');
+                overlay.classList.add('hidden');
+            }, 300);
+        }
+    }
+
+    initSidebarToggle();
+});
+</script>

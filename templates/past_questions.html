@@ -1,124 +1,160 @@
-{% extends "base.html" %}
-
-{% block title %}Geçmiş Sorular - ReviseMe{% endblock %}
-
-{% block styles %}
+<!DOCTYPE html>
+<html class="light" lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Geçmiş Sorular - ReviseMe</title>
+<meta name="csrf-token" content="{{ csrf_token() if csrf_token else '' }}">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4800b2",
+                        "primary-container": "#6200ee",
+                        "on-background": "#151c27",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#9547f7",
+                        "on-surface": "#151c27",
+                        "outline-variant": "#cbc3d9",
+                    },
+                    fontFamily: {
+                        "headline-md": ["Inter"],
+                        "display-xl": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
 <style>
-    body {
-        background-color: transparent !important;
-        position: relative;
-    }
-    .past-questions-bg {
-        background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
-        position: fixed;
-        left: 0; top: 0; width: 100vw; height: 100vh;
-        z-index: -1;
-    }
-    .page-header {
-        color: #232323;
-        font-size: 2.2rem;
-        font-weight: 800;
-        text-align: left;
-        margin-bottom: 0.8rem;
-        margin-top: 2.5rem;
-        letter-spacing: 2px;
-        font-family: 'Nunito', sans-serif;
-        text-shadow: 0 0 15px #fff, 0 0 20px #fff;
-    }
-    .past-question-card {
-        background-color: rgba(26, 20, 64, 0.85);
-        border: 1px solid rgba(106, 55, 181, 0.3);
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        color: #FFF;
-        backdrop-filter: blur(5px);
-        transition: all 0.3s;
-        display: flex;
-        align-items: center;
-        padding: 1.2rem 1.5rem;
-        margin-bottom: 1.2rem;
-    }
-    .past-question-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 35px rgba(46, 205, 200, 0.3);
-        border-color: #2ECDC8;
-    }
-    .past-question-img {
-        height: 80px;
-        width: 80px;
-        object-fit: cover;
-        border-radius: 10px;
-        margin-right: 20px;
-        border: 2px solid #8451D1;
-        background: #fff;
-    }
-    .past-question-content {
-        flex-grow: 1;
-        font-size: 1.1rem;
-        font-weight: 500;
-        color: #FFF;
-        text-shadow: 0 0 8px rgba(0,0,0,0.4);
-    }
-    .past-question-date {
-        background: #2ECDC8;
-        color: #222;
-        font-weight: bold;
-        border-radius: 1rem;
-        padding: 0.3rem 1rem;
-        margin-left: 1rem;
-        font-size: 1rem;
-        box-shadow: 0 0 8px rgba(46,205,200,0.2);
-    }
-    .past-question-btn {
-        font-weight: bold;
-        font-size: 1rem;
-        border-radius: 1.5rem;
-        padding: 0.5rem 1.2rem;
-        background: linear-gradient(135deg, #6A37B5, #8451D1);
-        color: #fff;
-        border: none;
-        box-shadow: 0 0 10px rgba(106, 55, 181, 0.3);
-        transition: all 0.2s;
-        margin-left: 1rem;
-    }
-    .past-question-btn:hover {
-        background: linear-gradient(135deg, #2ECDC8, #8451D1);
-        color: #fff;
-        transform: translateY(-2px);
-    }
-</style>
-{% endblock %}
+        body { background-color: #F8F5FF; font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .shadow-premium { box-shadow: 0 15px 15px rgba(98, 0, 238, 0.04); }
+        .sidebar-active {
+            background-color: #f8fafc;
+            color: #6200EE;
+            border-left: 4px solid #6200EE;
+            border-radius: 0;
+            border-top-right-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+        }
+    </style>
+    <style> html { font-size: 18px !important; } </style>
+    <style> html { font-size: 18px !important; } </style>
+</head>
+<body class="bg-[#F8F5FF] font-body-md text-on-background min-h-screen">
 
-{% block page_content %}
-<div class="past-questions-bg"></div>
-<div class="container mt-4">
-    <h2 class="page-header"><i class="fas fa-history" style="margin-right: 12px;"></i>Geçmiş Sorular</h2>
-    <div class="row">
-        {% for question in questions %}
-        <div class="col-12 past-question-card">
-            {% if question.ImagePath or question.PhotoPath %}
-                <img src="{{ url_for('static', filename=question.ImagePath or question.PhotoPath) }}" alt="Soru Görseli" class="past-question-img">
-            {% endif %}
-            <div class="past-question-content">
-                {{ question.Content[:100] }}{% if question.Content|length > 100 %}...{% endif %}
-            </div>
-            {# Çözülmesi gereken tarihi göster #}
-            <span class="past-question-date">
-                Çözülmesi gereken tarih:
-                {% if question.RepeatCount == 0 %}
-                    {{ question.Repeat1Date.strftime('%d.%m.%Y') if question.Repeat1Date else '' }}
-                {% elif question.RepeatCount == 1 %}
-                    {{ question.Repeat2Date.strftime('%d.%m.%Y') if question.Repeat2Date else '' }}
-                {% elif question.RepeatCount == 2 %}
-                    {{ question.Repeat3Date.strftime('%d.%m.%Y') if question.Repeat3Date else '' }}
-                {% endif %}
-            </span>
-            <a href="{{ url_for('view_question', question_id=question.QuestionId) }}" class="past-question-btn ms-3"><i class="fas fa-eye"></i> Görüntüle</a>
-        </div>
-        {% endfor %}
-        {% if questions|length == 0 %}
-        <div class="alert alert-info mt-3">Geçmiş soru bulunmuyor.</div>
-        {% endif %}
+<!-- TopAppBar Shell -->
+{% block header_title %}Geçmiş Sorular{% endblock %}
+{% include 'components/header_modern.html' %}
+
+<!-- SideNavBar Shell -->
+{% set active_page = 'past_questions' %}
+{% include 'components/sidebar_modern.html' %}
+
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-24 pb-12 px-6 md:px-12 max-w-full px-4 md:px-8 w-full mx-auto">
+<!-- Summary Panel (Summary Header) -->
+<header class="mb-8">
+<div class="bg-gradient-to-r from-violet-700 to-[#6200EE] rounded-3xl p-8 text-white shadow-xl shadow-violet-500/10 flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="space-y-2 text-center md:text-left">
+    <h1 class="text-3xl font-black tracking-tight">Geçmiş Sorular</h1>
+    <p class="font-medium opacity-90 text-sm max-w-lg">Zamanı geçmiş sorular burada birikti. Düzeni sağlamak için soruları hemen eritmeye başlayabilirsin!</p>
+</div>
+<div class="flex gap-4">
+    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 text-center min-w-[120px] shadow-inner">
+    <span class="block text-4xl font-black mb-1">{{ questions|length }}</span>
+    <span class="text-[10px] font-bold uppercase tracking-widest opacity-80">Toplam Geciken</span>
     </div>
 </div>
-{% endblock %} 
+</div>
+</header>
+
+<!-- Question Grid -->
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+    {% for question in questions %}
+    
+    {% set due_date = none %}
+    {% if question.RepeatCount == 0 %}
+        {% set due_date = question.Repeat1Date %}
+    {% elif question.RepeatCount == 1 %}
+        {% set due_date = question.Repeat2Date %}
+    {% elif question.RepeatCount == 2 %}
+        {% set due_date = question.Repeat3Date %}
+    {% endif %}
+
+    <!-- Card -->
+    <div class="bg-white rounded-3xl shadow-premium border border-slate-100 overflow-hidden flex flex-col sm:flex-row hover:shadow-2xl hover:-translate-y-1 hover:border-violet-200 transition-all duration-300 group">
+    <div class="w-full sm:w-48 h-48 sm:h-auto relative overflow-hidden bg-slate-50 shrink-0">
+        {% if question.ImagePath or question.PhotoPath %}
+            <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="{{ url_for('static', filename=question.ImagePath or question.PhotoPath) }}" />
+        {% else %}
+            <div class="w-full h-full flex items-center justify-center text-primary/30 group-hover:scale-105 transition-transform duration-500">
+                <span class="material-symbols-outlined text-6xl font-light">history</span>
+            </div>
+        {% endif %}
+        <!-- Aciliyeti temsil eden etiket (kırmızı vs) -->
+        <div class="absolute top-3 left-3 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-tighter shadow-sm border border-white/20">Süresi Geçti</div>
+    </div>
+    
+    <div class="flex-1 p-6 flex flex-col justify-between">
+        <div>
+        <div class="flex justify-between items-start mb-3">
+            <span class="text-violet-600 font-bold tracking-wider uppercase text-[10px] bg-violet-50 px-2 py-1 rounded border border-violet-100">{{ question.Topic or 'Soru' }}</span>
+            <div class="flex items-center text-red-500 font-bold text-xs bg-red-50 px-2 py-1 rounded-md border border-red-100">
+                <span class="material-symbols-outlined text-[14px] mr-1">history</span>
+                Gecikmede
+            </div>
+        </div>
+        <h3 class="font-bold text-slate-800 text-sm mb-2 line-clamp-2">{{ question.Content or "Görselden çözülecek soru içeriği" }}</h3>
+        <p class="text-slate-500 text-xs font-medium mb-4 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">calendar_month</span>
+            Son Tarih: {{ due_date.strftime('%d.%m.%Y') if due_date else 'Bilinmiyor' }}
+        </p>
+        </div>
+        
+        <div class="flex items-center justify-between">
+        <div class="text-slate-400 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">autorenew</span>
+            {{ question.RepeatCount + 1 }}. Tekrar Zamanı
+        </div>
+        <a href="{{ url_for('view_question', question_id=question.QuestionId) }}" class="bg-primary-container text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md shadow-primary/20 active:scale-95 transition-all hover:bg-primary flex items-center gap-1" style="text-decoration:none;">
+            Çözmeye Başla
+            <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+        </a>
+        </div>
+    </div>
+    </div>
+    {% endfor %}
+    
+    {% if questions|length == 0 %}
+    <!-- Empty State -->
+    <div class="col-span-1 xl:col-span-2 flex flex-col items-center justify-center py-20 text-center bg-white rounded-3xl border border-dashed border-gray-200">
+        <div class="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center mb-6">
+            <span class="material-symbols-outlined text-5xl text-emerald-500">task_alt</span>
+        </div>
+        <h2 class="text-2xl font-black text-slate-800 mb-2">Tebrikler!</h2>
+        <p class="text-slate-500 max-w-sm text-sm">Şu an için gecikmiş herhangi bir sorunuz bulunmuyor. Programınıza sadık kaldığınız için harikasınız.</p>
+    </div>
+    {% endif %}
+</div>
+
+</main>
+<!-- FAB for quick action (to dashboard) -->
+<a href="{{ url_for('index') }}" class="md:hidden fixed bottom-8 right-8 w-14 h-14 bg-[#6200EE] text-white rounded-full shadow-2xl flex items-center justify-center active:scale-90 transition-transform z-40">
+<span class="material-symbols-outlined">dashboard</span>
+</a>
+{% include 'components/chatbot_widget.html' %}
+</body>
+</html>

@@ -49,7 +49,7 @@
             background-color: var(--light-color);
             font-family: 'Nunito', sans-serif;
             color: var(--text-color);
-            font-size: 16px;
+            font-size: 18px;
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -953,6 +953,8 @@
         });
     })();
     </script>
+    <style> html { font-size: 18px !important; } </style>
+    <style> html { font-size: 18px !important; } </style>
 </head>
 <body style="padding-top: 56px;">
     <!-- Header ve Navbar -->
@@ -1551,5 +1553,6 @@
     <script>
 (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="x3OBgZhqJWVAgJWH9lBLG";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
 </script>
+{% include 'components/chatbot_widget.html' %}
 </body>
 </html>

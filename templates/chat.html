@@ -1,69 +1,193 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduAI Chat - ReviseMe</title>
+<meta name="csrf-token" content="{{ csrf_token() if csrf_token else '' }}">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4800b2",
+                        "primary-container": "#6200ee",
+                        "on-background": "#151c27",
+                        "tertiary": "#00453e",
+                        "tertiary-fixed": "#4ffbe6",
+                        "secondary": "#7b24dc",
+                        "surface": "#f9f9ff",
+                    },
+                    fontFamily: {
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "display-xl": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbc3d9; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #7a7488; }
+        .chat-container { scroll-behavior: smooth; }
+    </style>
+    <style> html { font-size: 18px !important; } </style>
+    <style> html { font-size: 18px !important; } </style>
+</head>
+<body class="bg-[#F8F5FF] text-slate-800 antialiased h-screen overflow-hidden flex flex-col md:flex-row">
 
-{% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8 mx-auto">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Motivasyon Asistanı</h5>
-                </div>
-                <div class="card-body">
-                    <div id="chat-messages" class="mb-4" style="height: 400px; overflow-y: auto;">
-                        {% for message in messages %}
-                        <div class="message {% if message.IsFromAI %}ai-message{% else %}user-message{% endif %} mb-3">
-                            <div class="message-content p-3 rounded">
-                                {{ message.Content }}
-                            </div>
-                            <small class="text-muted">
-                                {{ message.CreatedAt.strftime('%H:%M') }}
-                            </small>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    <form id="chat-form" class="mt-3">
-                        <div class="input-group">
-                            <input type="text" id="message-input" class="form-control" 
-                                   placeholder="Mesajınızı yazın..." required>
-                            <div class="input-group-append">
-                                <button type="submit" class="btn btn-primary">Gönder</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
+<!-- Sidebar Navigation Shell (Chat Specific) -->
+<aside class="hidden md:flex flex-col h-full p-4 z-40 bg-white border-r border-slate-100 w-64 shrink-0 shadow-sm">
+    <div class="mb-4 mt-2 px-2 flex items-center gap-3">
+        <div class="h-10 w-10 bg-[#6200EE] rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+            <span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+        </div>
+        <div>
+            <h1 class="text-lg font-black text-[#6200EE] tracking-tight">EduAI Chat</h1>
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Academic Assistant</p>
         </div>
     </div>
-</div>
+    
+    <nav class="flex-1 space-y-1 mt-4 overflow-y-auto">
+        <button class="w-full flex items-center gap-3 px-3 py-3 mb-4 bg-purple-50 text-[#6200EE] font-bold rounded-xl active:translate-x-1 transition-transform border border-purple-100 shadow-sm hover:shadow-md">
+            <span class="material-symbols-outlined">add_box</span>
+            <span class="text-xs tracking-wide">Yeni Sohbet</span>
+        </button>
+        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 mb-2 mt-6">Geçmiş</p>
+        <a class="w-full flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-[#6200EE] rounded-xl transition-all duration-200" href="#">
+            <span class="material-symbols-outlined text-[18px]">history</span>
+            <span class="text-xs font-semibold truncate">Hücre Bölünmesi Özeti</span>
+        </a>
+        <a class="w-full flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-[#6200EE] rounded-xl transition-all duration-200" href="#">
+            <span class="material-symbols-outlined text-[18px]">history</span>
+            <span class="text-xs font-semibold truncate">Türev Formülleri</span>
+        </a>
+        <a class="w-full flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-[#6200EE] rounded-xl transition-all duration-200" href="#">
+            <span class="material-symbols-outlined text-[18px]">history</span>
+            <span class="text-xs font-semibold truncate">Tarih: 1. Dünya Savaşı</span>
+        </a>
+    </nav>
+    
+    <div class="mt-auto space-y-4 pt-6 border-t border-slate-100">
+        <div class="p-4 bg-gradient-to-br from-[#6200EE] to-[#8451D1] rounded-2xl text-white shadow-lg relative overflow-hidden group hover:shadow-xl transition-shadow cursor-pointer">
+            <div class="absolute -right-4 -top-4 w-16 h-16 bg-white/20 rounded-full blur-xl group-hover:bg-white/30 transition-colors"></div>
+            <p class="text-[10px] font-black uppercase tracking-widest mb-1 opacity-80 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[12px]">bolt</span> Pro Plan
+            </p>
+            <p class="text-xs font-bold mb-3">Sınırsız yapay zeka deneyimini kilidini aç.</p>
+            <button class="w-full bg-white text-[#6200EE] py-2 rounded-xl text-xs font-black tracking-wide hover:bg-opacity-90 transition-colors">Yükselt</button>
+        </div>
+        <div class="space-y-1">
+            <a class="flex items-center gap-3 px-3 py-2 text-red-500 hover:bg-red-50 rounded-xl text-xs font-bold transition-colors" href="{{ url_for('logout') if 'logout' in active_endpoints else '#' }}">
+                <span class="material-symbols-outlined text-[18px]">logout</span>
+                Çıkış Yap
+            </a>
+        </div>
+    </div>
+</aside>
 
-<style>
-.message {
-    margin-bottom: 1rem;
-}
+<!-- Main Chat Canvas -->
+<main class="flex-1 flex flex-col md:ml-64 relative bg-[#F8F5FF] h-screen w-full">
 
-.user-message {
-    text-align: right;
-}
+    <!-- Top App Bar Content -->
+    <header class="flex items-center justify-between px-6 md:px-8 py-4 w-full sticky top-0 z-30 bg-white/60 backdrop-blur-xl border-b border-white/50 shadow-sm">
+        <div class="flex items-center gap-4">
+            <span class="md:hidden material-symbols-outlined text-slate-600 cursor-pointer">menu</span>
+            <div class="flex items-center gap-2">
+                <span class="text-lg font-black text-slate-800 tracking-tight">Akıllı Asistan</span>
+                <span class="bg-purple-100 text-[#6200EE] px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-purple-200">GPT-4 Turbo</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-6">
+            <!-- App Navigation embedded in Chat Header -->
+            <nav class="hidden md:flex items-center gap-6">
+                <a class="text-slate-500 font-bold text-xs hover:text-[#6200EE] transition-colors" href="{{ url_for('index') }}">Panel</a>
+                <a class="text-slate-500 font-bold text-xs hover:text-[#6200EE] transition-colors" href="{{ url_for('add_question') }}">Soru Ekle</a>
+                <a class="text-[#6200EE] font-black text-xs border-b-2 border-[#6200EE] pb-1" href="#">EduAI</a>
+            </nav>
+            <div class="flex items-center gap-3">
+                <a href="{{ url_for('profile') }}" class="h-8 w-8 rounded-full overflow-hidden border-2 border-[#6200EE]/20 hover:scale-105 transition-transform">
+                    <span class="material-symbols-outlined w-full h-full flex items-center justify-center text-[#6200EE] bg-violet-50">person</span>
+                </a>
+            </div>
+        </div>
+    </header>
 
-.user-message .message-content {
-    background-color: #007bff;
-    color: white;
-    display: inline-block;
-    max-width: 70%;
-}
+    <!-- Chat Area -->
+    <section id="chat-messages" class="flex-1 overflow-y-auto px-4 md:px-8 py-8 max-w-full px-4 md:px-8 mx-auto w-full space-y-8 pb-48 chat-container">
+        
+        <!-- Welcome Message (Only visible if empty, but server side rendered if needed) -->
+        <div class="flex flex-col items-center justify-center h-40 opacity-50 mt-10">
+            <div class="w-16 h-16 bg-purple-50 rounded-3xl flex items-center justify-center text-[#6200EE] mb-4 rotate-12">
+                <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+            </div>
+            <h2 class="text-xl font-black text-slate-800">Sana nasıl yardımcı olabilirim?</h2>
+            <p class="text-xs font-bold text-slate-500 mt-2">Ders çalışırken aklına takılan her şeyi sorabilirsin.</p>
+        </div>
 
-.ai-message .message-content {
-    background-color: #f8f9fa;
-    color: #212529;
-    display: inline-block;
-    max-width: 70%;
-}
+        <!-- Rendered Messages via Jinja (if any) -->
+        {% if messages %}
+            {% for message in messages %}
+                {% if not message.IsFromAI %}
+                    <!-- User Bubble -->
+                    <div class="flex justify-end gap-3 mt-4">
+                        <div class="max-w-[80%] md:max-w-[70%] bg-[#6200EE] text-white px-5 py-3.5 rounded-3xl rounded-tr-[4px] shadow-md">
+                            <p class="text-sm font-medium leading-relaxed">{{ message.Content }}</p>
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- AI Bubble -->
+                    <div class="flex justify-start gap-3 mt-4">
+                        <div class="w-8 h-8 rounded-full bg-white border border-purple-100 shadow-sm flex items-center justify-center shrink-0 mt-1">
+                            <span class="material-symbols-outlined text-[#6200EE] text-sm" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+                        </div>
+                        <div class="max-w-[85%] md:max-w-[75%] bg-white border border-slate-100 px-6 py-5 rounded-3xl rounded-tl-[4px] shadow-sm">
+                            <p class="text-sm font-medium text-slate-700 leading-relaxed">{{ message.Content }}</p>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        
+    </section>
 
-.message small {
-    display: block;
-    margin-top: 0.25rem;
-}
-</style>
+    <!-- Input Area Footer -->
+    <div class="absolute bottom-0 left-0 right-0 p-4 md:p-8 bg-gradient-to-t from-[#F8F5FF] via-[#F8F5FF] to-transparent z-40">
+        <div class="max-w-full px-4 md:px-8 mx-auto w-full">
+            <form id="chat-form" class="relative group bg-white rounded-3xl shadow-lg shadow-purple-500/5 border border-purple-100 p-2 focus-within:ring-4 focus-within:ring-[#6200EE]/10 focus-within:border-[#6200EE] transition-all flex flex-col">
+                <div class="flex items-end gap-2">
+                    <button type="button" class="p-3 text-slate-400 hover:text-[#6200EE] hover:bg-purple-50 transition-colors rounded-2xl shrink-0">
+                        <span class="material-symbols-outlined">attach_file</span>
+                    </button>
+                    <textarea id="message-input" required class="flex-1 bg-transparent border-none focus:ring-0 py-3.5 px-2 resize-none text-sm font-medium text-slate-800 placeholder:text-slate-400 placeholder:font-medium min-h-[52px] max-h-40 outline-none" placeholder="EduAI'ye Kimya, Biyoloji veya herhangi bir ders hakkında soru sor..." rows="1" oninput="this.style.height = '';this.style.height = Math.min(this.scrollHeight, 160) + 'px'"></textarea>
+                    
+                    <div class="flex gap-1 pb-1 shrink-0">
+                        <button type="button" class="hidden sm:block p-3 text-slate-400 hover:text-[#6200EE] hover:bg-purple-50 transition-colors rounded-2xl">
+                            <span class="material-symbols-outlined">mic</span>
+                        </button>
+                        <button type="submit" class="p-3 bg-[#6200EE] text-white rounded-2xl shadow-md hover:bg-purple-700 transition-all hover:scale-105 active:scale-95 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-lg">arrow_upward</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <p class="text-center text-[10px] font-bold text-slate-400 mt-4 uppercase tracking-widest">EduAI hata yapabilir. Önemli bilgileri kaynağınızla doğrulayın.</p>
+        </div>
+    </div>
+
+</main>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -71,56 +195,122 @@ document.addEventListener('DOMContentLoaded', function() {
     const messageInput = document.getElementById('message-input');
     const chatMessages = document.getElementById('chat-messages');
 
-    // Sayfa yüklendiğinde en son mesaja scroll
+    // Scroll to bottom on load
     chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Handle Enter key for textarea
+    messageInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            chatForm.dispatchEvent(new Event('submit'));
+        }
+    });
 
     chatForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const message = messageInput.value.trim();
         if (!message) return;
 
-        // Kullanıcı mesajını ekle
-        appendMessage(message, false);
-        messageInput.value = '';
+        // Hide the welcome banner if it exists
+        const welcomeBanner = chatMessages.querySelector('.opacity-50.mt-10');
+        if (welcomeBanner) {
+            welcomeBanner.style.display = 'none';
+        }
 
-        // AI yanıtını al
+        // Add User Bubble
+        appendMessage(message, false);
+        
+        // Reset Textarea
+        messageInput.value = '';
+        messageInput.style.height = '52px';
+        
+        // Add Loading indicator
+        const loadingId = 'loading-' + Date.now();
+        appendLoading(loadingId);
+
+        // Fetch AI Response
         fetch('/send-message', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
             body: `content=${encodeURIComponent(message)}`
         })
-        .then(response => response.json())
+        .then(response => {
+            if(!response.ok) throw new Error("Network error");
+            return response.json();
+        })
         .then(data => {
-            appendMessage(data.ai_response, true);
+            removeLoading(loadingId);
+            if(data.ai_response) {
+                appendMessage(data.ai_response, true);
+            } else if (data.response) {
+                 appendMessage(data.response, true);
+            } else {
+                 appendMessage("Yanıt alınamadı.", true);
+            }
         })
         .catch(error => {
             console.error('Error:', error);
-            appendMessage('Üzgünüm, bir hata oluştu. Lütfen tekrar deneyin.', true);
+            removeLoading(loadingId);
+            appendMessage('Üzgünüm, şu an bağlantı kuramıyorum. Lütfen tekrar dene.', true);
         });
     });
 
     function appendMessage(content, isAI) {
         const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${isAI ? 'ai-message' : 'user-message'} mb-3`;
         
-        const now = new Date();
-        const timeString = now.getHours().toString().padStart(2, '0') + ':' + 
-                          now.getMinutes().toString().padStart(2, '0');
-
-        messageDiv.innerHTML = `
-            <div class="message-content p-3 rounded">
-                ${content}
-            </div>
-            <small class="text-muted">
-                ${timeString}
-            </small>
-        `;
+        let formattedContent = content.replace(/\n/g, '<br>'); // Simple line break handling
+        
+        if (isAI) {
+            messageDiv.className = "flex justify-start gap-3 mt-4 animate-[fadeIn_0.3s_ease-out]";
+            messageDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-white border border-purple-100 shadow-sm flex items-center justify-center shrink-0 mt-1">
+                    <span class="material-symbols-outlined text-[#6200EE] text-sm" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+                </div>
+                <div class="max-w-[85%] md:max-w-[75%] bg-white border border-slate-100 px-6 py-5 rounded-3xl rounded-tl-[4px] shadow-sm">
+                    <p class="text-sm font-medium text-slate-700 leading-relaxed">${formattedContent}</p>
+                </div>
+            `;
+        } else {
+            messageDiv.className = "flex justify-end gap-3 mt-4 animate-[fadeIn_0.3s_ease-out]";
+            messageDiv.innerHTML = `
+                <div class="max-w-[80%] md:max-w-[70%] bg-[#6200EE] text-white px-5 py-3.5 rounded-3xl rounded-tr-[4px] shadow-md">
+                    <p class="text-sm font-medium leading-relaxed">${formattedContent}</p>
+                </div>
+            `;
+        }
 
         chatMessages.appendChild(messageDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
+    
+    function appendLoading(id) {
+        const messageDiv = document.createElement('div');
+        messageDiv.id = id;
+        messageDiv.className = "flex justify-start gap-3 mt-4";
+        messageDiv.innerHTML = `
+            <div class="w-8 h-8 rounded-full bg-white border border-purple-100 shadow-sm flex items-center justify-center shrink-0 mt-1">
+                <span class="material-symbols-outlined text-[#6200EE] text-sm" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+            </div>
+            <div class="bg-white border border-slate-100 px-6 py-5 rounded-3xl rounded-tl-[4px] shadow-sm flex gap-1 items-center">
+                <div class="w-2 h-2 bg-purple-200 rounded-full animate-bounce"></div>
+                <div class="w-2 h-2 bg-purple-300 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+            </div>
+        `;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    function removeLoading(id) {
+        const div = document.getElementById(id);
+        if(div) {
+            div.remove();
+        }
+    }
 });
 </script>
-{% endblock %} 
+</body>
+</html>

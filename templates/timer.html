@@ -1,233 +1,321 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Study Session - ReviseMe</title>
+<meta name="csrf-token" content="{{ csrf_token() if csrf_token else '' }}">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F5FF;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .timer-ring-container {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            margin: 0 auto;
+        }
+        .sidebar-active {
+            background-color: #f8fafc;
+            color: #6200EE;
+            border-left: 4px solid #6200EE;
+            border-radius: 0;
+            border-top-right-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+        }
+        
+        #progressCircle {
+            transition: stroke-dashoffset 1s linear;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4800b2",
+                        "primary-container": "#6200ee",
+                        "on-background": "#151c27",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#9547f7",
+                        "on-surface": "#151c27",
+                        "outline-variant": "#cbc3d9",
+                    },
+                    fontFamily: {
+                        "headline-md": ["Inter"],
+                        "display-xl": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style> html { font-size: 18px !important; } </style>
+    <style> html { font-size: 18px !important; } </style>
+</head>
+<body class="bg-[#F8F5FF] text-slate-800">
 
-{% block title %}Sayaç - ReviseMe{% endblock %}
+<!-- TopAppBar -->
+{% block header_title %}Study Sessions{% endblock %}
+{% include 'components/header_modern.html' %}
 
-{% block page_content %}
-<div class="timer-bg"></div>
-<div class="inner-content-wrapper">
-    <h2 class="pomodoro-header mb-4"><i class="fas fa-stopwatch" style="margin-right: 12px;"></i>Pomodoro Sayaç</h2>
-    <div class="card mb-4">
-        <div class="card-body text-center">
-            <div id="timerModeTitle" style="font-size:1.2rem; font-weight:600; margin-bottom:10px;">Odaklanma Zamanı</div>
-            <div id="timerDisplay" style="font-size:3rem; font-weight:bold;">25:00</div>
-            <div class="mt-3 d-flex justify-content-center gap-2">
-                <button class="btn btn-success" id="startBtn"><i class="fas fa-play"></i> Başlat</button>
-                <button class="btn btn-danger" id="stopBtn" style="display: none;"><i class="fas fa-stop"></i> Durdur</button>
-                <button class="btn btn-secondary" id="resetBtn"><i class="fas fa-undo"></i> Sıfırla</button>
-                <button class="btn btn-primary" id="saveBtn"><i class="fas fa-save"></i> Kaydet</button>
-                <button class="btn btn-warning" id="skipBtn" style="display: none;"><i class="fas fa-forward"></i> Mola Geç</button>
+<!-- SideNavBar -->
+{% set active_page = 'timer' %}
+{% include 'components/sidebar_modern.html' %}
+
+<!-- Main Canvas -->
+<main class="md:ml-64 pt-24 pb-12">
+<div class="flex-1 px-6 max-w-full px-4 md:px-8 mx-auto w-full">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+    
+<!-- Timer main screen -->
+<div class="col-span-1 md:col-span-12 lg:col-span-8 flex flex-col items-center justify-center bg-white rounded-3xl shadow-[0_15px_30px_rgba(98,0,238,0.04)] py-12 border border-slate-100 relative overflow-hidden">
+    
+    <div class="absolute -top-32 -left-32 w-64 h-64 bg-purple-50 rounded-full blur-3xl opacity-60"></div>
+    <div class="absolute -bottom-32 -right-32 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-60"></div>
+
+    <!-- Session Status -->
+    <div class="mb-8 flex flex-col items-center z-10">
+        <span id="sessionType" class="text-xs font-bold text-[#6200EE] uppercase tracking-widest mb-4 bg-purple-50 px-3 py-1 rounded border border-purple-100">Odaklanma Zamanı</span>
+        <div class="flex gap-3" id="sessionDots">
+            <div class="w-3 h-3 rounded-full bg-[#6200EE] shadow-[0_0_10px_rgba(98,0,238,0.4)]"></div>
+            <div class="w-3 h-3 rounded-full bg-purple-100"></div>
+            <div class="w-3 h-3 rounded-full bg-purple-100"></div>
+            <div class="w-3 h-3 rounded-full bg-purple-100"></div>
+        </div>
+        <p class="mt-4 text-xs font-bold uppercase text-slate-400 tracking-wider">Oturum <span id="currentSession">1</span> / 4</p>
+    </div>
+
+    <!-- Timer Visual -->
+    <div class="timer-ring-container flex items-center justify-center mb-12 z-10 w-full sm:w-[380px] h-[300px] sm:h-[380px]">
+        <!-- Progress Ring -->
+        <svg class="absolute inset-0 w-full h-full -rotate-90">
+            <circle cx="50%" cy="50%" fill="transparent" r="45%" stroke="#F3E8FF" stroke-width="12"></circle>
+            <circle id="progressCircle" cx="50%" cy="50%" fill="transparent" r="45%" stroke="#6200EE" stroke-dasharray="1068" stroke-dashoffset="0" stroke-linecap="round" stroke-width="12"></circle>
+        </svg>
+        <div class="text-center z-10 mt-2">
+            <span id="timerDisplay" class="block text-6xl sm:text-[84px] font-black tracking-tighter text-slate-800 leading-none mb-2">25:00</span>
+            <span id="timerModeTitle" class="text-sm uppercase font-bold tracking-widest text-[#6200EE]">Focus Time</span>
+        </div>
+    </div>
+
+    <!-- Timer Controls -->
+    <div class="flex items-center gap-4 sm:gap-6 z-10">
+        <button id="resetBtn" class="flex flex-col items-center gap-2 group">
+            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all active:scale-95">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">refresh</span>
+            </div>
+            <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-tighter">Sıfırla</span>
+        </button>
+
+        <button id="startBtn" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#6200EE] shadow-[0_10px_25px_rgba(98,0,238,0.3)] flex items-center justify-center text-white hover:scale-105 transition-all active:scale-95 group border-4 border-purple-50">
+            <span class="material-symbols-outlined text-4xl sm:text-5xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+        </button>
+
+        <button id="stopBtn" class="hidden w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#BA1A1A] shadow-[0_10px_25px_rgba(186,26,26,0.3)] flex items-center justify-center text-white hover:scale-105 transition-all active:scale-95 group border-4 border-red-50">
+            <span class="material-symbols-outlined text-4xl sm:text-5xl" style="font-variation-settings: 'FILL' 1;">pause</span>
+        </button>
+
+        <button id="skipBtn" class="flex flex-col items-center gap-2 group">
+            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all active:scale-95">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">skip_next</span>
+            </div>
+            <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-tighter">Geç</span>
+        </button>
+    </div>
+</div>
+
+<!-- Settings & Info Side -->
+<div class="col-span-1 md:col-span-12 lg:col-span-4 space-y-6">
+    <!-- Settings Card -->
+    <div class="bg-white rounded-3xl shadow-sm p-6 sm:p-8 border border-slate-100">
+        <div class="flex items-center gap-2 mb-6">
+            <span class="material-symbols-outlined text-[#6200EE]">settings</span>
+            <h3 class="text-lg font-bold text-slate-800">Ayarlar</h3>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Çalışma Süresi (dk)</label>
+                <input id="workDuration" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-bold focus:ring-2 focus:ring-[#6200EE] outline-none transition-all" type="number" value="25" min="1" max="60"/>
+            </div>
+            <div class="flex gap-4">
+                <div class="flex-1">
+                    <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Kısa Mola</label>
+                    <input id="shortBreakDuration" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-bold focus:ring-2 focus:ring-[#6200EE] outline-none transition-all" type="number" value="5" min="1" max="30"/>
+                </div>
+                <div class="flex-1">
+                    <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Uzun Mola</label>
+                    <input id="longBreakDuration" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-bold focus:ring-2 focus:ring-[#6200EE] outline-none transition-all" type="number" value="15" min="1" max="60"/>
+                </div>
+            </div>
+            <button id="saveSettingsBtnMain" class="mt-2 w-full py-3 bg-purple-50 text-[#6200EE] font-black uppercase tracking-wider text-xs rounded-xl hover:bg-purple-100 transition-all active:scale-95 border border-purple-200 shadow-sm">
+                Kaydet
+            </button>
+        </div>
+    </div>
+
+    <!-- Quote/Motivation Card -->
+    <div class="relative overflow-hidden bg-gradient-to-br from-[#6200EE] to-[#8451D1] rounded-3xl shadow-lg p-8 text-white">
+        <div class="absolute -right-4 -bottom-4 opacity-10 pointer-events-none">
+            <span class="material-symbols-outlined text-[140px]" style="font-variation-settings: 'FILL' 1;">format_quote</span>
+        </div>
+        <div class="relative z-10">
+            <h4 class="text-[10px] font-black uppercase tracking-widest opacity-80 mb-4">Günün Motivasyonu</h4>
+            <p class="text-xl font-medium leading-tight mb-6 line-clamp-4">"Zorluklar, başarıya giden merdivenin basamaklarıdır. Pes etmek için henüz çok erken."</p>
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-white/20 flex flex-shrink-0 items-center justify-center">
+                    <span class="material-symbols-outlined text-sm">auto_awesome</span>
+                </div>
+                <span class="text-xs font-bold uppercase tracking-wider text-purple-200">Odaklanmaya devam et</span>
             </div>
         </div>
     </div>
-    <div class="card">
-        <div class="card-header bg-light fw-bold"><i class="fas fa-cog"></i> Ayarlar</div>
-        <div class="card-body">
-            <form id="pomodoroSettingsForm">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Çalışma Süresi (dk)</label>
-                        <input type="number" class="form-control" id="workDuration" min="1" max="60" value="25">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Kısa Mola (dk)</label>
-                        <input type="number" class="form-control" id="shortBreakDuration" min="1" max="30" value="5">
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Uzun Mola (dk)</label>
-                        <input type="number" class="form-control" id="longBreakDuration" min="1" max="60" value="15">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Uzun Mola Öncesi Pomodoro</label>
-                        <input type="number" class="form-control" id="pomodorosUntilLongBreak" min="1" max="10" value="4">
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="autoStartBreaks" checked>
-                            <label class="form-check-label">Molaları otomatik başlat</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="autoStartPomodoros" checked>
-                            <label class="form-check-label">Pomodoro'ları otomatik başlat</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="playSound" checked>
-                            <label class="form-check-label">Bildirim sesi çal</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="showNotifications" checked>
-                            <label class="form-check-label">Bildirimleri göster</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-end">
-                    <button type="button" class="btn btn-primary" id="saveSettingsBtnMain">
-                        <i class="fas fa-save"></i> Ayarları Kaydet
-                    </button>
-                </div>
-            </form>
+</div>
+
+</div>
+
+<!-- Focus Tasks Container (Bottom Bento) -->
+<div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-white p-6 rounded-2xl border border-slate-100 hover:shadow-md transition-shadow">
+        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
+            <span class="material-symbols-outlined">task_alt</span>
         </div>
+        <h5 class="font-bold text-slate-800 mb-1">Biyoloji: Hücre Bölünmesi</h5>
+        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Tamamlanan görev</p>
+    </div>
+    
+    <div class="bg-white p-6 rounded-2xl border border-purple-200 shadow-sm ring-4 ring-purple-50 hover:shadow-md transition-all">
+        <div class="w-10 h-10 rounded-xl bg-purple-50 text-[#6200EE] flex items-center justify-center mb-4">
+            <span class="material-symbols-outlined">pending</span>
+        </div>
+        <h5 class="font-bold text-slate-800 mb-1">Matematik: Türev</h5>
+        <p class="text-[11px] font-bold text-[#6200EE] uppercase tracking-wide">Şu an çalışılıyor...</p>
+    </div>
+    
+    <div class="bg-slate-50/50 p-6 rounded-2xl border border-dashed border-slate-300 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-slate-50 transition-colors group">
+        <div class="w-10 h-10 rounded-full border-2 border-slate-300 flex items-center justify-center text-slate-400 group-hover:text-[#6200EE] group-hover:border-[#6200EE] transition-colors mb-2 bg-white">
+            <span class="material-symbols-outlined">add</span>
+        </div>
+        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-widest group-hover:text-[#6200EE] transition-colors">Yeni Görev</span>
     </div>
 </div>
-{% endblock %}
 
-{% block styles %}
-<style>
-    body {
-        background-color: transparent !important;
-        position: relative;
-    }
-    .timer-bg {
-        background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
-        position: fixed;
-        left: 0; top: 0; width: 100vw; height: 100vh;
-        z-index: -1;
-    }
-    .card {
-        background: rgba(35, 41, 70, 0.85);
-        color: #fff;
-        border: none;
-        box-shadow: 0 2px 16px rgba(48, 6, 75, 0.08);
-        backdrop-filter: blur(5px);
-    }
-    .card-header.bg-light {
-        background: rgba(35, 41, 70, 0.95) !important;
-        color: #30E8E8 !important;
-        border-bottom: 1px solid #2d3250;
-    }
-    .form-label, .form-check-label {
-        color: #b8c1ec;
-    }
-    .form-control {
-        background: rgba(22, 22, 26, 0.8);
-        color: #fff;
-        border: 1px solid #2d3250;
-    }
-    .form-control:focus {
-        background: rgba(35, 41, 70, 0.9);
-        color: #fff;
-        border-color: #30E8E8;
-        box-shadow: 0 0 0 0.2rem rgba(48, 232, 232, 0.15);
-    }
-    .btn-primary, .btn-success, .btn-danger, .btn-secondary, .btn-warning {
-        border: none;
-        font-weight: 600;
-    }
-    .btn-primary {
-        background: linear-gradient(90deg, #30E8E8 0%, #536976 100%);
-        color: #fff;
-    }
-    .btn-success {
-        background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
-        color: #232946;
-    }
-    .btn-danger {
-        background: linear-gradient(90deg, #ff5858 0%, #f09819 100%);
-        color: #fff;
-    }
-    .btn-secondary {
-        background: #b8c1ec;
-        color: #232946;
-    }
-    .btn-warning {
-        background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%);
-        color: #232946;
-    }
-    .inner-content-wrapper {
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 32px 0;
-    }
-    .pomodoro-header {
-        color: #232323;
-        font-size: 2.2rem;
-        font-weight: 800;
-        text-align: left;
-        margin-bottom: 0.8rem;
-        margin-top: 2.5rem;
-        letter-spacing: 2px;
-        font-family: 'Nunito', sans-serif;
-        text-shadow: 0 0 15px #fff, 0 0 20px #fff;
-    }
-</style>
-{% endblock %}
+</div>
+</main>
 
-{% block scripts %}
+<!-- BottomNavBar for Mobile -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-between items-center z-50">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="{{ url_for('index') }}">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-bold">Panel</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#6200EE]" href="{{ url_for('timer') }}">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">timer</span>
+<span class="text-[10px] font-bold">Sayaç</span>
+</a>
+<a href="{{ url_for('add_question') }}" class="bg-[#6200EE] p-3 rounded-full -mt-10 shadow-lg shadow-primary/30 text-white">
+<span class="material-symbols-outlined">add</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="{{ url_for('hedefleyici') }}">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-bold">Gelişim</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="{{ url_for('gorevlerim') }}">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-[10px] font-bold">Plan</span>
+</a>
+</nav>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Event listeners for Main Timer Controls on the timer page
-        const startBtn = document.getElementById('startBtn');
-        const stopBtn = document.getElementById('stopBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const saveBtn = document.getElementById('saveBtn');
-        const skipBtn = document.getElementById('skipBtn');
-        const saveSettingsBtn = document.getElementById('saveSettingsBtnMain'); // Use the new ID
-
-        if (startBtn) startBtn.addEventListener('click', function() { 
-            if (typeof window.startTimer === 'function') { 
-                window.startTimer(); 
-                if (typeof window.showMiniPomodoro === 'function') { 
-                    window.showMiniPomodoro(); // Show mini timer when main timer starts
-                }
-            }
-        });
-
-        if (stopBtn) stopBtn.addEventListener('click', function() { 
-            if (typeof window.stopTimer === 'function') { 
-                window.stopTimer(); 
-            }
-        });
-
-        if (resetBtn) resetBtn.addEventListener('click', function() { 
-            if (typeof window.resetTimer === 'function') { 
-                window.resetTimer(); 
-            }
-        });
-
-        if (saveBtn) saveBtn.addEventListener('click', function() { 
-            if (typeof window.saveTimer === 'function') { 
-                window.saveTimer(); 
-            }
-        });
-
-        if (skipBtn) skipBtn.addEventListener('click', function() { 
-            if (typeof window.skipTimer === 'function') { 
-                window.skipTimer(); 
-            }
-        });
-
-        if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', function() {
-             if (typeof window.saveSettings === 'function') {
-                 window.saveSettings();
-             }
-        });
-
-        // Initial button states based on loaded state from base.html
-        // Assuming timerRunning is managed in base.html and accessible
-        // This part might need refinement based on how loadPomodoroState in base.html sets the running state
-        // A simple check based on localStorage might be sufficient if loadPomodoroState sets it correctly.
-        const savedState = JSON.parse(localStorage.getItem('pomodoroTimer'));
-        if (savedState && savedState.running) {
-             if(startBtn) startBtn.style.display = 'none';
-             if(stopBtn) stopBtn.style.display = 'inline-block';
-             if(skipBtn) skipBtn.style.display = 'inline-block';
-        } else {
-             if(startBtn) startBtn.style.display = 'inline-block';
-             if(stopBtn) stopBtn.style.display = 'none';
-             if(skipBtn) skipBtn.style.display = 'none';
+    document.addEventListener("DOMContentLoaded", function() {
+        let timerDisplay = document.getElementById("timerDisplay");
+        let startBtn = document.getElementById("startBtn");
+        let stopBtn = document.getElementById("stopBtn");
+        let resetBtn = document.getElementById("resetBtn");
+        let progressCircle = document.getElementById("progressCircle");
+        let workDurationInput = document.getElementById("workDuration");
+        let saveSettingsBtn = document.getElementById("saveSettingsBtnMain");
+        
+        // Settings Sync functionality
+        if(saveSettingsBtn) {
+            saveSettingsBtn.addEventListener('click', function() {
+                let mins = parseInt(workDurationInput.value);
+                if(isNaN(mins) || mins <= 0) mins = 25;
+                if(window.PomodoroManager) window.PomodoroManager.reset(mins * 60);
+            });
         }
 
+        if(startBtn) {
+            startBtn.addEventListener("click", () => {
+                if(!window.PomodoroManager) return;
+                let state = window.PomodoroManager.getState();
+                if (state.totalTime <= 0 || isNaN(state.totalTime)) {
+                     let mins = parseInt(workDurationInput.value);
+                     window.PomodoroManager.start((isNaN(mins) ? 25 : mins) * 60);
+                } else {
+                     window.PomodoroManager.start();
+                }
+            });
+        }
+        
+        if(stopBtn) stopBtn.addEventListener("click", () => {
+            if(window.PomodoroManager) window.PomodoroManager.pause()
+        });
+        
+        if(resetBtn) {
+            resetBtn.addEventListener("click", () => {
+                let mins = parseInt(workDurationInput.value);
+                if(isNaN(mins) || mins<=0) mins = 25;
+                if(window.PomodoroManager) window.PomodoroManager.reset(mins * 60);
+            });
+        }
+        
+        // This receives ticks from the global manager in header_modern.html
+        window.onPomodoroTick = function(remaining, totalTime, isRunning) {
+            if(!timerDisplay) return;
+            
+            // Update big display
+            let minutes = Math.floor(remaining / 60);
+            let seconds = remaining % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Update circle stably
+            if(progressCircle) {
+                let circumference = 1068; // Based on original file fallback and standard SVG circle sizes
+                progressCircle.style.strokeDasharray = `${circumference} ${circumference}`;
+            
+                let safeTotal = (totalTime > 0 && !isNaN(totalTime)) ? totalTime : 1500;
+                let offset = circumference - (remaining / safeTotal) * circumference;
+                progressCircle.style.strokeDashoffset = offset;
+            }
+            
+            // Update buttons
+            if (isRunning) {
+                if(startBtn) startBtn.classList.add("hidden");
+                if(stopBtn) stopBtn.classList.remove("hidden");
+            } else {
+                if(startBtn) startBtn.classList.remove("hidden");
+                if(stopBtn) stopBtn.classList.add("hidden");
+            }
+        };
+        
+        // Give immediate first tick update directly relying on current state
+        if(window.PomodoroManager) {
+            window.PomodoroManager.tick();
+        } else {
+            console.error("PomodoroManager not found! Make sure header_modern.html defines it globally without DOMContentLoaded wrappers wrapping the object.");
+        }
     });
 </script>
-{% endblock %} 

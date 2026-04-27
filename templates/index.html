@@ -1,494 +1,351 @@
-{% extends "base.html" %}
-
-{% block title %}Ana Sayfa - ReviseMe{% endblock %}
-
-{% block styles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ReviseMe Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-container": "#6200ee",
+                    "on-tertiary-fixed-variant": "#005048",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed": "#290055",
+                    "surface-container-high": "#e2e8f8",
+                    "tertiary-container": "#005f56",
+                    "secondary-fixed-dim": "#d8b9ff",
+                    "secondary": "#7b24dc",
+                    "surface-variant": "#dce2f3",
+                    "on-secondary-container": "#fffbff",
+                    "on-tertiary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed-dim": "#17deca",
+                    "secondary-container": "#9547f7",
+                    "primary-fixed": "#e8ddff",
+                    "on-surface-variant": "#494456",
+                    "surface-container": "#e7eefe",
+                    "secondary-fixed": "#eddcff",
+                    "inverse-primary": "#cfbdff",
+                    "background": "#f9f9ff",
+                    "surface-bright": "#f9f9ff",
+                    "error-container": "#ffdad6",
+                    "surface-dim": "#d3daea",
+                    "surface-container-highest": "#dce2f3",
+                    "outline": "#7a7488",
+                    "on-tertiary-container": "#1ee0cc",
+                    "surface-tint": "#6d23f9",
+                    "on-primary-fixed": "#22005d",
+                    "on-tertiary-fixed": "#00201c",
+                    "surface": "#f9f9ff",
+                    "outline-variant": "#cbc3d9",
+                    "on-primary-container": "#d0beff",
+                    "error": "#ba1a1a",
+                    "surface-container-low": "#f0f3ff",
+                    "primary": "#4800b2",
+                    "on-primary": "#ffffff",
+                    "primary-fixed-dim": "#cfbdff",
+                    "on-primary-fixed-variant": "#5300cd",
+                    "on-error-container": "#93000a",
+                    "tertiary": "#00453e",
+                    "on-background": "#151c27",
+                    "on-surface": "#151c27",
+                    "tertiary-fixed": "#4ffbe6",
+                    "inverse-surface": "#2a313d",
+                    "on-secondary-fixed-variant": "#6200bc",
+                    "on-secondary": "#ffffff",
+                    "inverse-on-surface": "#ebf1ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "section-gap": "64px",
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "base": "8px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "display-xl": ["Inter"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-sm": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "display-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
 <style>
-    :root {
-        --primary-color: #6a37b5; /* More vibrant purple */
-        --secondary-color: #9c66da; /* Lighter purple */
-        --accent-color: #ff70a6; /* Pink accent */
-        --accent-turquoise: #2ecdc8; /* Turkuaz renk tanımlandı */
-        --text-color: #333;
-        --card-background: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
-        --card-border: rgba(106, 55, 181, 0.3);
-        --input-background: rgba(255, 255, 255, 0.9);
-        --input-border: #ccc;
-        --button-primary-background: var(--primary-color);
-        --button-primary-text: #fff;
-        --button-secondary-background: var(--secondary-color);
-        --button-secondary-text: #fff;
-        --danger-color: #e74c3c;
-        --success-color: #2ecc71;
-        --warning-color: #f39c12;
-        --info-color: #3498db;
-    }
-    
-    body {
-        font-family: 'Nunito', sans-serif;
-        background: #f0f0f0; /* Sayfa arka planını gri yap */
-        color: var(--text-color);
-        line-height: 1.6;
-        position: relative; /* Gerekirse ekleyin */
-    }
-    
-    /* Yıldız animasyonu */
-    @keyframes twinkle {
-        0% { opacity: 0.3; }
-        50% { opacity: 1; }
-        100% { opacity: 0.3; }
-    }
-    
-    .stars {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: -1;
-    }
-    
-    .star {
-        position: absolute;
-        width: 2px;
-        height: 2px;
-        background-color: white;
-        border-radius: 50%;
-    }
-    
-    .star-1 { top: 10%; left: 20%; animation: twinkle 3s infinite ease-in-out; }
-    .star-2 { top: 15%; left: 50%; animation: twinkle 4s infinite ease-in-out; }
-    .star-3 { top: 25%; left: 80%; animation: twinkle 5s infinite ease-in-out; }
-    .star-4 { top: 40%; left: 10%; animation: twinkle 4.5s infinite ease-in-out; }
-    .star-5 { top: 60%; left: 30%; animation: twinkle 3.5s infinite ease-in-out; }
-    .star-6 { top: 75%; left: 60%; animation: twinkle 4s infinite ease-in-out; }
-    .star-7 { top: 85%; left: 90%; animation: twinkle 3s infinite ease-in-out; }
-    
-    /* Header Dalga Arka Planı */
-    .header-wave {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        overflow: hidden;
-        line-height: 0;
-        z-index: -1;
-    }
-    
-    .header-wave svg {
-        position: relative;
-        display: block;
-        width: calc(100% + 1.3px);
-        height: 100px;
-    }
-    
-    .header-wave .shape-fill {
-        fill: var(--secondary-color);
-    }
-
-    /* Ana İçerik Kartları */
-    .motivation-author {
-        font-weight: 600;
-        font-size: 1.5rem;
-        text-align: left;
-        color: #0f0505;
-    }
-
-    .motivation-content {
-        position: relative;
-        /* z-index: 1; */
-        text-align: left;
-    }
-
-    /* Kategori Daireleri */
-    .categories-container {
-        padding: 1rem 0;
-    }
-
-    .category-item {
-        margin-bottom: 1rem;
-        transition: all 0.3s ease;
-    }
-
-    .category-item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .category-link {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-decoration: none;
-        color: inherit;
-        background-color: rgba(26, 20, 64, 0.9); /* Orijinal koyu mor arka plan */
-        border-radius: 50%;
-        padding: 2.5rem;
-        width: 250px;
-        height: 250px;
-        justify-content: center;
-        text-align: center;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-        border: 3px solid transparent;
-        overflow: hidden;
-    }
-
-    .category-item:hover .category-link {
-         background-color: rgba(46, 205, 200, 0.2); /* Orijinal hover arka planı (Turkuaz) */
-         border-color: transparent;
-    }
-
-    .category-content {
-        position: relative;
-        z-index: 2;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-    }
-
-    .category-icon {
-        font-size: 4rem; /* İkon boyutunu artır */
-        color: white; /* İkon rengini beyaz yap */
-        margin-bottom: 0.8rem; /* Boşluğu artır */
-    }
-
-    .category-name {
-        font-weight: 600;
-        color: white; /* Beyaz yazı */
-        font-size: 1.3rem; /* Yazı boyutunu artır */
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.7); /* Gölgeyi koyulaştırıyorum */
-    }
-
-    .category-count {
-        font-size: 1.1rem; /* Boyutu artırıyorum */
-        color: #fff; /* Yazı rengini beyaza çeviriyorum */
-    }
-
-    /* SVG Halka Stilleri */
-    .progress-ring {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        transform: rotate(-90deg);
-        z-index: 1;
-    }
-
-    .progress-ring-circle-bg {
-        stroke: rgba(46, 205, 200, 0.3);
-        stroke-width: 8;
-        fill: transparent;
-    }
-
-    .progress-ring-circle {
-        stroke: white; /* Halka rengini beyaz yap */
-        stroke-width: 8;
-        fill: transparent;
-        transition: stroke-dashoffset 0.5s ease-in-out;
-        stroke-linecap: round;
-    }
-
-    /* Dashboard Kartları */
-    .dashboard-card {
-        background-color: rgba(26, 20, 64, 0.8);
-        border: 1px solid rgba(106, 55, 181, 0.3);
-        border-radius: 0;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-        transition: all 0.3s ease;
-        color: #fff; /* Kart içindeki yazı rengi */
-    }
-
-    .dashboard-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
-    }
-
-    .dashboard-card .card-title {
-        color: #fff;
-        font-weight: 600;
-    }
-
-    .dashboard-card .card-text {
-        color: #ccc;
-    }
-
-    .dashboard-card .list-group-item {
-        background-color: rgba(255, 255, 255, 0.1); /* Liste öğesi arka planı */
-        border-color: rgba(255, 255, 255, 0.2); /* Liste öğesi border */
-        color: #eee;
-    }
-
-    .dashboard-card .list-group-item i {
-        color: var(--accent-color); /* Liste öğesi ikon rengi */
-    }
-
-    .dashboard-card .badge {
-        background-color: var(--accent-color);
-        color: #fff;
-    }
-
-    .dashboard-card a.btn-primary, .dashboard-card a.btn-warning {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-        color: #fff;
-        font-weight: 600;
-    }
-
-    .dashboard-card a.btn-primary:hover, .dashboard-card a.btn-warning:hover {
-        background-color: var(--secondary-color);
-        border-color: var(--secondary-color);
-    }
-
-    .dashboard-card .text-muted {
-        color: #bbb !important;
-    }
-
-    .dashboard-card .text-success {
-        color: var(--success-color) !important;
-    }
-
-    .dashboard-card .text-warning {
-        color: var(--warning-color) !important;
-    }
-    
-    /* Son Aktiviteler Kartı Stilleri */
-    .dashboard-card .card-title.activity-title {
-        color: var(--accent-turquoise);
-    }
-
-    .dashboard-card .list-group-item .activity-icon-circle {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-right: 1rem;
-        font-size: 1.2rem;
-        color: white;
-    }
-    
-    .activity-icon-circle.blue {
-        background-color: #3498db;
-    }
-
-    .activity-icon-circle.green {
-        background-color: #2ecc71;
-    }
-
-    .activity-icon-circle.teal {
-         background-color: var(--accent-turquoise);
-    }
-
-     .activity-icon-circle.yellow {
-         background-color: #f1c40f;
-     }
-
-    /* Genel stil düzeltmeleri */
-    .container {
-        padding-top: 20px;
-        padding-bottom: 20px;
-    }
-    
-    .btn-outline-primary {
-        color: var(--primary-color);
-        border-color: var(--primary-color);
-    }
-    
-    .btn-outline-primary:hover {
-        background-color: var(--primary-color);
-        color: #fff;
-    }
-    
-    .text-primary {
-        color: var(--primary-color) !important;
-    }
-    
-    .text-warning {
-        color: var(--warning-color) !important;
-    }
-
-    @media (max-width: 768px) {
-        .category-link {
-            width: 200px;
-            height: 200px;
-            padding: 2rem;
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-        .category-icon {
-            font-size: 3rem;
+        .revision-ring-gradient {
+            background: conic-gradient(#6200ee var(--progress), #f3f4f6 0deg);
         }
-        .category-name {
-            font-size: 1.1rem;
-        }
-        .category-count {
-            font-size: 0.9rem;
-        }
-    }
-
-    h1.page-header {
-        font-family: 'Poppins', 'Nunito', sans-serif;
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #000;
-        text-shadow: 0 2px 12px #fff, 0 1px 0 #fff;
-        margin-bottom: 2rem;
-        text-align: left;
-    }
-
-    /* Video Bölümü */
-    .video-full-width-section {
-        position: relative;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 350px;
-        overflow: hidden;
-        margin: 0;
-        padding: 0;
-        background: #f0f0f0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    .video-full-width-section video {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-    }
-</style>
-{% endblock styles %}
-
-{% block page_content %}
-<div class="stars">
-    <div class="star star-1"></div>
-    <div class="star star-2"></div>
-    <div class="star star-3"></div>
-    <div class="star star-4"></div>
-    <div class="star star-5"></div>
-    <div class="star star-6"></div>
-    <div class="star star-7"></div>
+        a { text-decoration: none; }
+    </style>
+    <style> html { font-size: 18px !important; } </style>
+    <style> html { font-size: 18px !important; } </style>
+</head>
+<body class="bg-[#F8F5FF] text-on-surface font-body-md">
+<!-- Sidebar Navigation -->
+{% set active_page = 'index' %}
+{% include 'components/sidebar_modern.html' %}
+<!-- Main Content Area -->
+<main class="md:ml-64 min-h-screen">
+<!-- Top App Bar -->
+{% block header_title %}Panel{% endblock %}
+{% include 'components/header_modern.html' %}
+<!-- Page Canvas -->
+<div class="p-8 max-w-full px-4 md:px-8 mx-auto">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left/Center Column -->
+<div class="lg:col-span-8 space-y-8">
+<!-- Welcome Hero -->
+<section class="relative overflow-hidden bg-gradient-to-br from-[#6200EE] to-[#7b24dc] rounded-[32px] p-8 text-white shadow-xl">
+<div class="relative z-10 max-w-md">
+<h2 class="font-headline-lg text-white mb-2">Welcome back, {{ current_user.Name }}! 👋</h2>
+<p class="text-purple-100 font-body-md mb-6 opacity-90">{{ motivation_message }}</p>
+<div class="flex gap-4">
+<a href="{{ url_for('add_question') }}" class="px-6 py-2.5 bg-white text-[#6200EE] rounded-full font-bold text-sm shadow-lg hover:shadow-xl transition-all inline-block no-underline">Resume Session</a>
+<a href="{{ url_for('hedefleyici') }}" class="px-6 py-2.5 bg-white/20 text-white rounded-full font-bold text-sm backdrop-blur-sm hover:bg-white/30 transition-all border border-white/30 inline-block no-underline">View Plan</a>
 </div>
-
-<div class="video-full-width-section">
-    <video autoplay muted loop>
-        <source src="{{ url_for('static', filename='images/WhatsApp Video 2025-06-04 saat 21.53.18_50dbedba.mp4') }}" type="video/mp4">
-        Tarayıcınız video etiketini desteklemiyor.
-    </video>
 </div>
+<!-- Illustration Placeholder -->
+<div class="absolute right-[-20px] bottom-[-20px] w-64 h-64 opacity-20">
+<img class="object-contain w-full h-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYIy_LgKXICig18BdO7zdgk4IjCuZNzpdNWmE5HguL3J47qP1IeZkHP2--_qqpmBTraRSaL_336j3d1C9TXP5eJNAnXFjDeL3Bqof4WlHzHS45AyggAnude0a1IdvdyPIpizlNib08Gu6OxM4X3asRUcX7tnLUHM40OihlOfRGzcg0UmLAyUK0aF0ZpkhCJpQJQNdFe5rYcEN26MDy66ta8PYobvBEjTqfbAw8zWY57TrZyUJXoL2SGh6EhsdeQRpRnZR97dEgBeY"/>
+</div>
+</section>
+<!-- Subjects Grid -->
+<section>
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-headline-md text-slate-900">Question Pools</h3>
+<button class="text-[#6200EE] font-bold text-sm flex items-center gap-1 hover:underline">
+                                Browse All <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-<div class="container">
-    <h1 class="page-header" style="text-align: left;">Hoş Geldin, {{ current_user.Name }}!</h1>
-    <p class="motivation-author">{{ motivation_message }}</p>
+{% for category in categories %}
+    {% set loop_index = loop.index0 % 4 %}
+    {% set color = 'blue' %}
+    {% if loop_index == 1 %}{% set color = 'purple' %}{% endif %}
+    {% if loop_index == 2 %}{% set color = 'emerald' %}{% endif %}
+    {% if loop_index == 3 %}{% set color = 'orange' %}{% endif %}
+    
+    {% set icon = 'menu_book' %}
+    {% if category.Name == 'Matematik' %}{% set icon = 'calculate' %}{% endif %}
+    {% if category.Name == 'Türk Dili ve Edebiyatı' %}{% set icon = 'translate' %}{% endif %}
+    {% if category.Name == 'Fizik' %}{% set icon = 'science' %}{% endif %}
+    {% if category.Name == 'Coğrafya' %}{% set icon = 'public' %}{% endif %}
+    {% if category.Name == 'Tarih' %}{% set icon = 'history_edu' %}{% endif %}
 
-    <div class="row categories-container justify-content-center">
-        {% for category in categories %}
-        <div class="col-12 col-md-6 col-lg-4 d-flex justify-content-center align-items-stretch category-item mb-4">
-            <a href="{{ url_for('category_questions', category_id=category.CategoryId) }}" class="category-link mx-auto">
-                <svg class="progress-ring" width="250" height="250">
-                    <circle
-                        class="progress-ring-circle-bg"
-                        stroke-width="8"
-                        fill="transparent"
-                        r="110"
-                        cx="125"
-                        cy="125"
-                    />
-                    <circle
-                        class="progress-ring-circle"
-                        stroke-width="8"
-                        fill="transparent"
-                        r="110"
-                        cx="125"
-                        cy="125"
-                        stroke-linecap="round"
-                       
-                    />
-                </svg>
-                <div class="category-content">
-                    <div class="category-icon">
-                        {% if category.Name == 'Matematik' %}
-                        <i class="fas fa-calculator"></i>
-                        {% elif category.Name == 'Fizik' %}
-                        <i class="fas fa-atom"></i>
-                        {% elif category.Name == 'Kimya' %}
-                        <i class="fas fa-flask"></i>
-                        {% elif category.Name == 'Biyoloji' %}
-                        <i class="fas fa-dna"></i>
-                        {% elif category.Name == 'Türk Dili ve Edebiyatı' %}
-                        <i class="fas fa-book"></i>
-                        {% elif category.Name == 'Tarih' %}
-                        <i class="fas fa-landmark"></i>
-                        {% elif category.Name == 'Coğrafya' %}
-                        <i class="fas fa-globe-europe"></i>
-                        {% elif category.Name == 'Din' %}
-                        <i class="fas fa-pray"></i>
-                        {% elif category.Name == 'Felsefe' %}
-                        <i class="fas fa-brain"></i>
-                        {% elif category.Name == 'Yabancı Dil' %}
-                        <i class="fas fa-language"></i>
-                        {% else %}
-                        <i class="fas fa-book"></i>
-                        {% endif %}
-                    </div>
-                    <div class="category-name">{{ category.Name }}</div>
-                    <div class="category-count">{{ category.question_count }} Soru</div>
-                </div>
-            </a>
-        </div>
-        {% endfor %}
-    </div>
-
-    {# Son Aktiviteler Kartı - Tekrar Eklendi #}
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="dashboard-card">
-                <h5 class="card-title" style="color: #fff;">Son Aktiviteler</h5>
-                <ul class="list-group list-group-flush">
-                    {# Bu kısım app.py'den gelen verilerle doldurulacak #}
-                    {% if notifications %}
-                        {% for notification in notifications %}
-                        <li class="list-group-item d-flex align-items-center">
-                            <div class="icon-circle {{ notification.color_class }}">
-                                <i class="{{ notification.icon }}"></i>
-                            </div>
-                            <div class="ms-3">
-                                <div class="fw-bold" style="color: #eee;">{{ notification.type }}</div>
-                                <small class="text-muted">{{ notification.msg }}</small>
-                                {% if notification.timestamp %}
-                                <div class="text-muted" style="font-size:0.85em;">
-                                    {{ notification.timestamp.strftime('%d.%m.%Y %H:%M') if notification.timestamp else '' }}
-                                </div>
-                                {% endif %}
-                            </div>
-                        </li>
-                        {% endfor %}
-                    {% else %}
-                        <li class="list-group-item">Henüz görüntülenecek bir aktivite yok.</li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </div>
+<a href="{{ url_for('category_questions', category_id=category.CategoryId) }}" class="no-underline text-inherit block">
+<div class="bg-white p-6 rounded-2xl shadow-[0_15px_15px_rgba(98,0,238,0.04)] border border-gray-100 hover:border-[#6200EE]/30 transition-all group h-full">
+<div class="flex items-start justify-between mb-6">
+<div class="p-3 bg-{{ color }}-50 text-{{ color }}-600 rounded-xl group-hover:bg-{{ color }}-600 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="{{ icon }}">{{ icon }}</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Limit</span>
+<span class="text-xl font-bold text-slate-800">{{ category.question_count }} </span>
+</div>
+</div>
+<h4 class="text-lg font-bold text-slate-900 mb-1">{{ category.Name }}</h4>
+<p class="text-sm text-slate-500 mb-6">{{ category.question_count }} Soru Kapasitesi</p>
+<div class="space-y-3">
+<div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-{{ color }}-500 rounded-full" style="width: {% if category.question_count > 0 %}100%{% else %}0%{% endif %}"></div>
+</div>
+<div class="flex justify-between text-xs font-medium text-slate-400">
+<span>{{ category.question_count }} Soru eklendi</span>
+</div>
+</div>
+</div>
+</a>
+{% else %}
+<!-- Statik Placeholder eğer kategori yoksa -->
+<div class="bg-white p-6 rounded-2xl shadow-[0_15px_15px_rgba(98,0,238,0.04)] border border-gray-100 hover:border-[#6200EE]/30 transition-all group">
+<div class="flex items-start justify-between mb-6">
+<div class="p-3 bg-blue-50 text-blue-600 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="calculate">calculate</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Progress</span>
+<span class="text-xl font-bold text-slate-800">68%</span>
+</div>
+</div>
+<h4 class="text-lg font-bold text-slate-900 mb-1">Mathematics</h4>
+<p class="text-sm text-slate-500 mb-6">Calculus, Linear Algebra &amp; Geometry</p>
+<div class="space-y-3">
+<div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-blue-500 rounded-full" style="width: 68%"></div>
+</div>
+<div class="flex justify-between text-xs font-medium text-slate-400">
+<span>450 / 600 Solved</span>
+<span>150 Remaining</span>
+</div>
+</div>
+</div>
+{% endfor %}
 
 </div>
-
-{% endblock page_content %}
-
-{% block scripts %}
-{{ super() }}
-<script>
-    // JavaScript for any dynamic elements on the index page
-    // This block is now minimal as time update script is in base.html
-</script>
-{% endblock scripts %}
-
-
+</section>
+</div>
+<!-- Right Sidebar -->
+<div class="lg:col-span-4 space-y-6">
+<!-- Streak Card -->
+<div class="bg-white p-6 rounded-2xl shadow-[0_15px_15px_rgba(98,0,238,0.04)] border border-gray-100">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center text-orange-500">
+<span class="material-symbols-outlined text-3xl font-bold" data-icon="local_fire_department">local_fire_department</span>
+</div>
+<div>
+<h4 class="font-bold text-slate-900">Daily Streak</h4>
+<p class="text-sm text-slate-500">12 Days Active</p>
+</div>
+</div>
+<div class="flex justify-between mt-4">
+<div class="flex flex-col items-center gap-1">
+<span class="text-[10px] text-slate-400 font-bold">M</span>
+<div class="w-2 h-8 bg-[#6200EE] rounded-full"></div>
+</div>
+<div class="flex flex-col items-center gap-1">
+<span class="text-[10px] text-slate-400 font-bold">T</span>
+<div class="w-2 h-8 bg-[#6200EE] rounded-full"></div>
+</div>
+<div class="flex flex-col items-center gap-1">
+<span class="text-[10px] text-slate-400 font-bold">W</span>
+<div class="w-2 h-12 bg-[#6200EE] rounded-full"></div>
+</div>
+<div class="flex flex-col items-center gap-1">
+<span class="text-[10px] text-slate-400 font-bold">T</span>
+<div class="w-2 h-6 bg-[#6200EE] rounded-full"></div>
+</div>
+<div class="flex flex-col items-center gap-1">
+<span class="text-[10px] text-slate-400 font-bold">F</span>
+<div class="w-2 h-10 bg-[#6200EE] rounded-full"></div>
+</div>
+<div class="flex flex-col items-center gap-1 text-[#6200EE]">
+<span class="text-[10px] font-bold">S</span>
+<div class="w-2 h-14 bg-[#6200EE] rounded-full"></div>
+</div>
+<div class="flex flex-col items-center gap-1">
+<span class="text-[10px] text-slate-400 font-bold">S</span>
+<div class="w-2 h-4 bg-slate-100 rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Stats Card -->
+<div class="bg-white p-6 rounded-2xl shadow-[0_15px_15px_rgba(98,0,238,0.04)] border border-gray-100">
+<h4 class="font-bold text-slate-900 mb-6">Performance Stats</h4>
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="track_changes">track_changes</span>
+</div>
+<span class="text-sm font-medium text-slate-700">Accuracy Rate</span>
+</div>
+<span class="font-bold text-slate-900">84.2%</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="speed">speed</span>
+</div>
+<span class="text-sm font-medium text-slate-700">Avg. Time</span>
+</div>
+<span class="font-bold text-slate-900">42s</span>
+</div>
+</div>
+</div>
+<!-- Countdown Card -->
+<div class="bg-[#F1EBFF] p-6 rounded-2xl border border-purple-100">
+<div class="flex items-center justify-between mb-4">
+<span class="text-[10px] font-bold text-[#6200EE] uppercase tracking-widest">Next Major Exam</span>
+<span class="material-symbols-outlined text-purple-400" data-icon="calendar_today">calendar_today</span>
+</div>
+<h4 class="font-headline-md text-[#22005d] mb-4">University Entrance Exam</h4>
+<div class="grid grid-cols-3 gap-2 text-center">
+<div class="bg-white py-3 rounded-xl">
+<p class="text-xl font-bold text-[#6200EE]">42</p>
+<p class="text-[10px] text-slate-500 font-bold uppercase">Days</p>
+</div>
+<div class="bg-white py-3 rounded-xl">
+<p class="text-xl font-bold text-[#6200EE]">14</p>
+<p class="text-[10px] text-slate-500 font-bold uppercase">Hrs</p>
+</div>
+<div class="bg-white py-3 rounded-xl">
+<p class="text-xl font-bold text-[#6200EE]">56</p>
+<p class="text-[10px] text-slate-500 font-bold uppercase">Mins</p>
+</div>
+</div>
+</div>
+<!-- Recent Badges -->
+<div class="bg-white p-6 rounded-2xl shadow-[0_15px_15px_rgba(98,0,238,0.04)] border border-gray-100">
+<h4 class="font-bold text-slate-900 mb-4">Recent Achievements</h4>
+<div class="flex flex-wrap gap-3">
+<div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600" title="Fast Learner">
+<span class="material-symbols-outlined" data-icon="bolt">bolt</span>
+</div>
+<div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600" title="100 Questions">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+</div>
+<div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600" title="Perfect Week">
+<span class="material-symbols-outlined" data-icon="workspace_premium">workspace_premium</span>
+</div>
+<div class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 border-2 border-dashed border-slate-200">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Mobile Navigation Bar -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-6 py-3 flex justify-between items-center z-50">
+<a class="flex flex-col items-center gap-1 text-[#6200EE]" href="{{ url_for('index') }}">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-[10px] font-bold">Dashboard</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="{{ url_for('gorevlerim') }}">
+<span class="material-symbols-outlined" data-icon="event_note">event_note</span>
+<span class="text-[10px] font-bold">Plan</span>
+</a>
+<div class="relative -top-8">
+<a href="{{ url_for('add_question') }}" class="w-14 h-14 bg-[#6200EE] text-white rounded-full flex items-center justify-center shadow-lg shadow-purple-200">
+<span class="material-symbols-outlined" data-icon="play_arrow">play_arrow</span>
+</a>
+</div>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="{{ url_for('hedefleyici') }}">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="text-[10px] font-bold">Library</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="{{ url_for('settings') }}">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-[10px] font-bold">Settings</span>
+</a>
+</nav>
+{% include 'components/chatbot_widget.html' %}
+</body></html>

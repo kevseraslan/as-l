@@ -1,129 +1,216 @@
-{% extends "base.html" %}
-
-{% block title %}Ayarlar - ReviseMe{% endblock %}
-
-{% block styles %}
+<!DOCTYPE html>
+<html class="light" lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ayarlar - ReviseMe</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#4800b2",
+                    "primary-container": "#6200ee",
+                    "primary-fixed": "#e8ddff",
+                    "on-surface": "#151c27",
+                    "on-surface-variant": "#494456",
+                    "surface-container-low": "#f0f3ff",
+                    "surface-container-high": "#e2e8f8",
+                    "tertiary-fixed": "#4ffbe6",
+                    "tertiary-container": "#005f56",
+                    "secondary-fixed": "#eddcff",
+                },
+                fontFamily: {
+                    "headline-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-sm": ["Inter"]
+                }
+            }
+        }
+    }
+</script>
 <style>
-    body {
-        background-color: transparent !important;
-        position: relative;
-    }
-    body::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        z-index: -1;
-    }
-    .settings-card {
-        background-color: rgba(26, 20, 64, 0.85);
-        border: 1px solid rgba(106, 55, 181, 0.3);
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        color: #FFF;
-        backdrop-filter: blur(5px);
-    }
-    .settings-card .card-header {
-        background: linear-gradient(135deg, #4e73df, #224abe);
-        color: #30E8E8;
-        border-radius: 15px 15px 0 0;
-        font-weight: 700;
-        font-size: 1.5rem;
-        text-align: center;
-        text-shadow: 0 0 10px rgba(48, 6, 75, 0.5);
-    }
-    .settings-card .btn-primary {
-        background: linear-gradient(135deg, #30E8E8, #4e73df);
-        border: none;
-        color: #fff;
-        font-weight: 700;
-    }
-    .settings-card .btn-secondary {
-        background: #fff;
-        color: #4e73df;
-        border: 1px solid #4e73df;
-        font-weight: 700;
-    }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .shadow-premium { box-shadow: 0 15px 15px rgba(98, 0, 238, 0.04); }
+    body { background-color: #F8F5FF; font-family: 'Inter', sans-serif;}
 </style>
-{% endblock %}
+    <style> html { font-size: 18px !important; } </style>
+    <style> html { font-size: 18px !important; } </style>
+</head>
+<body class="font-body-md text-on-surface flex h-screen overflow-hidden">
 
-{% block page_content %}
-<div class="container py-5">
-    <h2 style="color: #232323; font-size: 2.2rem; font-weight: 800; text-align: left; margin-bottom: 0.8rem; margin-top: 2.5rem; letter-spacing: 2px; font-family: 'Nunito', sans-serif; text-shadow: 0 0 15px #fff, 0 0 20px #fff;"><i class="fas fa-cog me-2"></i>Ayarlar</h2>
-    <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
-        <div class="col-md-7 col-lg-6">
-            <div class="card settings-card shadow-lg border-0">
-            <!-- <div class="card-header">
-                    Ayarlar
-            </div> -->
-                <div class="card-body p-4">
-                <div class="mb-4">
-                    <h5>Bildirim Ayarları</h5>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
-                        <label class="form-check-label" for="emailNotifications">E-posta Bildirimleri</label>
+<!-- Unified Sidebar Navigation -->
+{% set active_page = 'settings' %}
+{% include 'components/sidebar_modern.html' %}
+
+<!-- Main Content Shell -->
+<div class="flex-1 flex flex-col h-screen md:ml-64 overflow-y-auto w-full relative">
+    
+    <!-- TopAppBar -->
+    {% block header_title %}Ayarlar ve Profil{% endblock %}
+{% include 'components/header_modern.html' %}
+
+    <!-- Main Canvas -->
+    <main class="flex-1 p-6 md:p-12 max-w-full px-4 md:px-8 mx-auto w-full pb-32">
+        <div class="mb-10">
+            <h3 class="text-3xl font-black text-slate-800 mb-2">Ayarlar</h3>
+            <p class="text-slate-500 font-medium text-sm">Hesap tercihlerinizi ve uygulama görünümünü buradan özelleştirebilirsiniz.</p>
+        </div>
+
+        <div class="space-y-8">
+            <!-- Section: Notification Settings -->
+            <section class="bg-white rounded-2xl p-6 md:p-8 shadow-premium border border-slate-100/50">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center border border-purple-100">
+                        <span class="material-symbols-outlined text-[#6200EE]">notifications_active</span>
                     </div>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="pushNotifications" checked>
-                        <label class="form-check-label" for="pushNotifications">Anlık Bildirimler</label>
+                    <h4 class="text-xl font-bold text-slate-800 tracking-tight">Bildirim Ayarları</h4>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                    <!-- Email Notifs -->
+                    <div class="flex items-center justify-between p-5 bg-surface-container-low rounded-xl border border-slate-100/60 hover:shadow-sm transition-shadow">
+                        <div>
+                            <p class="font-bold text-slate-800 text-sm">E-posta Bildirimleri</p>
+                            <p class="text-xs text-slate-500 mt-1 font-medium">Haftalık özet ve hatırlatıcılar</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input checked="" class="sr-only peer" type="checkbox" id="emailNotifications"/>
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#6200EE]"></div>
+                        </label>
+                    </div>
+                    <!-- Push Notifs -->
+                    <div class="flex items-center justify-between p-5 bg-surface-container-low rounded-xl border border-slate-100/60 hover:shadow-sm transition-shadow">
+                        <div>
+                            <p class="font-bold text-slate-800 text-sm">Anlık Bildirimler</p>
+                            <p class="text-xs text-slate-500 mt-1 font-medium">Mobil cihazınıza anlık uyarılar</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input class="sr-only peer" type="checkbox" id="pushNotifications"/>
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#6200EE]"></div>
+                        </label>
                     </div>
                 </div>
-                <div class="mb-4">
-                    <h5>Tekrar Ayarları</h5>
-                    <div class="mb-3">
-                        <label for="repeatInterval" class="form-label">Tekrar Aralığı (gün)</label>
-                        <input type="number" class="form-control" id="repeatInterval" value="7" min="1" max="30">
+            </section>
+
+            <!-- Section: Revision & Display -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Revision Interval -->
+                <section class="bg-white rounded-2xl p-6 md:p-8 shadow-premium border border-slate-100/50">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center border border-teal-100">
+                            <span class="material-symbols-outlined text-teal-600">update</span>
+                        </div>
+                        <h4 class="text-xl font-bold text-slate-800 tracking-tight">Tekrar Ayarları</h4>
                     </div>
-                </div>
-                <div class="mb-4">
-                    <h5>Görünüm Ayarları</h5>
-                    <div class="mb-3">
-                        <label for="theme" class="form-label">Tema</label>
-                        <select class="form-select" id="theme">
-                            <option value="light">Açık</option>
-                            <option value="dark">Koyu</option>
-                        </select>
+                    <div class="space-y-4">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tekrar Aralığı (gün)</label>
+                        <div class="relative">
+                            <input id="repeatInterval" class="w-full bg-surface-container-low border border-slate-200 rounded-xl py-3 px-4 focus:ring-2 focus:ring-[#6200EE]/20 focus:border-[#6200EE] outline-none transition-all text-sm font-bold text-slate-700" type="number" value="7" min="1" max="30"/>
+                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">Gün</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 font-medium leading-relaxed mt-2">Bu ayar, bir konunun ne sıklıkla tekrar listesine düşeceğini belirler.</p>
                     </div>
-                </div>
-                <div class="d-grid gap-2">
-                    <button type="button" class="btn btn-primary" onclick="saveSettings()">Ayarları Kaydet</button>
-                    <a href="{{ url_for('index') }}" class="btn btn-secondary">Geri Dön</a>
+                </section>
+
+                <!-- Appearance -->
+                <section class="bg-white rounded-2xl p-6 md:p-8 shadow-premium border border-slate-100/50">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 rounded-xl bg-fuchsia-50 flex items-center justify-center border border-fuchsia-100">
+                            <span class="material-symbols-outlined text-fuchsia-600">palette</span>
+                        </div>
+                        <h4 class="text-xl font-bold text-slate-800 tracking-tight">Görünüm Ayarları</h4>
                     </div>
-                </div>
+                    <div class="space-y-4">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tema Tercihi</label>
+                        <div class="relative">
+                            <select id="theme" class="w-full bg-surface-container-low border border-slate-200 rounded-xl py-3 px-4 outline-none appearance-none transition-all text-sm font-bold text-slate-700 focus:ring-2 focus:ring-[#6200EE]/20 focus:border-[#6200EE] cursor-pointer">
+                                <option value="light">Açık Tema (Klasik)</option>
+                                <option value="dark">Koyu Tema (Dark Mode)</option>
+                                <option value="system" selected>Sistem Tercihi</option>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 text-lg">expand_more</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 font-medium leading-relaxed mt-2">Uygulamanın renk temasını değiştirin veya sistem ayarlarınıza otomatik entegre edin.</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Action Footer -->
+            <div class="flex flex-col sm:flex-row items-center justify-end gap-4 pt-8">
+                <a href="{{ url_for('index') }}" class="w-full sm:w-auto px-8 py-3.5 text-sm font-bold text-slate-500 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:text-slate-700 transition-all text-center">
+                    Geri Dön
+                </a>
+                <button type="button" onclick="saveSettings()" class="w-full sm:w-auto px-10 py-3.5 bg-[#6200EE] text-white rounded-xl font-bold shadow-lg shadow-purple-500/30 hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[18px] text-purple-200">save</span>    
+                    Ayarları Kaydet
+                </button>
             </div>
         </div>
-    </div>
+    </main>
+
+    <!-- Footer Spacer -->
+    <footer class="py-8 text-center text-slate-400 text-[10px] uppercase font-bold tracking-widest border-t border-slate-100/50 mt-auto shrink-0 bg-white/30 backdrop-blur-sm">
+        © 2024 Akademi Pro Revision Suite. Tüm hakları saklıdır.
+    </footer>
 </div>
-{% endblock %}
 
-{% block scripts %}
 <script>
-function saveSettings() {
-    const theme = document.getElementById('theme').value;
-    localStorage.setItem('theme', theme);
-    alert('Ayarlar başarıyla kaydedildi!');
-    applyTheme();
-}
-
-function applyTheme() {
-    const theme = localStorage.getItem('theme') || 'light';
-    if (theme === 'dark') {
-        document.body.classList.add('dark-theme');
-    } else {
-        document.body.classList.remove('dark-theme');
+    function saveSettings() {
+        const theme = document.getElementById('theme').value;
+        const repeat = document.getElementById('repeatInterval').value;
+        
+        localStorage.setItem('theme', theme);
+        localStorage.setItem('repeatInterval', repeat);
+        
+        // Alert substitution for better UX could be added here
+        alert('Ayarlarınız başarıyla kayıt edilmiştir!');
+        applyTheme();
     }
-}
 
-document.addEventListener('DOMContentLoaded', function() {
-    const theme = localStorage.getItem('theme') || 'light';
-    document.getElementById('theme').value = theme;
-    applyTheme();
-});
+    function applyTheme() {
+        const theme = localStorage.getItem('theme') || 'light';
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+        } else if (theme === 'light') {
+            document.documentElement.classList.add('light');
+            document.documentElement.classList.remove('dark');
+        }
+        // In "system" logic would be determined by window.matchMedia
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const _theme = localStorage.getItem('theme') || 'system';
+        const _repeat = localStorage.getItem('repeatInterval') || '7';
+        
+        document.getElementById('theme').value = _theme;
+        document.getElementById('repeatInterval').value = _repeat;
+        applyTheme();
+    });
 </script>
-{% endblock %} 
+
+<!-- Mobile Navigation Bar -->
+<nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-100 flex justify-around p-3 z-50 pb-4 shadow-[0_-10px_20px_rgba(0,0,0,0.03)]">
+    <a href="{{ url_for('index') }}" class="flex flex-col items-center text-slate-400 hover:text-[#6200EE] transition-colors">
+        <span class="material-symbols-outlined text-[24px]">dashboard</span>
+        <span class="text-[10px] mt-1 font-semibold">Panel</span>
+    </a>
+    <a href="{{ url_for('today_questions') }}" class="flex flex-col items-center text-slate-400 hover:text-[#6200EE] transition-colors">
+        <span class="material-symbols-outlined text-[24px]">event_available</span>
+        <span class="text-[10px] mt-1 font-semibold">Bugün</span>
+    </a>
+    <a href="{{ url_for('settings') }}" class="flex flex-col items-center text-[#6200EE] border-t-2 border-[#6200EE] -mt-3 pt-3">
+        <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">settings</span>
+        <span class="text-[10px] mt-1 font-bold">Ayarlar</span>
+    </a>
+</nav>
+
+{% include 'components/chatbot_widget.html' ignore missing %}
+</body>
+</html>

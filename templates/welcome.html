@@ -1,656 +1,307 @@
-{% extends "base_no_nav.html" %}
-{% block title %}ReviseMe - Kişiselleştirilmiş Tekrar Sistemi{% endblock title %}
-
-{% block styles %}
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ReviseMe - Kolay Öğrenme</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-tint": "#6d23f9",
+                      "tertiary-fixed": "#4ffbe6",
+                      "surface-container-low": "#f0f3ff",
+                      "on-primary": "#ffffff",
+                      "surface-container-high": "#e2e8f8",
+                      "on-secondary-fixed-variant": "#6200bc",
+                      "tertiary-container": "#005f56",
+                      "outline": "#7a7488",
+                      "on-error": "#ffffff",
+                      "surface-dim": "#d3daea",
+                      "secondary": "#7b24dc",
+                      "on-secondary-container": "#fffbff",
+                      "on-background": "#151c27",
+                      "secondary-fixed": "#eddcff",
+                      "on-secondary": "#ffffff",
+                      "on-primary-container": "#d0beff",
+                      "error": "#ba1a1a",
+                      "surface-variant": "#dce2f3",
+                      "surface-container-lowest": "#ffffff",
+                      "primary-fixed": "#e8ddff",
+                      "surface-container": "#e7eefe",
+                      "primary-fixed-dim": "#cfbdff",
+                      "on-tertiary-fixed": "#00201c",
+                      "tertiary": "#00453e",
+                      "primary": "#4800b2",
+                      "on-tertiary-fixed-variant": "#005048",
+                      "background": "#f9f9ff",
+                      "on-error-container": "#93000a",
+                      "on-surface-variant": "#494456",
+                      "surface": "#f9f9ff",
+                      "secondary-container": "#9547f7",
+                      "on-secondary-fixed": "#290055",
+                      "error-container": "#ffdad6",
+                      "on-surface": "#151c27",
+                      "inverse-on-surface": "#ebf1ff",
+                      "outline-variant": "#cbc3d9",
+                      "on-primary-fixed-variant": "#5300cd",
+                      "secondary-fixed-dim": "#d8b9ff",
+                      "inverse-surface": "#2a313d",
+                      "tertiary-fixed-dim": "#17deca",
+                      "on-primary-fixed": "#22005d",
+                      "primary-container": "#6200ee",
+                      "on-tertiary-container": "#1ee0cc",
+                      "on-tertiary": "#ffffff",
+                      "inverse-primary": "#cfbdff",
+                      "surface-bright": "#f9f9ff",
+                      "surface-container-highest": "#dce2f3"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "section-gap": "64px",
+                      "base": "8px",
+                      "gutter": "24px",
+                      "container-max": "1280px",
+                      "margin-mobile": "16px"
+              },
+              "fontFamily": {
+                      "body-lg": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "display-xl": ["Inter"],
+                      "body-md": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "headline-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                      "display-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                      "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "label-sm": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
 <style>
-    :root {
-        /* Ana Renk Şeması - İkinci görseldeki web tasarımı */
-        --primary-color: #5b03b9; /* Koyu mor */
-        --primary-light: #8a4fff; /* Açık mor */
-        --primary-lighter: #e6e6fa; /* Açık leylak/lavanta */
-        --accent-orange: #ff5722; /* Turuncu */
-        --accent-pink: #ff4081; /* Pembe */
-        --accent-teal: #00e5ff; /* Turkuaz */
-        --accent-yellow: #ffeb3b; /* Sarı */
-        --white: #FFFFFF;
-        --light-gray: #F8F9FA;
-    }
-    
-    body {
-        font-family: 'Nunito', sans-serif;
-        background-color: var(--primary-color);
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-        background-image: linear-gradient(135deg, var(--primary-color) 0%, #3a0587 100%);
-    }
-    
-    /* Üst Bar (Header / Navigasyon) */
-    .navbar {
-        background-color: transparent;
-        padding: 1.5rem 2rem;
-        position: relative;
-        z-index: 100;
-    }
-    
-    .logo-container {
-        display: flex;
-        align-items: center;
-    }
-    
-    .logo {
-        width: 40px;
-        height: 40px;
-        background-color: var(--white);
-        border-radius: 8px;
-        margin-right: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--primary-color);
-        font-weight: bold;
-        font-size: 18px;
-    }
-    
-    .navbar-brand {
-        font-weight: 700;
-        font-size: 1.8rem;
-        color: var(--white);
-    }
-    
-    .btn-login {
-        background-color: transparent;
-        color: var(--white);
-        border: 2px solid var(--white);
-        padding: 8px 24px;
-        border-radius: 50px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        margin-right: 15px;
-    }
-    
-    .btn-login:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-        transform: translateY(-3px);
-    }
-    
-    .btn-register {
-        background: var(--white);
-        color: var(--primary-color);
-        border: none;
-        padding: 10px 26px;
-        border-radius: 50px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
-    }
-    
-    .btn-register:hover {
-        background: var(--light-gray);
-        transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(255, 255, 255, 0.4);
-    }
-    
-    /* Ana Başlık Bölümü (Hero Section) */
-    .hero-section {
-        height: 100vh;
-        display: flex;
-        align-items: center;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .hero-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 2rem;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        position: relative;
-        z-index: 10;
-    }
-    
-    .hero-content {
-        flex: 1;
-        max-width: 500px;
-        padding: 2rem;
-        z-index: 20;
-        color: var(--white);
-    }
-    
-    .hero-illustration {
-        flex: 1;
-        max-width: 600px;
-        height: 500px;
-        position: relative;
-        z-index: 20;
-    }
-    
-    /* Dekoratif şekiller ve arka plan elemanları */
-    .decorative-elements {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        z-index: 5;
-    }
-    
-    .circle {
-        position: absolute;
-        border-radius: 50%;
-        opacity: 0.2;
-    }
-    
-    .circle-1 {
-        width: 300px;
-        height: 300px;
-        background-color: var(--accent-pink);
-        top: -100px;
-        left: -100px;
-    }
-    
-    .circle-2 {
-        width: 200px;
-        height: 200px;
-        background-color: var(--accent-teal);
-        bottom: 100px;
-        right: 50px;
-    }
-    
-    .circle-3 {
-        width: 150px;
-        height: 150px;
-        background-color: var(--accent-yellow);
-        top: 200px;
-        left: 10%;
-    }
-    
-    .dots {
-        position: absolute;
-        width: 200px;
-        height: 200px;
-        background-image: radial-gradient(circle, rgba(255,255,255,0.3) 2px, transparent 3px);
-        background-size: 20px 20px;
-    }
-    
-    .dots-1 {
-        top: 50px;
-        right: 10%;
-    }
-    
-    .dots-2 {
-        bottom: 50px;
-        left: 5%;
-    }
-    
-    .star {
-        position: absolute;
-        width: 30px;
-        height: 30px;
-        background-color: var(--accent-yellow);
-        clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-        opacity: 0.7;
-        animation: starTwinkle 3s ease-in-out infinite;
-    }
-    
-    .star-1 {
-        top: 100px;
-        right: 25%;
-    }
-    
-    .star-2 {
-        top: 70%;
-        left: 20%;
-        transform: scale(0.7);
-    }
-    
-    .star-3 {
-        top: 30%;
-        right: 10%;
-        transform: scale(1.2);
-    }
-    
-    /* Bilgisayar ekranı illüstrasyonu */
-    .computer-screen {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    .monitor {
-        width: 380px;
-        height: 260px;
-        background: var(--white);
-        border-radius: 10px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        padding: 15px;
-        position: relative;
-        z-index: 2;
-    }
-    
-    .screen {
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(45deg, #f5f5f5, #fff);
-        border-radius: 5px;
-        overflow: hidden;
-        position: relative;
-    }
-    
-    .screen-content {
-        padding: 20px;
-        position: relative;
-    }
-    
-    .screen-block {
-        height: 15px;
-        border-radius: 3px;
-        margin-bottom: 10px;
-    }
-    
-    .block-red {
-        background-color: var(--accent-orange);
-        width: 70%;
-    }
-    
-    .block-blue {
-        background-color: var(--accent-teal);
-        width: 85%;
-    }
-    
-    .block-green {
-        background-color: var(--primary-light);
-        width: 60%;
-    }
-    
-    .block-yellow {
-        background-color: var(--accent-yellow);
-        width: 80%;
-    }
-    
-    .monitor-base {
-        width: 100px;
-        height: 60px;
-        background: #e0e0e0;
-        border-radius: 0 0 50% 50%;
-        margin: -10px auto 0;
-        position: relative;
-        z-index: 1;
-    }
-    
-    .floating-elements {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-    }
-    
-    .floating-element {
-        position: absolute;
-        border-radius: 8px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        animation: float 6s ease-in-out infinite;
-    }
-    
-    .element-1 {
-        width: 80px;
-        height: 60px;
-        background-color: var(--accent-orange);
-        top: 20%;
-        left: -40px;
-        transform: rotate(-15deg);
-        animation-delay: 0.5s;
-    }
-    
-    .element-2 {
-        width: 50px;
-        height: 50px;
-        background-color: var(--accent-teal);
-        bottom: 30%;
-        right: -20px;
-        transform: rotate(10deg);
-        animation-delay: 1.5s;
-    }
-    
-    .element-3 {
-        width: 40px;
-        height: 40px;
-        background-color: var(--accent-yellow);
-        top: 10%;
-        right: 30px;
-        transform: rotate(25deg);
-        animation-delay: 1s;
-    }
-    
-    .element-4 {
-        width: 35px;
-        height: 35px;
-        background-color: var(--accent-pink);
-        bottom: 15%;
-        left: 40px;
-        transform: rotate(-10deg);
-        animation-delay: 2s;
-    }
-    
-    @keyframes float {
-        0%, 100% { transform: translateY(0) rotate(0); }
-        50% { transform: translateY(-15px) rotate(5deg); }
-    }
-    
-    @keyframes starTwinkle {
-        0%, 100% { transform: scale(1); opacity: 0.7; }
-        50% { transform: scale(1.2); opacity: 1; }
-    }
-    
-    /* Başlık ve Metin Stilleri */
-    .headline {
-        font-size: 4rem;
-        font-weight: 800;
-        color: var(--white);
-        margin-bottom: 0.5rem;
-        line-height: 1.1;
-    }
-    
-    .headline-sub {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: var(--accent-pink);
-        margin-bottom: 1.5rem;
-    }
-    
-    .subheadline {
-        font-size: 1.1rem;
-        color: rgba(255, 255, 255, 0.9);
-        margin-bottom: 2.5rem;
-        line-height: 1.6;
-    }
-    
-    /* Butonlar */
-    .btn-primary {
-        background: var(--accent-yellow);
-        color: var(--primary-color);
-        border: none;
-        padding: 12px 30px;
-        border-radius: 50px;
-        font-size: 1rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        margin-right: 1rem;
-        box-shadow: 0 8px 20px rgba(255, 235, 59, 0.3);
-    }
-    
-    .btn-primary:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 25px rgba(255, 235, 59, 0.4);
-    }
-    
-    /* Özellikler Bölümü */
-    .features-section {
-        background-color: var(--white);
-        padding: 6rem 0;
-        position: relative;
-        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
-    }
-    
-    .features-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 2rem;
-    }
-    
-    .section-title {
-        text-align: center;
-        font-size: 2.5rem;
-        color: var(--primary-color);
-        margin-bottom: 3.5rem;
-        font-weight: 800;
-        position: relative;
-    }
-    
-    .section-title::after {
-        content: '';
-        position: absolute;
-        bottom: -15px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 80px;
-        height: 5px;
-        background: linear-gradient(to right, var(--primary-color), var(--primary-light));
-        border-radius: 50px;
-    }
-    
-    .features-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 2.5rem;
-    }
-    
-    .feature-card {
-        background: white;
-        border-radius: 15px;
-        padding: 2.5rem;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
-        transition: all 0.4s ease;
-        position: relative;
-        overflow: hidden;
-        border: 1px solid #f0f0f0;
-    }
-    
-    .feature-card:hover {
-        transform: translateY(-15px);
-        box-shadow: 0 25px 50px rgba(91, 3, 185, 0.15);
-    }
-    
-    .feature-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 5px;
-        background: linear-gradient(to right, var(--primary-color), var(--primary-light));
-    }
-    
-    .feature-icon {
-        width: 80px;
-        height: 80px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 32px;
-        background: var(--primary-lighter);
-        color: var(--primary-color);
-        border-radius: 20px;
-        margin-bottom: 2rem;
-        box-shadow: 0 10px 20px rgba(91, 3, 185, 0.1);
-    }
-    
-    .feature-title {
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: var(--primary-color);
-        margin-bottom: 1rem;
-    }
-    
-    .feature-description {
-        color: #666;
-        line-height: 1.7;
-    }
-    
-    /* Responsive Düzenlemeler */
-    @media (max-width: 992px) {
-        .hero-container {
-            flex-direction: column-reverse;
-            text-align: center;
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-        
-        .hero-content, .hero-illustration {
-            max-width: 100%;
-            padding: 1rem;
+        .revision-ring {
+            background: conic-gradient(from 0deg, #6200EE 0%, #6200EE 75%, #F0F3FF 75%, #F0F3FF 100%);
         }
-        
-        .headline {
-            font-size: 3rem;
+        .bento-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        
-        .headline-sub {
-            font-size: 1.8rem;
+        .bento-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px rgba(98, 0, 238, 0.08);
         }
-        
-        .hero-illustration {
-            height: 400px;
-        }
-        
-        .monitor {
-            width: 300px;
-            height: 200px;
-        }
-    }
-    
-    @media (max-width: 768px) {
-        .navbar {
-            padding: 1rem;
-        }
-        
-        .headline {
-            font-size: 2.5rem;
-        }
-        
-        .feature-card {
-            padding: 2rem;
-        }
-        
-        .hero-illustration {
-            height: 300px;
-        }
-        
-        .monitor {
-            width: 260px;
-            height: 180px;
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .btn-primary, .btn-login, .btn-register {
-            width: 100%;
-            margin-bottom: 1rem;
-            margin-right: 0;
-        }
-        
-        .headline {
-            font-size: 2rem;
-        }
-        
-        .hero-illustration {
-            height: 250px;
-        }
-        
-        .monitor {
-            width: 220px;
-            height: 160px;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<!-- Üst Bar (Header / Navigasyon) -->
-<nav class="navbar navbar-expand-lg">
-    <div class="container">
-        <div class="logo-container">
-            <div class="logo">R</div>
-            <a class="navbar-brand" href="#">ReviseMe</a>
-        </div>
-        <div class="d-flex">
-            <a class="btn btn-login" href="{{ url_for('login') }}">Giriş Yap</a>
-            <a class="btn btn-register" href="{{ url_for('register') }}">Kayıt Ol</a>
-        </div>
-    </div>
+    </style>
+    <style> html { font-size: 18px !important; } </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-sm border-b border-gray-100">
+<div class="flex items-center justify-between px-6 py-4 max-w-full px-4 md:px-8 mx-auto">
+<div class="text-2xl font-black tracking-tighter text-violet-700">ReviseMe</div>
+<div class="hidden md:flex items-center space-gap-8 gap-8">
+<a class="text-slate-600 font-medium text-sm tracking-tight hover:text-violet-600 transition-colors" style="text-decoration: none;" href="#">Features</a>
+<a class="text-slate-600 font-medium text-sm tracking-tight hover:text-violet-600 transition-colors" style="text-decoration: none;" href="#">Methodology</a>
+<a class="text-slate-600 font-medium text-sm tracking-tight hover:text-violet-600 transition-colors" style="text-decoration: none;" href="#">Pricing</a>
+<a class="text-slate-600 font-medium text-sm tracking-tight hover:text-violet-600 transition-colors" style="text-decoration: none;" href="#">Success Stories</a>
+</div>
+<div class="flex items-center gap-4">
+<a href="{{ url_for('login') }}" class="text-slate-600 font-medium text-sm tracking-tight px-4 py-2 hover:text-violet-600 transition-colors" style="text-decoration: none;">Sign In</a>
+<a href="{{ url_for('register') }}" class="inline-block bg-primary-container text-on-primary font-medium text-sm tracking-tight px-6 py-2.5 rounded-full scale-95 hover:scale-100 transition-transform shadow-md" style="text-decoration: none;">Get Started</a>
+</div>
+</div>
 </nav>
 
-<!-- Dekoratif Arka Plan Elemanları -->
-<div class="decorative-elements">
-    <div class="circle circle-1"></div>
-    <div class="circle circle-2"></div>
-    <div class="circle circle-3"></div>
-    <div class="dots dots-1"></div>
-    <div class="dots dots-2"></div>
-    <div class="star star-1"></div>
-    <div class="star star-2"></div>
-    <div class="star star-3"></div>
+<main class="pt-24 overflow-hidden">
+<!-- Hero Section -->
+<section class="relative px-6 py-20 max-w-full px-4 md:px-8 mx-auto">
+<div class="grid lg:grid-cols-2 gap-16 items-center">
+<div class="z-10">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-label-sm mb-6">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>Yapay Zeka Destekli Öğrenme</span>
 </div>
-
-<!-- Ana Başlık Bölümü (Hero Section) -->
-<section class="hero-section">
-    <div class="hero-container">
-        <div class="hero-content">
-            <h1 class="headline">REVISEME</h1>
-            <h1 class="headline-sub">Öğren, Geliş, Yenilen</h1>
-            <p class="subheadline">ReviseMe ile tekrarlarını planlayarak öğrenmeni kalıcı hale getir. Akıllı tekrar sistemi, ilerleme takibi ve daha fazlasıyla öğrenme yolculuğunu kusursuz hale getir.</p>
-            <a href="{{ url_for('register') }}" class="btn btn-primary">Keşfet</a>
-        </div>
-        
-        <div class="hero-illustration">
-            <div class="computer-screen">
-                <div class="monitor">
-                    <div class="screen">
-                        <div class="screen-content">
-                            <div class="screen-block block-red"></div>
-                            <div class="screen-block block-blue"></div>
-                            <div class="screen-block block-green"></div>
-                            <div class="screen-block block-yellow"></div>
+<h1 class="font-display-xl text-display-xl text-on-surface mb-6 leading-tight">
+                        Öğrenme Yolculuğunuzu <span class="text-primary-container">Geliştirin</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-10 max-w-lg">
+                        Bilimsel temelli aralıklı tekrar ve aktif hatırlama yöntemleriyle derslerinde ustalaşın. Sınav stresini verimli çalışmaya dönüştürün.
+                    </p>
+<div class="flex flex-wrap gap-4">
+<a href="{{ url_for('register') }}" class="bg-primary-container text-on-primary font-headline-md px-8 py-4 rounded-xl shadow-lg hover:shadow-primary-container/20 transition-all flex items-center gap-3 no-underline" style="text-decoration: none;">
+                            Hemen Başla
+                            <span class="material-symbols-outlined">arrow_forward</span>
+</a>
+<button class="bg-surface-container-low text-primary-container border border-outline-variant font-headline-md px-8 py-4 rounded-xl hover:bg-surface-container-high transition-all">
+                            Nasıl Çalışır?
+                        </button>
+</div>
+<div class="mt-12 flex items-center gap-6">
+<div class="flex -space-x-3">
+<img alt="User" class="w-10 h-10 rounded-full border-2 border-white" data-alt="close-up portrait of a smiling young university student with a professional headshot style and warm natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYwEwO2k7b_q4JEVwIC_ZpTshQoMKfXL5008JOMbcGrk9DiTqGBRG16I3HlFfUnBsyWs-0PcQnEB51LU92kfborn3lLkBO11bUix0lsBVjs1r1PJLElfkYGesFP5NjR59e9LP8RyPsO9V6RPvMqQ7z32YdUW1EVNddUuWxxlbQIETQnCAdDPvlCev3f-NnGWJIqgcbYx3aws1JH0YIhwZHofyLQ8URdpTPXYmGkI_DEeeuw1ZOpNqrlmJtxgjOCiC7vB5x2uoq_78"/>
+<img alt="User" class="w-10 h-10 rounded-full border-2 border-white" data-alt="portrait of a focused young man wearing glasses looking directly at camera with neutral studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuE7F_zsNYuPWE4bR0BlGQuteoZJrpuuSH18guk0yYPXeEfD56ERfWrWxuQ3yY21lWupTfdJOK_ZbLw1JkRwtgJdy9KR2a30VhOxjBog5BCru46ziMo668dHhtNOjvcMZx8MPAKgosRlhagrr0uB_qiPnezX01GAL1dWFFYdVB8MOAyFYfGpN6Un1yIjf_Ori5CoWzK9kfbi3-tlndpgGpyI9B3gm1QxIRGGhqHb1jzdHM1iZhajswOa1nCQuXyv3WIy80RheKGa4"/>
+<img alt="User" class="w-10 h-10 rounded-full border-2 border-white" data-alt="cheerful young woman laughing with soft bokeh background and vibrant colors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC18KKXjppcpaxaizr8dhZCsYofUJ3SaJJ7hQY5ZycpZecgnzxiCBgqzQN6gN6pbgpv9oJJfiQVJ6NbrcH6A9LJ5njxmjTQ34RYUYW8zRPgkl6My6cNgdfMhqPVHFnpdcNHAGtmw4MfKECR3uMuMsf7tbl5yhA0oYlm66GZejeASp5BUdJcCNfhom2uljL1pcXir_fMgEikOmuH1WPZKFX9RFRm1K0QWToSRHygJ8nTjLEbMojC6FvDy6NmIp9JDXXqTaqPmeXuuLI"/>
+</div>
+<div class="text-label-sm text-on-surface-variant">
+<span class="font-bold text-on-surface">50,000+</span> Öğrenci ReviseMe ile Başarıyor
                         </div>
-                    </div>
-                </div>
-                <div class="monitor-base"></div>
-                <div class="floating-elements">
-                    <div class="floating-element element-1"></div>
-                    <div class="floating-element element-2"></div>
-                    <div class="floating-element element-3"></div>
-                    <div class="floating-element element-4"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+</div>
+</div>
+<div class="relative">
+<!-- Glassmorphism Visuals -->
+<div class="absolute -top-20 -right-20 w-80 h-80 bg-primary-container/10 rounded-full blur-3xl"></div>
+<div class="absolute -bottom-20 -left-10 w-64 h-64 bg-tertiary-container/10 rounded-full blur-3xl"></div>
+<div class="relative grid grid-cols-2 gap-4">
+<div class="space-y-4">
+<div class="bg-white p-6 rounded-2xl shadow-[0_15px_30px_rgba(98,0,238,0.04)] border border-gray-100 flex flex-col items-center">
+<div class="w-20 h-20 rounded-full revision-ring flex items-center justify-center mb-4">
+<div class="w-16 h-16 bg-white rounded-full flex items-center justify-center font-bold text-primary-container">
+                                        75%
+                                    </div>
+</div>
+<span class="text-label-sm text-slate-500 uppercase tracking-widest">Hafıza Gücü</span>
+</div>
+<div class="bg-primary-container p-6 rounded-2xl shadow-xl text-white">
+<span class="material-symbols-outlined text-4xl mb-4" data-weight="fill">psychology</span>
+<div class="text-headline-md mb-1">Akıllı Tekrar</div>
+<div class="text-body-md opacity-80">Sonraki oturum: 14:00</div>
+</div>
+</div>
+<div class="space-y-4 pt-8">
+<div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+<img alt="Study Session" class="rounded-xl mb-4" data-alt="clean minimal workspace with an open notebook, laptop, and a cup of coffee on a white desk with natural morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQRLuZHCTZNtwhWYzguIJ5ScJhAdEV8I1eCmZA3lqrZceLHD6LELGVBkm3Wc3hLb8ZL59UYQkJ9l9qRpdeu8KoF8M_Sva9zoBAk5puipiIkbgnRcnpUmXIvSNPIH6TV69SFpi2hZIyFRyQUNXqqd8zszhZRa0uZ3UoftYbjjPShCcgNoMriZ9-VnmV5btj8tw2Woaihg8oifo8WMKxmr7cVQKcfS99QFporUIQEHmXAP1NJ449_rYmU9PG-lwokSst3yoSd1a3GJ0"/>
+<div class="space-y-2">
+<div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full w-2/3 bg-tertiary-fixed-dim"></div>
+</div>
+<div class="flex justify-between text-label-sm">
+<span class="text-slate-400">Fizik - Termodinamik</span>
+<span class="text-on-surface">66%</span>
+</div>
+</div>
+</div>
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+<div class="p-3 bg-secondary-fixed rounded-full text-secondary">
+<span class="material-symbols-outlined">trending_up</span>
+</div>
+<div>
+<div class="text-label-sm text-slate-500">Skor Artışı</div>
+<div class="font-bold text-xl text-on-surface">+24%</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 </section>
-
-<!-- Özellikler Bölümü -->
-<section class="features-section">
-    <div class="features-container">
-        <h2 class="section-title">Öğrenme Yolculuğunuzu Geliştirin</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-brain"></i>
-                </div>
-                <h3 class="feature-title">Akıllı Tekrar Sistemi</h3>
-                <p class="feature-description">Öğrenme bilimlerine dayalı sistemimiz, bilgileri uzun süreli hafızaya taşımanız için en uygun tekrar zamanlarını belirler.</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <h3 class="feature-title">İlerleme Takibi</h3>
-                <p class="feature-description">Çalışma istatistiklerinizi takip edin, ilerlemenizi görün ve öğrenme alışkanlıklarınızı optimize edin.</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-mobile-alt"></i>
-                </div>
-                <h3 class="feature-title">Her Yerde Erişim</h3>
-                <p class="feature-description">Tüm cihazlarınızda senkronize çalışın. İster evde, ister yolda, notlarınıza ve tekrarlarınıza her an erişin.</p>
-            </div>
-        </div>
-    </div>
+<!-- Bento Grid Features Section -->
+<section class="bg-surface-container-low py-24 px-6">
+<div class="max-w-full px-4 md:px-8 mx-auto">
+<div class="text-center mb-16">
+<h2 class="font-headline-lg text-headline-lg mb-4">Eğitimin Geleceği Burada</h2>
+<p class="text-on-surface-variant max-w-2xl mx-auto">Geleneksel yöntemleri bir kenara bırakın. ReviseMe'nin sunduğu modern araçlarla potansiyelinizi açığa çıkarın.</p>
+</div>
+<div class="grid md:grid-cols-3 gap-6">
+<!-- Feature 1 -->
+<div class="bento-card bg-white p-8 rounded-3xl border border-outline-variant/30 flex flex-col h-full">
+<div class="w-14 h-14 bg-primary-fixed flex items-center justify-center rounded-2xl mb-8">
+<span class="material-symbols-outlined text-primary-container text-3xl" data-weight="fill">neurology</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-4 text-on-surface">Akıllı Tekrar Sistemi</h3>
+<p class="text-body-md text-on-surface-variant mb-6">
+                            Unutma eğrisi algoritması ile bilgileri tam unutmaya başladığınız anda hatırlatarak kalıcı hafızaya aktarın.
+                        </p>
+<div class="mt-auto inline-flex items-center gap-2 text-primary-container font-semibold group cursor-pointer">
+                            Detayları Gör
+                            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+</div>
+</div>
+<!-- Feature 2 -->
+<div class="bento-card bg-white p-8 rounded-3xl border border-outline-variant/30 flex flex-col h-full">
+<div class="w-14 h-14 bg-tertiary-fixed/30 flex items-center justify-center rounded-2xl mb-8">
+<span class="material-symbols-outlined text-tertiary text-3xl" data-weight="fill">query_stats</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-4 text-on-surface">İlerleme Takibi</h3>
+<p class="text-body-md text-on-surface-variant mb-6">
+                            Öğrenme hızınızı ve ustalık seviyenizi detaylı grafiklerle analiz edin. Hangi konularda zayıf olduğunuzu anında görün.
+                        </p>
+<div class="mt-auto inline-flex items-center gap-2 text-primary-container font-semibold group cursor-pointer">
+                            Verileri İncele
+                            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+</div>
+</div>
+<!-- Feature 3 -->
+<div class="bento-card bg-white p-8 rounded-3xl border border-outline-variant/30 flex flex-col h-full">
+<div class="w-14 h-14 bg-secondary-fixed flex items-center justify-center rounded-2xl mb-8">
+<span class="material-symbols-outlined text-secondary text-3xl" data-weight="fill">devices</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-4 text-on-surface">Her Yerde Erişim</h3>
+<p class="text-body-md text-on-surface-variant mb-6">
+                            Kütüphanede, otobüste veya yatakta. Tüm cihazlarınız arasında anlık senkronizasyon ile çalışmaya her yerden devam edin.
+                        </p>
+<div class="mt-auto inline-flex items-center gap-2 text-primary-container font-semibold group cursor-pointer">
+                            Uygulamayı İndir
+                            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+</div>
+</div>
+</div>
+</div>
 </section>
-{% endblock %}
+<!-- Dynamic Content Section -->
+<section class="py-24 px-6 max-w-full px-4 md:px-8 mx-auto">
+<div class="bg-primary shadow-2xl rounded-[3rem] overflow-hidden flex flex-col md:flex-row items-center">
+<div class="p-12 md:p-20 md:w-1/2">
+<h2 class="font-display-xl text-headline-lg text-white mb-6">Başarıya Giden En Kısa Yol</h2>
+<p class="text-primary-fixed-dim text-body-lg mb-8">
+                        ReviseMe sadece bir uygulama değil, akademik başarınızın dijital mimarıdır. Binlerce başarılı öğrenci gibi siz de verimliliğinizi ikiye katlayın.
+                    </p>
+<a href="{{ url_for('register') }}" class="inline-block bg-white text-primary font-headline-md px-10 py-4 rounded-2xl hover:bg-primary-fixed transition-colors no-underline" style="text-decoration: none;">
+                        Ücretsiz Hesabını Oluştur
+</a>
+</div>
+<div class="md:w-1/2 relative h-80 md:h-[500px] w-full">
+<img alt="Collaborative Learning" class="absolute inset-0 w-full h-full object-cover" data-alt="diverse group of college students studying together with laptops and tablets in a modern high-tech university library lounge" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDA44NXSCmYuAMsB_mgmsov6dzIOGaElLDmh4M5Goq754-Q4bPL0sT2gwip5O4rroVSnCI9CR1Hk9q_HESYkufTp6BS3w3TSk3czVEIJXMY_d9Pf4HtDSKHgAWRzQ2AbreCZYu9mU75lDgexhXy5XbI6x51jWMMxRF58BRWXHQR5lb_d2fJcN9_ioXdyXmTyNVtWMLfG2n4VGFB2DcbKnY1JkZrBY-2aS28S6i1gYdPvV-mqtTFpfV7ZTUX7usFKzYLVwqQ2Q8cwkM"/>
+<div class="absolute inset-0 bg-gradient-to-r from-primary via-primary/20 to-transparent"></div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 mt-24 bg-slate-50 border-t border-gray-200">
+<div class="flex flex-col md:flex-row justify-between items-center gap-6 px-6 max-w-full px-4 md:px-8 mx-auto">
+<div class="flex flex-col items-center md:items-start gap-4">
+<div class="text-lg font-bold text-slate-900">ReviseMe</div>
+<p class="font-['Inter'] text-sm text-slate-500">© 2024 ReviseMe. Precision Revision for High Performance.</p>
+</div>
+<div class="flex gap-8">
+<a class="text-slate-500 text-sm hover:underline hover:text-violet-600 transition-opacity" href="#">Privacy</a>
+<a class="text-slate-500 text-sm hover:underline hover:text-violet-600 transition-opacity" href="#">Terms</a>
+<a class="text-slate-500 text-sm hover:underline hover:text-violet-600 transition-opacity" href="#">Research</a>
+<a class="text-slate-500 text-sm hover:underline hover:text-violet-600 transition-opacity" href="#">Support</a>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-slate-400 cursor-pointer hover:text-violet-600 transition-colors">language</span>
+<span class="material-symbols-outlined text-slate-400 cursor-pointer hover:text-violet-600 transition-colors">mail</span>
+<span class="material-symbols-outlined text-slate-400 cursor-pointer hover:text-violet-600 transition-colors">share</span>
+</div>
+</div>
+</footer>
+</body>
+</html>

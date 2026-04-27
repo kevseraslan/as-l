@@ -1,543 +1,180 @@
-{% extends "base_no_nav.html" %}
-{% block title %}Giriş - ReviseMe{% endblock title %}
+<!DOCTYPE html>
+<html class="light" lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Giriş Yap | ReviseMe</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4800b2",
+                        "primary-container": "#6200ee",
+                        "on-surface": "#151c27",
+                        "surface-bright": "#f9f9ff",
+                        "outline-variant": "#cbc3d9",
+                    },
+                    fontFamily: {
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #F8F5FF; font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+        }
+        .login-card-shadow {
+            box-shadow: 0 15px 30px -5px rgba(98, 0, 238, 0.04), 0 10px 10px -5px rgba(98, 0, 238, 0.02);
+        }
+        .bento-gradient {
+            background: linear-gradient(135deg, #4800b2 0%, #6d23f9 100%);
+        }
+    </style>
+    <style> html { font-size: 18px !important; } </style>
+    <style> html { font-size: 18px !important; } </style>
+</head>
+<body class="text-on-surface antialiased min-h-screen flex items-center justify-center p-0 relative overflow-hidden">
 
-{% block styles %}
-<style>
-    :root {
-        /* Ana Renk Şeması - Mor Temaları */
-        --primary-color: #6A37B5;
-        --primary-light: #8451D1;
-        --primary-lighter: #A98AE5;
-        --primary-dark: #4A2882;
-        --primary-ultra-light: #F0E8FF;
-        
-        /* Nötr Renkler */
-        --dark-bg: #1A1A2E;
-        --dark-card: #252542;
-        --dark-input: #303056;
-        --dark-border: #444464;
-        --white: #FFFFFF;
-        --light-text: #E0E0E0;
-        --gray-text: #9E9E9E;
-        
-        /* Vurgu Renkleri */
-        --accent-turquoise: #2ECDC8;
-        --accent-pink: #F56FAD;
-    }
-    
-    body {
-        font-family: 'Nunito', sans-serif;
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-        min-height: 100vh;
-    }
-    
-    /* İki Sütunlu Ana Düzen */
-    .split-layout {
-        display: flex;
-        height: 100vh;
-        width: 100%;
-    }
-    
-    /* Sol Sütun - Aydınlık Bölüm */
-    .left-column {
-        flex: 1;
-        background-color: var(--primary-ultra-light);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        padding: 3rem;
-        position: relative;
-        overflow: hidden;
-        border-radius: 0 100px 0 0;
-    }
-    
-    .left-column::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        width: 100%;
-        height: 100%;
-        background: var(--primary-ultra-light);
-        border-radius: 0 0 70% 0;
-        z-index: -1;
-    }
-    
-    .brand-logo {
-        margin-bottom: 2rem;
-        text-align: center;
-        position: relative;
-        z-index: 3;
-    }
-    
-    .brand-logo img {
-        width: 140px;
-        height: auto;
-    }
-    
-    .logo-text {
-        font-size: 2rem;
-        font-weight: 700;
-        color: var(--primary-dark);
-        margin-top: 1rem;
-    }
-    
-    .illustration-container {
-        width: 80%;
-        max-width: 480px;
-        margin-top: 2rem;
-        position: relative;
-        z-index: 3;
-    }
-    
-    .illustration {
-        width: 100%;
-        height: auto;
-        position: relative;
-        z-index: 2;
-    }
-    
-    .blob-shape {
-        position: absolute;
-        background: linear-gradient(120deg, rgba(169, 138, 229, 0.3), rgba(106, 55, 181, 0.15));
-        border-radius: 71% 29% 70% 30% / 53% 51% 49% 47%;
-        width: 140%;
-        height: 140%;
-        top: -20%;
-        left: -20%;
-        z-index: 1;
-        animation: blob-movement 15s infinite alternate ease-in-out;
-    }
-    
-    @keyframes blob-movement {
-        0% {
-            border-radius: 71% 29% 70% 30% / 53% 51% 49% 47%;
-        }
-        50% {
-            border-radius: 40% 60% 30% 70% / 50% 60% 40% 50%;
-        }
-        100% {
-            border-radius: 60% 40% 50% 50% / 40% 50% 50% 60%;
-        }
-    }
-    
-    /* Sağ Sütun - Koyu Bölüm */
-    .right-column {
-        flex: 1;
-        background-color: var(--dark-bg);
-        color: var(--light-text);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 3rem;
-        position: relative;
-    }
-    
-    /* Şekiller ve Desen Efektleri */
-    .geometric-shapes {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 0;
-        overflow: hidden;
-    }
-    
-    .shape {
-        position: absolute;
-        opacity: 0.15;
-    }
-    
-    .shape-1 {
-        width: 200px;
-        height: 200px;
-        background: var(--primary-color);
-        border-radius: 50%;
-        top: 15%;
-        right: 10%;
-    }
-    
-    .shape-2 {
-        width: 150px;
-        height: 150px;
-        background: var(--accent-turquoise);
-        border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-        bottom: 15%;
-        left: 10%;
-    }
-    
-    /* Login Formu Konteyner */
-    .login-container {
-        width: 100%;
-        max-width: 420px;
-        z-index: 10;
-        position: relative;
-    }
-    
-    .login-title {
-        text-align: left;
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: var(--white);
-        margin-bottom: 2rem;
-    }
-    
-    /* Form Elemanları */
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-    
-    .form-label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 600;
-        color: var(--light-text);
-    }
-    
-    .form-control {
-        width: 100%;
-        padding: 1rem;
-        font-size: 1rem;
-        background-color: var(--dark-input);
-        border: 1px solid var(--dark-border);
-        color: var(--white);
-        border-radius: 10px;
-        transition: all 0.3s ease;
-    }
-    
-    .form-control:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(106, 55, 181, 0.25);
-        outline: none;
-    }
-    
-    .form-check {
-        display: flex;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
-    
-    .form-check-input {
-        margin-right: 0.5rem;
-        width: 18px;
-        height: 18px;
-        background-color: var(--dark-input);
-        border: 1px solid var(--dark-border);
-    }
-    
-    .form-check-label {
-        font-size: 0.9rem;
-        color: var(--gray-text);
-    }
-    
-    .btn-login {
-        background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
-        color: white;
-        border: none;
-        padding: 1rem;
-        border-radius: 10px;
-        font-size: 1rem;
-        font-weight: 600;
-        width: 100%;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(106, 55, 181, 0.3);
-        cursor: pointer;
-    }
-    
-    .btn-login:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(106, 55, 181, 0.4);
-    }
-    
-    .login-footer {
-        margin-top: 2rem;
-    }
-    
-    .login-footer p {
-        margin-bottom: 0.5rem;
-    }
-    
-    .login-footer a {
-        color: var(--primary-lighter);
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .login-footer a:hover {
-        color: var(--primary-light);
-        text-decoration: underline;
-    }
-    
-    .divider {
-        display: flex;
-        align-items: center;
-        margin: 2rem 0;
-    }
-    
-    .divider::before, .divider::after {
-        content: '';
-        flex: 1;
-        height: 1px;
-        background-color: var(--dark-border);
-    }
-    
-    .divider span {
-        padding: 0 1rem;
-        color: var(--gray-text);
-        font-size: 0.9rem;
-    }
-    
-    .social-login {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-        margin-top: 1rem;
-    }
-    
-    .social-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        background-color: var(--dark-input);
-        border: 1px solid var(--dark-border);
-        color: var(--gray-text);
-        font-size: 1.1rem;
-        transition: all 0.3s ease;
-    }
-    
-    .social-btn:hover {
-        transform: translateY(-3px);
-        border-color: var(--primary-lighter);
-        color: var(--primary-lighter);
-    }
-    
-    .back-to-home {
-        margin-top: 2rem;
-        text-align: center;
-    }
-    
-    .back-to-home a {
-        color: var(--primary-lighter);
-        text-decoration: none;
-        font-size: 0.9rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .back-to-home a:hover {
-        text-decoration: underline;
-    }
-    
-    .forgot-password-link {
-        color: var(--gray-text);
-        text-decoration: none;
-        font-size: 0.9rem;
-        transition: color 0.3s ease;
-    }
-    
-    .forgot-password-link:hover {
-        color: var(--primary-lighter);
-        text-decoration: underline;
-    }
-    
-    .register-link {
-        margin-top: 2rem;
-        text-align: center;
-    }
-    
-    .register-link p {
-        margin-bottom: 0.5rem;
-    }
-    
-    .register-link a {
-        color: var(--primary-lighter);
-        text-decoration: none;
-        font-size: 0.9rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .register-link a:hover {
-        text-decoration: underline;
-    }
-    
-    /* Responsive Tasarım */
-    @media (max-width: 992px) {
-        .split-layout {
-            flex-direction: column;
-            height: auto;
-        }
-        
-        .left-column, .right-column {
-            flex: none;
-            width: 100%;
-            padding: 2rem;
-        }
-        
-        .left-column {
-            min-height: 50vh;
-        }
-        
-        .illustration-container {
-            width: 60%;
-            margin-bottom: 2rem;
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .login-title {
-            font-size: 1.8rem;
-        }
-        
-        .form-control, .btn-login {
-            padding: 0.8rem;
-        }
-        
-        .illustration-container {
-            width: 90%;
-        }
-    }
-</style>
-{% endblock styles %}
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="fixed top-0 left-1/2 -translate-x-1/2 z-50 w-full max-w-md">
+            {% for category, message in messages %}
+                <div class="bg-{% if category == 'success' %}green{% else %}red{% endif %}-50 border border-{% if category == 'success' %}green{% else %}red{% endif %}-200 text-{% if category == 'success' %}green{% else %}red{% endif %}-700 p-0 rounded-xl shadow-lg mb-2 flex justify-between items-center">
+                    <span class="text-sm font-bold">{{ message }}</span>
+                    <button onclick="this.parentElement.style.display='none'" class="opacity-50 hover:opacity-100"><span class="material-symbols-outlined text-[18px]">close</span></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
 
-{% block content %}
-<!-- İki Sütunlu Ana Düzen -->
-<div class="split-layout">
-    <!-- Sol Sütun - Logo ve İllüstrasyon -->
-    <div class="left-column">
-        <div class="brand-logo">
-            <!-- ReviseMe Logosu - Kare içinde kitap ve insan ikonu -->
-            <div style="width: 120px; height: 120px; background-color: var(--primary-color); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
-                <svg width="70" height="70" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="35" cy="20" r="10" fill="white"/>
-                    <path d="M25 30 L25 55 L45 55 L45 30" stroke="white" stroke-width="4" fill="none"/>
-                    <path d="M35 30 L35 55" stroke="white" stroke-width="2" fill="none"/>
-                </svg>
-            </div>
-            <div class="logo-text">ReviseMe</div>
+<!-- Main Container -->
+<div class="relative z-10 w-full max-w-full px-4 md:px-8 grid grid-cols-1 md:grid-cols-12 bg-white rounded-none overflow-hidden login-card-shadow border border-slate-100 min-h-screen">
+    
+    <!-- Left Visual Side (Bento-style features) -->
+    <div class="hidden md:flex md:col-span-5 bento-gradient p-12 flex-col justify-between relative overflow-hidden text-white">
+        
+        <div class="relative z-10">
+            <h1 class="text-4xl font-black mb-1 flex items-center gap-3">
+                <div class="bg-white/10 p-2 rounded-xl backdrop-blur-sm"><span class="material-symbols-outlined text-3xl">auto_stories</span></div>
+                ReviseMe
+            </h1>
+            <div class="text-indigo-200 font-bold text-xs uppercase tracking-widest pl-[60px]">Mastery Portal</div>
         </div>
         
-        <div class="illustration-container">
-            <div class="blob-shape"></div>
-            <!-- Yeni İllüstrasyon - Öğrenci ve Dijital Öğrenme -->
-            <div class="illustration">
-                <svg width="100%" height="100%" viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Mor Kitap Yığını -->
-                    <rect x="170" y="320" width="220" height="30" rx="5" fill="#8451D1" />
-                    <rect x="175" y="290" width="210" height="30" rx="5" fill="#6A37B5" />
-                    <rect x="180" y="260" width="200" height="30" rx="5" fill="#9866E9" />
-                    <rect x="185" y="230" width="190" height="30" rx="5" fill="#A98AE5" />
-                    
-                    <!-- Laptop/Tablet -->
-                    <rect x="200" y="180" width="160" height="10" rx="2" fill="#444" />
-                    <rect x="180" y="190" width="200" height="120" rx="5" fill="#252542" />
-                    <rect x="190" y="200" width="180" height="100" rx="3" fill="#2ECDC8" opacity="0.7" />
-                    
-                    <!-- Öğrenci -->
-                    <circle cx="280" cy="110" r="35" fill="#6A37B5" />
-                    <rect x="265" y="145" width="30" height="50" rx="10" fill="#6A37B5" />
-                    
-                    <!-- Düşünce Simgeleri -->
-                    <circle cx="350" cy="80" r="20" fill="#F56FAD" opacity="0.9" />
-                    <text x="344" y="85" fill="white" font-size="18" font-weight="bold">✓</text>
-                    
-                    <circle cx="380" cy="120" r="15" fill="#2ECDC8" opacity="0.8" />
-                    <text x="375" y="125" fill="white" font-size="15" font-weight="bold">!</text>
-                    
-                    <circle cx="370" cy="160" r="18" fill="#A98AE5" opacity="0.8" />
-                    <text x="363" y="166" fill="white" font-size="16" font-weight="bold">?</text>
-                    
-                    <!-- Dalga Çizgileri -->
-                    <path d="M120,140 C160,110 200,170 240,140 C280,110 320,170 360,140" stroke="#A98AE5" stroke-width="3" fill="none" opacity="0.5" />
-                    <path d="M140,180 C180,150 220,210 260,180 C300,150 340,210 380,180" stroke="#6A37B5" stroke-width="3" fill="none" opacity="0.3" />
-                    
-                    <!-- Küçük Dekoratif Daireler -->
-                    <circle cx="150" cy="100" r="8" fill="#A98AE5" opacity="0.5" />
-                    <circle cx="120" cy="150" r="5" fill="#F56FAD" opacity="0.5" />
-                    <circle cx="180" cy="120" r="6" fill="#2ECDC8" opacity="0.5" />
-                    <circle cx="410" cy="200" r="7" fill="#A98AE5" opacity="0.5" />
-                    <circle cx="430" cy="150" r="4" fill="#F56FAD" opacity="0.5" />
-                    <circle cx="400" cy="90" r="6" fill="#2ECDC8" opacity="0.5" />
-                </svg>
+        <div class="relative z-10 flex flex-col gap-6">
+            <!-- Feature Card 1 -->
+            <div class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl border border-white/10 group hover:bg-white/20 transition-colors">
+                <span class="material-symbols-outlined text-white mb-3 text-3xl group-hover:scale-110 transition-transform">psychology</span>
+                <h3 class="text-white text-xl font-bold mb-2">Yapay Zeka Destekli Analizler</h3>
+                <p class="text-indigo-100 text-sm font-medium opacity-80 leading-relaxed">Kavramları daha hızlı ve kalıcı öğrenmeniz için özenle tasarlanmış kişiselleştirilmiş çalışma rotaları.</p>
+            </div>
+            
+            <!-- Feature Card 2 -->
+            <div class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl border border-white/10 group hover:bg-white/20 transition-colors">
+                <span class="material-symbols-outlined text-white mb-3 text-3xl group-hover:scale-110 transition-transform">analytics</span>
+                <h3 class="text-white text-xl font-bold mb-2">Detaylı Performans Takibi</h3>
+                <p class="text-indigo-100 text-sm font-medium opacity-80 leading-relaxed">Müfredatınızdaki her bir konu için net ve görsel ilerleme göstergeleri.</p>
             </div>
         </div>
+        
+        <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-fuchsia-600 rounded-full blur-[100px] opacity-40"></div>
+        <div class="absolute top-0 right-0 w-80 h-80 bg-teal-400 rounded-full blur-[120px] opacity-20"></div>
+        
+        <footer class="relative z-10 flex items-center justify-between">
+            <p class="text-indigo-200 text-xs font-bold uppercase tracking-widest">© 2024 ReviseMe EdTech.</p>
+            <a href="{{ url_for('welcome') }}" class="text-white/80 hover:text-white text-xs font-bold flex items-center gap-1 transition-colors">
+                <span class="material-symbols-outlined text-[16px]">arrow_back</span> Ana Sayfa
+            </a>
+        </footer>
     </div>
     
-    <!-- Sağ Sütun - Giriş Formu -->
-    <div class="right-column">
-        <!-- Arka Plan Şekilleri -->
-        <div class="geometric-shapes">
-            <div class="shape shape-1"></div>
-            <div class="shape shape-2"></div>
-        </div>
-        
-        <!-- Giriş Formu -->
-        <div class="login-container">
-            <h1 class="login-title">Hesabınıza Giriş Yapın</h1>
+    <!-- Right Form Side -->
+    <div class="col-span-1 md:col-span-7 p-8 md:p-16 lg:p-24 flex flex-col justify-center bg-white relative">
+        <div class="max-w-md w-full mx-auto">
+            <header class="mb-10">
+                <h1 class="text-4xl font-black text-slate-800 mb-3 tracking-tight">Tekrar Hoş Geldin! 👋</h1>
+                <p class="text-slate-500 font-medium text-sm leading-relaxed">Akademik komuta merkezinize erişin ve mükemmellik yolculuğunuza kaldığınız yerden devam edin.</p>
+            </header>
             
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <form method="POST" action="{{ url_for('login') }}" class="space-y-6">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}">
+
+                <!-- Input Fields -->
+                <div class="space-y-5">
+                    <div class="group">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1" for="username">Kullanıcı Adı veya E-Posta</label>
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#6200EE] transition-colors">alternate_email</span>
+                            <input name="username" id="username" type="text" required class="w-full pl-12 pr-4 py-4 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#6200EE]/20 focus:border-[#6200EE] outline-none transition-all text-sm font-medium text-slate-800 placeholder:text-slate-400" placeholder="E-posta veya @kullaniciadi"/>
                         </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-            
-            <form method="POST" action="{{ url_for('login') }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <div class="form-group">
-                    <label for="username" class="form-label">Kullanıcı Adı / E-posta</label>
-                    <input type="text" class="form-control" id="username" name="username" placeholder="Kullanıcı adınızı veya e-postanızı girin" required>
+                    </div>
+                    
+                    <div class="group">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1" for="password">Şifre</label>
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#6200EE] transition-colors">lock</span>
+                            <input name="password" id="password" type="password" required class="w-full pl-12 pr-12 py-4 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#6200EE]/20 focus:border-[#6200EE] outline-none transition-all text-sm font-medium text-slate-800 placeholder:text-slate-400" placeholder="••••••••"/>
+                            
+                            <!-- Toggle Password Visibility (Optional JS needed for full functionality, just UI for now) -->
+                            <button type="button" onclick="const p = document.getElementById('password'); p.type = p.type === 'password' ? 'text' : 'password';" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#6200EE] transition-colors">
+                                <span class="material-symbols-outlined text-[20px]">visibility</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="password" class="form-label">Şifre</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Şifrenizi girin" required>
+                <div class="flex items-center justify-between mt-4">
+                    <label class="flex items-center gap-2 cursor-pointer group">
+                        <input name="remember" id="remember" type="checkbox" class="w-5 h-5 rounded border-slate-300 text-[#6200EE] focus:ring-[#6200EE] cursor-pointer transition-all"/>
+                        <span class="text-sm font-semibold text-slate-500 group-hover:text-slate-800 transition-colors">Beni Hatırla</span>
+                    </label>
+                    <a href="{{ url_for('forgot_password') }}" class="text-sm font-bold text-[#6200EE] hover:text-[#4800b2] transition-colors">Şifremi Unuttum?</a>
                 </div>
                 
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                    <label class="form-check-label" for="remember">Beni Hatırla</label>
-                </div>
-                
-                <button type="submit" class="btn-login">Giriş Yap</button>
+                <!-- CTA Button -->
+                <button type="submit" class="w-full mt-2 py-4 bg-[#6200EE] text-white rounded-xl font-bold text-lg shadow-lg shadow-[#6200EE]/30 hover:bg-[#4800b2] hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2">
+                    Giriş Yap <span class="material-symbols-outlined text-[20px]">login</span>
+                </button>
             </form>
-            <div class="text-center mt-3">
-                <a href="{{ url_for('forgot_password') }}" class="forgot-password-link">Şifremi Unuttum</a>
-            </div>
-            <div class="register-link">
-                <p>Hesabınız yok mu? <a href="{{ url_for('register') }}">Kayıt Olun</a></p>
-            </div>
             
-            <div class="divider">
-                <span>veya</span>
+            <div class="relative flex py-6 items-center">
+                <div class="flex-grow border-t border-slate-200"></div>
+                <span class="flex-shrink mx-4 text-slate-400 font-bold text-[10px] uppercase tracking-widest">Yeni misin?</span>
+                <div class="flex-grow border-t border-slate-200"></div>
             </div>
+
+            <!-- Google Auth Placeholder -->
+            <button class="w-full flex items-center justify-center gap-3 py-3.5 px-4 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all duration-200 group active:scale-[0.98] shadow-sm" type="button">
+                <img alt="Google Logo" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZbnJ8yOZ2d5nJaH3QRQsy8r7EmfZg6W_a3WcEDJMqooO9WdtYoqELxMb_LOsWmXKOKQoGc1qKbJ9TtwQAVYR7OYJ8BHarfvuCWO7BiSqv7kp815CfOnzwQGWIEE0Mt1rvNEXwF25bzVbLTSAzgcxp2_5TF6XqZq_7OVUbAn69pi8COlz3lIr8XVYHStEfgk_H5tBhg2ACbcVZKQOTxxkyPE9h6FRUadk3xxAZiI7CtD7KoLC6HX6kooy48a-wXNCoCl9ZmF-7Atk"/>
+                <span class="font-bold text-sm text-slate-700">Google ile Devam Et</span>
+            </button>
             
-            <div class="social-login">
-                <a href="#" class="social-btn"><i class="fab fa-google"></i></a>
-                <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" class="social-btn"><i class="fab fa-twitter"></i></a>
-            </div>
-            
-            <div class="back-to-home">
-                <a href="{{ url_for('welcome') }}">
-                    <i class="fas fa-arrow-left"></i> Ana Sayfaya Dön
-                </a>
-            </div>
+            <footer class="mt-8 text-center">
+                <p class="text-sm font-medium text-slate-500">
+                    Henüz bir hesabın yok mu? 
+                    <a href="{{ url_for('register') }}" class="text-[#6200EE] font-black hover:underline ml-1">Hemen Kayıt Ol</a>
+                </p>
+            </footer>
         </div>
     </div>
 </div>
-{% endblock content %}
+
+<!-- Background Decorative Elements -->
+<div class="fixed top-0 right-0 -z-10 w-[500px] h-[500px] bg-[#6200EE]/5 rounded-full blur-[120px] pointer-events-none"></div>
+<div class="fixed bottom-0 left-0 -z-10 w-[400px] h-[400px] bg-fuchsia-600/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+</body>
+</html>

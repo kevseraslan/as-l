@@ -1,137 +1,294 @@
-{% extends "base.html" %}
-
-{% block title %}Soru Detayı - ReviseMe{% endblock %}
-
-{% block page_content %}
-<div class="container-fluid">
-    <div class="row">
-        <!-- Ana İçerik -->
-        <main class="col-12 px-md-4">
-            <!-- Üst Menü -->
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <div>
-                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left"></i> Geri
-                    </a>
-                    <button onclick="toggleFavorite({{ question.QuestionId }})" class="btn {{ 'btn-warning' if is_favorite else 'btn-outline-warning' }}">
-                        <i class="fas fa-star"></i> {{ 'Favorilerden Çıkar' if is_favorite else 'Favorilere Ekle' }}
-                    </button>
-                </div>
-            </div>
-
-            <!-- Soru Detayı -->
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="card mb-4">
-                        {% if question.ImagePath %}
-                        <img src="{{ url_for('static', filename=question.ImagePath) }}" class="card-img-top" alt="Soru Görseli" style="max-height: 400px; object-fit: contain;">
-                        {% endif %}
-                        <div class="card-body">
-                            <h5 class="card-title">Soru İçeriği</h5>
-                            <p class="card-text">{{ question.Content }}</p>
-                            
-                            <div class="d-flex justify-content-between align-items-center mt-3">
-                                <div>
-                                    <span class="badge bg-primary">{{ question.category.Name if question.category else 'Kategorisiz' }}</span>
-                                    {% if question.DifficultyLevel %}
-                                    <span class="badge bg-secondary">{{ question.DifficultyLevel }}</span>
-                                    {% endif %}
-                                </div>
-                                <div class="btn-group">
-                                    <a href="{{ url_for('edit_question', question_id=question.QuestionId) }}" class="btn btn-outline-primary">
-                                        <i class="fas fa-edit"></i> Düzenle
-                                    </a>
-                                    <button onclick="deleteQuestion({{ question.QuestionId }})" class="btn btn-outline-danger">
-                                        <i class="fas fa-trash"></i> Sil
-                                    </button>
-                                    {% if section == 'kategori' %}
-                                    <button onclick="skipQuestion({{ question.QuestionId }}, 'kategori', {{ question.CategoryId }})" class="btn btn-warning">
-                                        <i class="fas fa-forward"></i> Soruyu Atla
-                                    </button>
-                                    {% else %}
-                                    <button onclick="skipQuestion({{ question.QuestionId }}, 'past')" class="btn btn-warning">
-                                        <i class="fas fa-forward"></i> Soruyu Atla
-                                    </button>
-                                    {% endif %}
-                                    {% if section != 'anasayfa' and section != 'kategori' %}
-                                    <button type="button" onclick="markCompletedPast({{ question.QuestionId }});" class="btn btn-success" id="completeBtnPast">
-                                        <i class="fas fa-check"></i> Tamamlandı
-                                    </button>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Notlar -->
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Notlar</h5>
-                        </div>
-                        <div class="card-body">
-                            <form id="noteForm" class="mb-3">
-                                <div class="mb-3">
-                                    <textarea class="form-control" id="noteContent" rows="3" placeholder="Not ekle..."></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-plus"></i> Not Ekle
-                                </button>
-                            </form>
-                            
-                            <div id="notesList">
-                                {% for note in notes %}
-                                <div class="card mb-2">
-                                    <div class="card-body">
-                                        <p class="card-text">{{ note.Content }}</p>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-    <!-- Tekrar Durumu -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">Tekrar Durumu</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <h6>1. Tekrar</h6>
-                            <p class="mb-0 {% if question.RepeatCount == 0 %}text-success{% endif %}">{{ question.Repeat1Date.strftime('%d.%m.%Y') if question.Repeat1Date else 'Belirlenmedi' }}</p>
-                        </div>
-                        <div class="col-md-4">
-                            <h6>2. Tekrar</h6>
-                            <p class="mb-0 {% if question.RepeatCount == 1 %}text-success{% endif %}">{{ question.Repeat2Date.strftime('%d.%m.%Y') if question.Repeat2Date else 'Belirlenmedi' }}</p>
-                        </div>
-                        <div class="col-md-4">
-                            <h6>3. Tekrar</h6>
-                            <p class="mb-0 {% if question.RepeatCount == 2 %}text-success{% endif %}">{{ question.Repeat3Date.strftime('%d.%m.%Y') if question.Repeat3Date else 'Belirlenmedi' }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Soru Görüntüle - ReviseMe</title>
+<meta name="csrf-token" content="{{ csrf_token() if csrf_token else '' }}">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .premium-shadow {
+            box-shadow: 0 15px 30px -10px rgba(98, 0, 238, 0.08);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-container": "#6200ee",
+                      "on-tertiary-container": "#1ee0cc",
+                      "on-primary-fixed": "#22005d",
+                      "tertiary-fixed-dim": "#17deca",
+                      "surface-container-highest": "#dce2f3",
+                      "surface-bright": "#f9f9ff",
+                      "inverse-primary": "#cfbdff",
+                      "on-tertiary": "#ffffff",
+                      "surface": "#f9f9ff",
+                      "secondary-container": "#9547f7",
+                      "on-surface-variant": "#494456",
+                      "on-error-container": "#93000a",
+                      "background": "#f9f9ff",
+                      "inverse-surface": "#2a313d",
+                      "secondary-fixed-dim": "#d8b9ff",
+                      "on-primary-fixed-variant": "#5300cd",
+                      "outline-variant": "#cbc3d9",
+                      "on-surface": "#151c27",
+                      "inverse-on-surface": "#ebf1ff",
+                      "on-secondary-fixed": "#290055",
+                      "error-container": "#ffdad6",
+                      "surface-variant": "#dce2f3",
+                      "error": "#ba1a1a",
+                      "secondary-fixed": "#eddcff",
+                      "on-secondary": "#ffffff",
+                      "on-primary-container": "#d0beff",
+                      "secondary": "#7b24dc",
+                      "on-secondary-container": "#fffbff",
+                      "on-background": "#151c27",
+                      "surface-dim": "#d3daea",
+                      "outline": "#7a7488",
+                      "on-error": "#ffffff",
+                      "primary": "#4800b2",
+                      "on-tertiary-fixed-variant": "#005048",
+                      "tertiary": "#00453e",
+                      "surface-container": "#e7eefe",
+                      "primary-fixed-dim": "#cfbdff",
+                      "on-tertiary-fixed": "#00201c",
+                      "surface-container-lowest": "#ffffff",
+                      "primary-fixed": "#e8ddff",
+                      "tertiary-fixed": "#4ffbe6",
+                      "surface-tint": "#6d23f9",
+                      "tertiary-container": "#005f56",
+                      "surface-container-high": "#e2e8f8",
+                      "on-secondary-fixed-variant": "#6200bc",
+                      "on-primary": "#ffffff",
+                      "surface-container-low": "#f0f3ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "container-max": "1280px",
+                      "gutter": "24px",
+                      "section-gap": "64px",
+                      "base": "8px"
+              },
+              "fontFamily": {
+                      "label-sm": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "display-xl": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "body-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "label-sm": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                      "display-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                      "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+    <style> html { font-size: 18px !important; } </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
+<div class="flex items-center gap-8">
+<a href="{{ url_for('index') }}" style="text-decoration: none;" class="text-xl font-bold tracking-tighter text-violet-700">ReviseMe</a>
+<nav class="hidden md:flex gap-6">
+<a class="text-slate-500 hover:text-slate-900 font-sans text-sm font-medium tracking-tight transition-colors" href="{{ url_for('index') }}" style="text-decoration:none;">Dashboard</a>
+<a class="text-violet-700 border-b-2 border-violet-700 pb-1 font-sans text-sm font-medium tracking-tight" href="{{ url_for('hedefleyici') }}" style="text-decoration:none;">Practice</a>
+</nav>
 </div>
-{% endblock %}
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined text-slate-500 p-2 hover:bg-slate-50 rounded-full transition-colors cursor-pointer">notifications</span>
+</div>
+<a href="{{ url_for('profile') }}" class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-200 text-slate-600 ring-2 ring-violet-100 hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined font-sm">person</span>
+</a>
+</div>
+</header>
+<!-- Sidebar Navigation (Hidden on Mobile) -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 hidden lg:flex flex-col p-4 border-r border-slate-200 bg-slate-50">
+<div class="flex items-center gap-3 mb-8 px-4">
+<div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center text-white">
+<span class="material-symbols-outlined" data-weight="fill">quiz</span>
+</div>
+<div>
+<h2 class="text-sm font-bold text-on-surface">Study Session</h2>
+<p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold">Focus Mode</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-3 text-slate-600 px-4 py-3 hover:bg-slate-200/50 rounded-lg transition-transform hover:translate-x-1" href="{{ url_for('index') }}" style="text-decoration:none;">
+<span class="material-symbols-outlined">home</span>
+<span class="font-sans text-sm font-semibold">Home</span>
+</a>
+<a class="flex items-center gap-3 bg-violet-100 text-violet-700 rounded-lg px-4 py-3" href="#" style="text-decoration:none;">
+<span class="material-symbols-outlined" data-weight="fill">quiz</span>
+<span class="font-sans text-sm font-semibold">Practice</span>
+</a>
+<a class="flex items-center gap-3 text-slate-600 px-4 py-3 hover:bg-slate-200/50 rounded-lg transition-transform hover:translate-x-1" href="{{ url_for('gorevlerim') }}" style="text-decoration:none;">
+<span class="material-symbols-outlined">verified</span>
+<span class="font-sans text-sm font-semibold">Revision Plan</span>
+</a>
+<!-- Favoriler Menüsü Eklendi -->
+<a class="flex items-center gap-3 text-slate-600 px-4 py-3 hover:bg-slate-200/50 rounded-lg transition-transform hover:translate-x-1" href="{{ url_for('favorites') }}" style="text-decoration:none;">
+<span class="material-symbols-outlined" style="color: #ffb400;">star</span>
+<span class="font-sans text-sm font-semibold">Favoriler</span>
+</a>
+</nav>
+<a href="{{ url_for('logout') }}" class="mt-auto mb-4 mx-2 bg-error/10 text-error font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-error hover:text-white transition-all active:scale-95" style="text-decoration:none;">
+<span class="material-symbols-outlined text-sm">logout</span>
+            End Session
+        </a>
+</aside>
+<!-- Main Content Area -->
+<main class="lg:ml-64 mt-16 p-8 min-h-[calc(100vh-64px)] flex flex-col items-center">
+<div class="max-w-full px-4 md:px-8 w-full grid grid-cols-1 xl:grid-cols-12 gap-8">
+<!-- Question Canvas (Left & Center) -->
+<div class="xl:col-span-8 flex flex-col gap-6">
+<!-- Session Status Bar -->
+<div class="bg-white p-4 rounded-2xl flex items-center justify-between premium-shadow border border-slate-100">
+<div class="flex items-center gap-4">
+<div class="bg-violet-100 px-3 py-1.5 rounded-full">
+<span class="text-violet-700 font-label-sm text-label-sm">{{ question.category.Name if question.category else 'Kategorisiz' }}</span>
+</div>
+<div class="flex items-center gap-2 border-l border-slate-200 pl-4">
+<span class="w-2 h-2 rounded-full bg-amber-400"></span>
+<span class="text-slate-600 font-label-sm text-label-sm">{{ question.DifficultyLevel or 'Genel' }}</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-slate-400 font-label-sm text-label-sm mb-1 uppercase tracking-widest text-[10px]">Topic</span>
+<div class="flex items-center gap-3">
+<span class="font-sans text-sm font-bold text-on-surface">{{ question.Topic or 'Belirtilmemiş' }}</span>
+</div>
+</div>
+</div>
+<!-- Main Card: Question Content -->
+<div class="bg-white rounded-3xl p-10 premium-shadow border border-slate-100 flex flex-col gap-8">
+<div class="flex justify-between items-start">
+<h1 class="font-headline-md text-headline-md text-on-surface max-w-2xl">
+                            {{ question.Content }}
+                        </h1>
+<div class="flex gap-2">
+<button onclick="toggleFavorite({{ question.QuestionId }})" class="p-2 hover:bg-slate-50 {{ 'text-red-500' if is_favorite else 'text-slate-400' }} hover:text-red-500 rounded-xl transition-colors">
+<span class="material-symbols-outlined" {% if is_favorite %}style="font-variation-settings: 'FILL' 1;"{% endif %}>favorite</span>
+</button>
+<button onclick="deleteQuestion({{ question.QuestionId }})" class="p-2 hover:bg-slate-50 text-slate-400 hover:text-red-500 rounded-xl transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+<a href="{{ url_for('edit_question', question_id=question.QuestionId) }}" class="p-2 hover:bg-slate-50 text-slate-400 hover:text-blue-500 rounded-xl transition-colors inline-block" style="text-decoration:none;">
+<span class="material-symbols-outlined">edit</span>
+</a>
+</div>
+</div>
+{% if question.ImagePath %}
+<div class="relative w-full rounded-2xl overflow-hidden bg-slate-50 border border-slate-100 p-4 flex items-center justify-center">
+<img src="{{ url_for('static', filename=question.ImagePath) }}" class="max-w-full max-h-[500px] object-contain" alt="Question Image" />
+</div>
+{% endif %}
 
-{% block scripts %}
+</div>
+<!-- Bottom Actions -->
+<div class="flex items-center justify-between gap-4 mt-2">
+<div class="flex gap-2">
+    <button onclick="skipQuestion({{ question.QuestionId }}, '{{ section }}', {{ question.CategoryId }})" class="px-6 py-4 rounded-2xl font-bold text-slate-500 hover:bg-slate-100 transition-all flex items-center gap-2">
+    <span class="material-symbols-outlined">fast_forward</span>
+                            Skip Question
+                        </button>
+</div>
+<button id="completeBtnPast" onclick="markCompletedPast({{ question.QuestionId }})" class="px-10 py-4 rounded-2xl bg-primary-container text-white font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined">check_circle</span>
+                        Mastered / Mark as Done
+                    </button>
+</div>
+</div>
+<!-- Side Panel (Right) -->
+<div class="xl:col-span-4 flex flex-col gap-8">
+<!-- Retention Pulse Card -->
+<div class="bg-white rounded-3xl p-6 premium-shadow border border-slate-100">
+<h3 class="font-label-sm text-label-sm text-slate-400 uppercase tracking-widest mb-6">Retention Pulse</h3>
+<div class="flex items-center justify-center py-4">
+<div class="relative w-32 h-32">
+<svg class="w-full h-full -rotate-90" viewbox="0 0 36 36">
+<path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f1f5f9" stroke-width="3"></path>
+{% set dash = (question.RepeatCount / 3) * 100 if question.RepeatCount else 0 %}
+<path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#6200ee" stroke-dasharray="{{ dash }}, 100" stroke-width="3"></path>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+<span class="font-display-xl text-headline-lg leading-none">{{ question.RepeatCount }}/3</span>
+<span class="text-[10px] text-slate-400 font-bold uppercase mt-1">Steps</span>
+</div>
+</div>
+</div>
+<div class="mt-4 p-4 bg-slate-50 rounded-2xl">
+<p class="font-sans text-sm text-slate-600 text-center">
+    {% if question.RepeatCount == 0 %}
+    Sıradaki Tekrar: <strong class="block mt-1">{{ question.Repeat1Date.strftime('%d.%m.%Y') if question.Repeat1Date else 'Belirlenmedi' }}</strong>
+    {% elif question.RepeatCount == 1 %}
+    Sıradaki Tekrar: <strong class="block mt-1">{{ question.Repeat2Date.strftime('%d.%m.%Y') if question.Repeat2Date else 'Belirlenmedi' }}</strong>
+    {% elif question.RepeatCount == 2 %}
+    Sıradaki Tekrar: <strong class="block mt-1">{{ question.Repeat3Date.strftime('%d.%m.%Y') if question.Repeat3Date else 'Belirlenmedi' }}</strong>
+    {% else %}
+    <strong>Tüm tekrarlar tamamlandı!</strong>
+    {% endif %}
+</p>
+</div>
+</div>
+<!-- Personal Notes Area -->
+<div class="bg-white rounded-3xl p-6 premium-shadow border border-slate-100 flex-1 flex flex-col gap-4">
+<div class="flex items-center justify-between border-b border-slate-100 pb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-violet-700">edit_note</span>
+<h3 class="font-headline-md text-body-lg font-bold">Personal Notes</h3>
+</div>
+</div>
+
+<form id="noteForm" class="flex flex-col gap-3">
+    <textarea id="noteContent" class="flex-1 w-full p-4 rounded-2xl border-none bg-slate-50/50 focus:ring-2 focus:ring-primary-container/20 font-body-md text-body-md placeholder:text-slate-400 resize-none min-h-[150px]" placeholder="Type your notes here..."></textarea>
+    <button type="submit" class="self-end px-4 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary-container transition-colors">Add Note</button>
+</form>
+
+<div id="notesList" class="flex flex-col gap-2 mt-4 max-h-[300px] overflow-y-auto custom-scrollbar">
+    {% for note in notes %}
+    <div class="p-4 bg-violet-50 text-slate-700 rounded-xl text-sm leading-relaxed border border-violet-100">
+        {{ note.Content }}
+    </div>
+    {% else %}
+    <p class="text-sm text-slate-400 text-center mt-4">Belirli bir notunuz yok.</p>
+    {% endfor %}
+</div>
+
+</div>
+</div>
+</div>
+</main>
 <script>
 function toggleFavorite(questionId) {
     fetch(`/toggle_favorite/${questionId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
         }
     })
     .then(response => response.json())
@@ -150,7 +307,7 @@ function deleteQuestion(questionId) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
             }
         })
         .then(response => response.json())
@@ -166,9 +323,9 @@ function deleteQuestion(questionId) {
 
 function skipQuestion(currentId, source, categoryId) {
     let url = `/next_question/${currentId}`;
-    if (source && categoryId) {
+    if (source && categoryId && source !== 'None') {
         url += `?source=${source}&category_id=${categoryId}`;
-    } else if (source) {
+    } else if (source && source !== 'None') {
         url += `?source=${source}`;
     }
     fetch(url)
@@ -182,24 +339,9 @@ function skipQuestion(currentId, source, categoryId) {
                 window.location.href = redirectUrl;
             } else {
                 alert('Atlanacak başka soru yok!');
+                window.location.href = "{{ url_for('index') }}";
             }
         });
-}
-
-function completeRepeat(questionId) {
-    fetch(`/mark_completed/${questionId}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    // Server now redirects, so no need to process JSON response here
-    // The browser will handle the redirect automatically
-    .catch(error => {
-        console.error('Error completing repeat:', error);
-        alert('Tekrar tamamlanırken bir hata oluştu.');
-    });
 }
 
 function markCompletedPast(questionId) {
@@ -222,7 +364,7 @@ function markCompletedPast(questionId) {
                         if (nextData.next_id) {
                             window.location.href = `/view_question/${nextData.next_id}`;
                         } else {
-                            window.location.href = '/past_questions';
+                            window.location.href = "{{ url_for('index') }}";
                         }
                     });
             }, 200);
@@ -236,12 +378,13 @@ function markCompletedPast(questionId) {
 document.getElementById('noteForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const content = document.getElementById('noteContent').value;
-    
+    if(!content.trim()) return;
+
     fetch(`/add_note/{{ question.QuestionId }}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
         },
         body: JSON.stringify({ content: content })
     })
@@ -255,4 +398,5 @@ document.getElementById('noteForm').addEventListener('submit', function(e) {
     });
 });
 </script>
-{% endblock %} 
+</body>
+</html>

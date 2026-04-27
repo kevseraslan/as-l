@@ -1,628 +1,258 @@
-{% extends "base_no_nav.html" %}
+<!DOCTYPE html>
+<html class="light" lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Kayıt Ol - ReviseMe Akademi</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4800b2",
+                        "primary-container": "#6200ee",
+                        "on-surface": "#151c27",
+                        "surface-bright": "#f9f9ff",
+                        "outline-variant": "#cbc3d9",
+                    },
+                    fontFamily: {
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        body { background-color: #F8F5FF; font-family: 'Inter', sans-serif; }
+        .ambient-shadow { box-shadow: 0 15px 30px -5px rgba(98, 0, 238, 0.04); }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+    <style> html { font-size: 18px !important; } </style>
+    <style> html { font-size: 18px !important; } </style>
+</head>
+<body class="bg-[#F8F5FF] font-body-md text-on-surface min-h-screen flex flex-col items-center justify-center">
 
-{% block title %}Kayıt Ol - ReviseMe{% endblock %}
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="fixed top-0 left-1/2 -translate-x-1/2 z-50 w-full max-w-md">
+            {% for category, message in messages %}
+                <div class="bg-{% if category == 'success' %}green{% else %}red{% endif %}-50 border border-{% if category == 'success' %}green{% else %}red{% endif %}-200 text-{% if category == 'success' %}green{% else %}red{% endif %}-700 p-0 rounded-xl shadow-lg mb-2 flex justify-between items-center">
+                    <span class="text-sm font-bold">{{ message }}</span>
+                    <button onclick="this.parentElement.style.display='none'" class="opacity-50 hover:opacity-100"><span class="material-symbols-outlined text-[18px]">close</span></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
 
-{% block styles %}
-<style>
-    :root {
-        /* Ana Renk Şeması */
-        --primary-color: #6A37B5;
-        --primary-light: #8451D1;
-        --primary-lighter: #A98AE5;
-        --primary-dark: #4A2882;
-        --white: #FFFFFF;
-        --light-gray: #F8F9FC;
+<div class="w-full max-w-full px-4 md:px-8 mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 p-6 lg:p-10 h-full min-h-screen">
+    
+    <!-- Sol Sütun (Marketing & Illustration) -->
+    <div class="hidden lg:flex lg:col-span-5 flex-col justify-between p-12 bg-gradient-to-br from-[#4800b2] to-[#6a37b5] rounded-none relative overflow-hidden text-white shadow-xl">
+        <div class="absolute inset-0 opacity-10 pointer-events-none mix-blend-overlay">
+            <!-- Background pattern representation -->
+            <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_TYQOwAJYxZcO0_l5yhIk1st04cx8Q2sEWMHVHhO0yqeBmOozGd7wcAYnBB7ZRyhkYONdeVXOsH5Wzu7O-kAoZlX1XkUYHKwGP1EqOVsLQ88TttuIVs3RKCy60SJs1UpdW49rAowNb8H_qejHQAr4IEfJQyf2FahDF3ovc7wQwVz6ShwA-qkafD-FQNm_aODTKX2nxO0LyRFGq20rCLFhzI-C5AHvYbffZyt0-8paZHboPdIuzyyX2J_70nvvdpHahsXh3H0P9R8"/>
+        </div>
         
-        /* Nötr Renkler */
-        --dark-bg: #1A1A2E;
-        --dark-card: #252542;
-        --dark-input: #303056;
-        --dark-border: #444464;
+        <div class="relative z-10">
+            <h1 class="text-4xl font-black mb-4 flex items-center gap-3 tracking-tight">
+                <div class="bg-white/10 p-2 rounded-xl backdrop-blur-sm"><span class="material-symbols-outlined text-3xl">auto_stories</span></div>
+                ReviseMe
+            </h1>
+            <p class="text-lg opacity-90 max-w-sm font-medium leading-relaxed">
+                Yapay zeka destekli akıllı tekrar sistemi ile akademik potansiyelinizin zirvesine ulaşın.
+            </p>
+        </div>
         
-        /* Vurgu Renkleri */
-        --accent-turquoise: #2ECDC8;
-        --accent-pink: #F56FAD;
-        --accent-blue: #4A8FE7;
-        --accent-orange: #FF9966;
-    }
-    
-    body {
-        font-family: 'Nunito', sans-serif;
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-        min-height: 100vh;
-    }
-    
-    /* İki Sütunlu Ana Düzen */
-    .split-layout {
-        display: flex;
-        min-height: 100vh;
-        width: 100%;
-    }
-    
-    /* Sol Sütun - İllüstrasyon */
-    .left-column {
-        flex: 1;
-        background-color: var(--primary-color);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        overflow: hidden;
-        padding: 2rem;
-    }
-    
-    .brand-logo {
-        position: absolute;
-        top: 2rem;
-        left: 2rem;
-        display: flex;
-        align-items: center;
-    }
-    
-    .brand-logo-icon {
-        width: 40px;
-        height: 40px;
-        background-color: white;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 0.8rem;
-    }
-    
-    .brand-logo-text {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: white;
-    }
-    
-    .illustration-container {
-        width: 85%;
-        max-width: 600px;
-        margin: 0 auto;
-        position: relative;
-        z-index: 2;
-    }
-    
-    .abstract-shapes {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        opacity: 0.1;
-        z-index: 1;
-        overflow: hidden;
-    }
-    
-    .shape {
-        position: absolute;
-        background-color: white;
-        border-radius: 50%;
-    }
-    
-    .shape-1 {
-        width: 300px;
-        height: 300px;
-        top: -50px;
-        left: -100px;
-    }
-    
-    .shape-2 {
-        width: 200px;
-        height: 200px;
-        bottom: 50px;
-        right: -50px;
-    }
-    
-    .shape-3 {
-        width: 150px;
-        height: 150px;
-        bottom: -50px;
-        left: 40%;
-    }
-    
-    /* Sağ Sütun - Kayıt Formu */
-    .right-column {
-        flex: 1;
-        background-color: var(--white);
-        display: flex;
-        flex-direction: column;
-        padding: 3rem;
-        overflow-y: auto;
-    }
-    
-    .register-title {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: var(--primary-color);
-        margin-bottom: 0.5rem;
-    }
-    
-    .register-subtitle {
-        font-size: 1rem;
-        color: #666;
-        margin-bottom: 2rem;
-    }
-    
-    .progress-indicator {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 2rem;
-    }
-    
-    .progress-step {
-        display: flex;
-        align-items: center;
-    }
-    
-    .step-number {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background-color: var(--primary-color);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        margin-right: 0.5rem;
-    }
-    
-    .step-text {
-        font-size: 0.9rem;
-        color: #888;
-    }
-    
-    .step-active .step-text {
-        color: var(--primary-color);
-        font-weight: 600;
-    }
-    
-    .step-line {
-        flex: 1;
-        height: 2px;
-        background-color: #e1e5ee;
-        margin: 0 1rem;
-    }
-    
-    /* Form Elemanları */
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-    
-    .form-label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 600;
-        color: #444;
-    }
-    
-    .form-control {
-        width: 100%;
-        padding: 0.8rem 1rem;
-        font-size: 1rem;
-        border: 2px solid #e1e5ee;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-    }
-    
-    .form-control:focus {
-        border-color: var(--primary-lighter);
-        box-shadow: 0 0 0 3px rgba(169, 138, 229, 0.25);
-        outline: none;
-    }
-    
-    .form-check {
-        display: flex;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
-    
-    .form-check-input {
-        margin-right: 0.5rem;
-        width: 18px;
-        height: 18px;
-    }
-    
-    .form-check-label {
-        font-size: 0.9rem;
-        color: #666;
-    }
-    
-    .btn-register {
-        background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
-        color: white;
-        border: none;
-        padding: 0.8rem 1rem;
-        border-radius: 10px;
-        font-size: 1rem;
-        font-weight: 600;
-        width: 100%;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(106, 55, 181, 0.3);
-        cursor: pointer;
-    }
-    
-    .btn-register:hover {
-        background: linear-gradient(45deg, var(--primary-light), var(--primary-color));
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(106, 55, 181, 0.4);
-    }
-    
-    .register-footer {
-        text-align: center;
-        margin-top: 2rem;
-    }
-    
-    .register-footer a {
-        color: var(--primary-color);
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .register-footer a:hover {
-        color: var(--primary-light);
-        text-decoration: underline;
-    }
-    
-    /* Features Card */
-    .features-card {
-        background-color: #f8f9fc;
-        border-radius: 10px;
-        padding: 1.5rem;
-        margin-top: 2rem;
-    }
-    
-    .features-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: var(--primary-color);
-        margin-bottom: 1rem;
-    }
-    
-    .features-list {
-        margin: 0;
-        padding-left: 0;
-        list-style-type: none;
-    }
-    
-    .feature-item {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 0.8rem;
-    }
-    
-    .feature-icon {
-        min-width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 0.8rem;
-        font-size: 0.8rem;
-        background: linear-gradient(45deg, var(--primary-lighter), var(--primary-light));
-        color: white;
-    }
-    
-    .feature-text {
-        color: #666;
-        font-size: 0.9rem;
-        line-height: 1.4;
-    }
-    
-    /* Responsive Design */
-    @media (max-width: 992px) {
-        .split-layout {
-            flex-direction: column;
-        }
-        
-        .left-column {
-            min-height: 40vh;
-        }
-        
-        .right-column {
-            padding: 2rem;
-        }
-        
-        .brand-logo {
-            top: 1.5rem;
-            left: 1.5rem;
-        }
-        
-        .illustration-container {
-            width: 70%;
-            max-width: 400px;
-            margin-top: 80px;
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .right-column {
-            padding: 1.5rem;
-        }
-        
-        .register-title {
-            font-size: 1.5rem;
-        }
-        
-        .illustration-container {
-            width: 90%;
-        }
-    }
-</style>
-{% endblock styles %}
-
-{% block content %}
-<!-- İki Sütunlu Ana Düzen -->
-<div class="split-layout">
-    <!-- Sol Sütun - İllüstrasyon -->
-    <div class="left-column">
-        <!-- Logo -->
-        <div class="brand-logo">
-            <div class="brand-logo-icon">
-                <i class="fas fa-book-reader" style="color: var(--primary-color); font-size: 1.3rem;"></i>
+        <div class="relative z-10 space-y-8 mt-12">
+            <div class="flex items-start gap-0">
+                <div class="bg-white/10 p-3 rounded-xl backdrop-blur-sm shadow-inner group transition-all">
+                    <span class="material-symbols-outlined group-hover:scale-110 transition-transform">auto_graph</span>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold">Akıllı Analizler</h3>
+                    <p class="opacity-80 text-sm mt-1">Bilgi boşluklarınızı ve güçlü yanlarınızı anlık olarak haritalandırın.</p>
+                </div>
             </div>
-            <div class="brand-logo-text">ReviseMe</div>
-        </div>
-
-        <!-- Soyut Şekiller -->
-        <div class="abstract-shapes">
-            <div class="shape shape-1"></div>
-            <div class="shape shape-2"></div>
-            <div class="shape shape-3"></div>
+            <div class="flex items-start gap-0">
+                <div class="bg-white/10 p-3 rounded-xl backdrop-blur-sm shadow-inner group transition-all">
+                    <span class="material-symbols-outlined group-hover:scale-110 transition-transform">schedule</span>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold">Dinamik Planlama</h3>
+                    <p class="opacity-80 text-sm mt-1">Performansınıza göre esneyen, tamamen size özel çalışma planları.</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-0">
+                <div class="bg-white/10 p-3 rounded-xl backdrop-blur-sm shadow-inner group transition-all">
+                    <span class="material-symbols-outlined group-hover:scale-110 transition-transform">psychology</span>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold">Unutma Eğrisi Kırıcı</h3>
+                    <p class="opacity-80 text-sm mt-1">Birebir zamanlamalar ile öğrendiklerinizi kalıcı hafızaya taşıyın.</p>
+                </div>
+            </div>
         </div>
         
-        <!-- İllüstrasyon -->
-        <div class="illustration-container">
-            <svg width="100%" height="100%" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
-                <!-- Masaüstü Bilgisayar ve Ekran -->
-                <rect x="250" y="230" width="320" height="200" rx="10" fill="#252542" />
-                <rect x="270" y="250" width="280" height="160" rx="5" fill="#2ECDC8" opacity="0.7" />
-                
-                <!-- Masa -->
-                <rect x="180" y="430" width="460" height="20" rx="5" fill="#A98AE5" />
-                <rect x="200" y="450" width="420" height="30" rx="3" fill="#8451D1" />
-                
-                <!-- Karakter -->
-                <!-- Kafa -->
-                <circle cx="400" cy="170" r="60" fill="#FF9966" />
-                
-                <!-- Yüz Özellikleri -->
-                <circle cx="380" cy="160" r="5" fill="#333" />
-                <circle cx="420" cy="160" r="5" fill="#333" />
-                <path d="M390,190 Q400,200 410,190" stroke="#333" stroke-width="3" fill="none" />
-                
-                <!-- Saç -->
-                <path d="M350,130 Q370,100 400,100 Q430,100 450,130" fill="#F56FAD" />
-                <path d="M340,170 Q330,140 340,110 Q360,90 380,80 Q420,80 440,100 Q470,130 460,170" fill="#F56FAD" />
-                
-                <!-- Vücut -->
-                <rect x="370" y="230" width="60" height="80" rx="20" fill="#A98AE5" />
-                
-                <!-- Kollar -->
-                <path d="M370,240 Q340,270 300,280" stroke="#A98AE5" stroke-width="20" fill="none" stroke-linecap="round" />
-                <path d="M430,240 Q460,270 500,280" stroke="#A98AE5" stroke-width="20" fill="none" stroke-linecap="round" />
-                
-                <!-- Eller Klavyede -->
-                <circle cx="300" cy="280" r="15" fill="#FF9966" />
-                <circle cx="500" cy="280" r="15" fill="#FF9966" />
-                
-                <!-- Düşünce Balonu -->
-                <path d="M500,100 Q530,80 560,100 Q580,80 590,110 Q610,120 590,140 Q600,160 580,170 Q560,190 540,170 Q520,180 510,160 Q490,150 500,130 Q490,120 500,100" fill="white" opacity="0.9" />
-                
-                <!-- Düşünce İçeriği -->
-                <circle cx="550" cy="135" r="25" fill="#6A37B5" opacity="0.9" />
-                <text x="540" y="142" fill="white" font-size="25" font-weight="bold">?</text>
-                
-                <!-- Teknoloji İkonları -->
-                <rect x="180" y="380" width="40" height="40" rx="5" fill="#F56FAD" opacity="0.7" />
-                <rect x="580" y="380" width="40" height="40" rx="5" fill="#2ECDC8" opacity="0.7" />
-                <circle cx="230" cy="180" r="30" fill="#8451D1" opacity="0.7" />
-                <circle cx="570" cy="180" r="30" fill="#F56FAD" opacity="0.7" />
-                
-                <!-- Parlama Efektleri -->
-                <circle cx="290" cy="150" r="5" fill="white" opacity="0.8" />
-                <circle cx="510" cy="150" r="5" fill="white" opacity="0.8" />
-                <circle cx="400" cy="90" r="7" fill="white" opacity="0.8" />
-                <circle cx="350" cy="200" r="4" fill="white" opacity="0.8" />
-                <circle cx="450" cy="200" r="4" fill="white" opacity="0.8" />
-            </svg>
+        <div class="relative z-10 pt-12 mt-auto border-t border-white/10 w-full">
+            <div class="flex items-center gap-3">
+                <div class="flex -space-x-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-400 border-2 border-[#4800b2] flex items-center justify-center text-xs font-black shadow-lg">AY</div>
+                    <div class="w-10 h-10 rounded-full bg-emerald-400 border-2 border-[#4800b2] flex items-center justify-center text-xs font-black shadow-lg">BK</div>
+                    <div class="w-10 h-10 rounded-full bg-fuchsia-400 border-2 border-[#4800b2] flex items-center justify-center text-xs font-black shadow-lg shadow-[#6200EE]/50">+10K</div>
+                </div>
+                <p class="text-xs font-bold opacity-80 uppercase tracking-widest pl-2">Aktif Öğrenci Katıldı</p>
+            </div>
         </div>
     </div>
     
-    <!-- Sağ Sütun - Kayıt Formu -->
-    <div class="right-column">
-        <h1 class="register-title">Kayıt Ol</h1>
-        <p class="register-subtitle">ReviseMe'ye kaydolarak öğrenme sürecinizi optimize edin</p>
-        
-        <!-- İlerleme Göstergesi -->
-        <div class="progress-indicator">
-            <div class="progress-step step-active">
-                <div class="step-number">1</div>
-                <div class="step-text">Kişisel Bilgiler</div>
-            </div>
-            <div class="step-line"></div>
-            <div class="progress-step">
-                <div class="step-number">2</div>
-                <div class="step-text">Tamamlandı</div>
-            </div>
+    <!-- Sağ Sütun (Kayıt Formu) -->
+    <div class="lg:col-span-7 flex flex-col bg-white rounded-none ambient-shadow border border-slate-100 p-8 lg:px-16 lg:py-12 overflow-y-auto scrollbar-hide relative z-20">
+        <div class="mb-8">
+            <h2 class="text-3xl font-black text-slate-800 mb-2">Hesabını Oluştur</h2>
+            <p class="text-slate-500 font-medium text-sm">Akademik mükemmellik yolculuğuna bugün başla.</p>
         </div>
+        
+        <div class="flex flex-col gap-6 w-full">
+            
+            <form method="POST" action="{{ url_for('register') }}" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}">
+
+                <!-- Row 1: Ad ve Soyad -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Adınız</label>
+                    <input name="name" type="text" required class="px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all placeholder:text-slate-400 text-sm font-medium" placeholder="Örn: Mert"/>
+                </div>
                 
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Soyadınız</label>
+                    <input name="surname" type="text" required class="px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all placeholder:text-slate-400 text-sm font-medium" placeholder="Örn: Yılmaz"/>
+                </div>
+
+                <!-- Row 2: Kullanıcı Adı ve Doğum Yılı -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Kullanıcı Adı</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-[14px] text-slate-400 font-bold">@</span>
+                        <input name="username" type="text" required class="w-full pl-9 pr-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all placeholder:text-slate-400 text-sm font-medium" placeholder="akademik_mert"/>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Doğum Yılı</label>
+                    <input name="year_of_birth" type="number" min="1990" max="2015" required class="px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all placeholder:text-slate-400 text-sm font-medium" placeholder="YYYY"/>
+                </div>
                 
-                <form method="POST" action="{{ url_for('register') }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="name" class="form-label">İsim</label>
-                        <input type="text" class="form-control" id="name" name="name" placeholder="İsminizi girin" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="surname" class="form-label">Soyisim</label>
-                        <input type="text" class="form-control" id="surname" name="surname" placeholder="Soyisminizi girin" required>
-                            </div>
-                        </div>
+                <!-- Row 3: E-Posta -->
+                <div class="md:col-span-2 flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">E-Posta Adresi</label>
+                    <input name="email" type="email" required class="px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all placeholder:text-slate-400 text-sm font-medium" placeholder="mert.yilmaz@okul.edu.tr"/>
+                </div>
+
+                <!-- Row 4: Sınıf Düzeyi ve Hedef Alan (Area) -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Sınıf Düzeyi</label>
+                    <div class="relative">
+                        <select name="class_level" required class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all text-sm font-bold text-slate-700 appearance-none cursor-pointer">
+                            <option value="">Seçiniz</option>
+                            <option value="9">9. Sınıf</option>
+                            <option value="10">10. Sınıf</option>
+                            <option value="11">11. Sınıf</option>
+                            <option value="12">12. Sınıf</option>
+                            <option value="mezun">Mezun</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-3 top-3.5 text-slate-400 pointer-events-none">expand_more</span>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="username" class="form-label">Kullanıcı Adı</label>
-                <input type="text" class="form-control" id="username" name="username" placeholder="Kullanıcı adınızı belirleyin" required>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Lise Alanı</label>
+                    <div class="relative">
+                        <select name="area" required class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all text-sm font-bold text-slate-700 appearance-none cursor-pointer">
+                            <option value="">Seçiniz</option>
+                            <option value="sayisal">Sayısal</option>
+                            <option value="sozel">Sözel</option>
+                            <option value="esitagirlik">Eşit Ağırlık</option>
+                            <option value="dil">Dil</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-3 top-3.5 text-slate-400 pointer-events-none">expand_more</span>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="email" class="form-label">E-posta</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="E-posta adresinizi girin" required>
+                </div>
+
+                <!-- Row 5: Hedef (Aim) -->
+                <div class="md:col-span-2 flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Kariyer / Üniversite Hedefi</label>
+                    <input name="aim" type="text" required class="px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all placeholder:text-slate-400 text-sm font-medium" placeholder="Örn: Hacettepe Tıp, Boğaziçi Bilgisayar..."/>
+                </div>
+
+                <!-- Row 6: Güvenlik Sorusu ve Cevabı -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Güvenlik Sorusu</label>
+                    <div class="relative">
+                        <select name="security_question" required class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all text-sm font-bold text-slate-700 appearance-none cursor-pointer">
+                            <option value="">Seçiniz</option>
+                            <option value="ilk_okul">İlk okulunuzun adı nedir?</option>
+                            <option value="anne_kizlik">Anne kızlık soyadı?</option>
+                            <option value="dogum_yeri">Doğum yeriniz neresidir?</option>
+                            <option value="evcil_hayvan">İlk evcil hayvanınızın adı nedir?</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-3 top-3.5 text-slate-400 pointer-events-none">expand_more</span>
                     </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="class_level" class="form-label">Sınıf Düzeyi</label>
-                                <select class="form-control" id="class_level" name="class_level" required>
-                                    <option value="">Seçiniz</option>
-                                    <option value="9">9. Sınıf</option>
-                                    <option value="10">10. Sınıf</option>
-                                    <option value="11">11. Sınıf</option>
-                                    <option value="12">12. Sınıf</option>
-                                    <option value="mezun">Mezun</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="year_of_birth" class="form-label">Doğum Yılı</label>
-                        <input type="number" class="form-control" id="year_of_birth" name="year_of_birth" min="1990" max="2010" placeholder="YYYY" required>
-                            </div>
-                        </div>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Güvenlik Cevabı</label>
+                    <input name="security_answer" type="text" required class="px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all placeholder:text-slate-400 text-sm font-medium" placeholder="Cevabınız"/>
+                </div>
+
+                <!-- Row 7: Şifreler -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Şifre</label>
+                    <div class="relative">
+                        <input id="password" name="password" type="password" required class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all placeholder:text-slate-400 text-sm font-medium" placeholder="••••••••"/>
+                        <span class="material-symbols-outlined absolute right-4 top-3.5 text-slate-400 pointer-events-none">lock</span>
                     </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="area" class="form-label">Alan</label>
-                                <select class="form-control" id="area" name="area" required>
-                                    <option value="">Seçiniz</option>
-                                    <option value="sayisal">Sayısal</option>
-                                    <option value="sozel">Sözel</option>
-                                    <option value="esitagirlik">Eşit Ağırlık</option>
-                                    <option value="dil">Dil</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="aim" class="form-label">Hedef</label>
-                                <input type="text" class="form-control" id="aim" name="aim" placeholder="Örn: Tıp Fakültesi" required>
-                            </div>
-                        </div>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Şifre Tekrar</label>
+                    <div class="relative">
+                        <input id="confirm_password" name="confirm_password" type="password" required class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all placeholder:text-slate-400 text-sm font-medium" placeholder="••••••••"/>
+                        <span class="material-symbols-outlined absolute right-4 top-3.5 text-slate-400 pointer-events-none">lock</span>
                     </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="security_question" class="form-label">Güvenlik Sorusu</label>
-                                <select class="form-control" id="security_question" name="security_question" required>
-                                    <option value="">Seçiniz</option>
-                                    <option value="ilk_okul">İlk okulunuzun adı nedir?</option>
-                                    <option value="anne_kizlik">Annenizin kızlık soyadı nedir?</option>
-                                    <option value="dogum_yeri">Doğum yeriniz neresidir?</option>
-                                    <option value="evcil_hayvan">İlk evcil hayvanınızın adı nedir?</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="security_answer" class="form-label">Güvenlik Cevabı</label>
-                        <input type="text" class="form-control" id="security_answer" name="security_answer" placeholder="Cevabınızı girin" required>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="password" class="form-label">Şifre</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Şifrenizi belirleyin" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="confirm_password" class="form-label">Şifre Tekrar</label>
-                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Şifrenizi tekrar girin" required>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
-                        <label class="form-check-label" for="terms">
-                            <a href="#">Kullanım Şartları</a> ve <a href="#">Gizlilik Politikası</a>'nı kabul ediyorum.
+                </div>
+
+                <!-- Footer & Actions -->
+                <div class="md:col-span-2 mt-4 pt-4 border-t border-slate-100 space-y-5">
+                    <div class="flex items-start gap-3">
+                        <input id="terms" name="terms" type="checkbox" required class="w-5 h-5 rounded border-slate-300 text-[#6200EE] focus:ring-[#6200EE] mt-0.5 cursor-pointer"/>
+                        <label for="terms" class="text-sm font-medium text-slate-500 leading-snug cursor-pointer">
+                            Bana özel akademik analizlerin yapılmasını, <a href="#" class="text-[#6200EE] font-bold hover:underline">Hizmet Şartları</a>'nı ve <a href="#" class="text-[#6200EE] font-bold hover:underline">Gizlilik Politikası</a>'nı okudum ve kabul ediyorum.
                         </label>
                     </div>
                     
-            <button type="submit" class="btn-register">Kayıt Ol <i class="fas fa-arrow-right ml-2"></i></button>
-                
-                <div class="register-footer">
-                    <p>Zaten hesabınız var mı? <a href="{{ url_for('login') }}">Giriş Yapın</a></p>
+                    <button type="submit" class="w-full bg-[#6200EE] text-white py-4 rounded-xl font-bold text-lg hover:-translate-y-0.5 transition-all shadow-lg shadow-[#6200EE]/30 active:scale-[0.98] flex items-center justify-center gap-2">
+                        Kaydı Tamamla <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+                    </button>
+                    
+                    <p class="text-center text-sm font-medium text-slate-500 mt-6">
+                        Zaten bir efsane misin? <a href="{{ url_for('login') }}" class="text-[#6200EE] font-black hover:underline ml-1">Giriş Yap</a>
+                    </p>
                 </div>
-        </form>
-        
-        <!-- Özellikler -->
-        <div class="features-card">
-            <h4 class="features-title">ReviseMe Avantajları</h4>
-                <ul class="features-list">
-                    <li class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-brain"></i>
-                        </div>
-                        <div class="feature-text">
-                            <strong>Bilimsel Tekrar Sistemi</strong> ile bilgilerinizi kalıcı hale getirin
-                        </div>
-                    </li>
-                    <li class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-tasks"></i>
-                        </div>
-                        <div class="feature-text">
-                            <strong>Kategorize Edilmiş Sorular</strong> ile organize çalışın
-                        </div>
-                    </li>
-                    <li class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="feature-text">
-                            <strong>İlerleme Takibi</strong> ile gelişiminizi görselleştirin
-                        </div>
-                    </li>
-                </ul>
+            </form>
         </div>
     </div>
 </div>
-{% endblock content %}
 
-{% block extra_scripts %}
 <script>
-    // Şifre eşleşme kontrolü
     document.addEventListener('DOMContentLoaded', function() {
         const password = document.getElementById('password');
         const confirmPassword = document.getElementById('confirm_password');
@@ -635,8 +265,12 @@
             }
         }
         
-        password.addEventListener('change', validatePassword);
-        confirmPassword.addEventListener('keyup', validatePassword);
+        if(password && confirmPassword) {
+            password.addEventListener('change', validatePassword);
+            confirmPassword.addEventListener('keyup', validatePassword);
+        }
     });
 </script>
-{% endblock extra_scripts %}
+
+</body>
+</html>

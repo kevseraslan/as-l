@@ -110,51 +110,8 @@
     <style> html { font-size: 18px !important; } </style>
 </head>
 <body class="bg-background text-on-background">
-<!-- SideNavBar -->
-<aside class="hidden lg:flex flex-col fixed left-0 top-0 h-full p-4 space-y-2 w-64 border-r border-gray-200 bg-white shadow-xl z-50">
-<div class="flex items-center gap-3 px-2 mb-8 mt-2">
-<div class="w-10 h-10 bg-primary-container rounded-xl flex items-center justify-center text-white shadow-lg">
-<span class="material-symbols-outlined" data-icon="auto_stories">auto_stories</span>
-</div>
-<div>
-<h1 class="text-lg font-black text-[#6200EE]">ReviseMe</h1>
-<p class="text-[10px] text-slate-500 font-medium uppercase tracking-widest">Mastery through order</p>
-</div>
-</div>
-<nav class="flex-1 space-y-1">
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:translate-x-1 transition-all duration-200 rounded-lg font-medium text-sm" href="{{ url_for('index') }}" style="text-decoration:none;">
-<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-                Dashboard
-            </a>
-<a class="flex items-center gap-3 px-4 py-3 bg-violet-50 text-[#6200EE] rounded-lg font-medium text-sm transition-all duration-200" href="{{ url_for('index') }}" style="text-decoration:none;">
-<span class="material-symbols-outlined" data-icon="library_books">library_books</span>
-                Question Pools
-            </a>
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:translate-x-1 transition-all duration-200 rounded-lg font-medium text-sm" href="{{ url_for('gorevlerim') }}" style="text-decoration:none;">
-<span class="material-symbols-outlined" data-icon="quiz">quiz</span>
-                Revision Plan
-            </a>
-<!-- Favoriler Menüsü Eklendi -->
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:translate-x-1 transition-all duration-200 rounded-lg font-medium text-sm" href="{{ url_for('favorites') }}" style="text-decoration:none;">
-<span class="material-symbols-outlined" style="color: #ffb400;">star</span>
-                Favorilerim
-            </a>
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:translate-x-1 transition-all duration-200 rounded-lg font-medium text-sm" href="{{ url_for('hedefleyici') }}" style="text-decoration:none;">
-<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
-                Analytics
-            </a>
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:translate-x-1 transition-all duration-200 rounded-lg font-medium text-sm" href="{{ url_for('settings') }}" style="text-decoration:none;">
-<span class="material-symbols-outlined" data-icon="settings">settings</span>
-                Settings
-            </a>
-</nav>
-<div class="pt-4 border-t border-slate-100 space-y-1">
-<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-lg font-medium text-sm" href="{{ url_for('logout') }}" style="text-decoration:none;">
-<span class="material-symbols-outlined" data-icon="logout">logout</span>
-                Logout
-            </a>
-</div>
-</aside>
+{% set active_page = 'index' %}
+{% include 'components/sidebar_modern.html' %}
 <!-- Main Content Area -->
 <main class="lg:ml-64 min-h-screen flex flex-col">
 <!-- TopAppBar -->
@@ -232,11 +189,11 @@
     {% set diff_bg = 'bg-slate-50' %}
     {% set diff_text = 'text-slate-600' %}
     {% set diff_border = 'border-slate-100' %}
-    {% if question.DifficultyLevel == 'Zor' %}
+    {% if question.difficulty == 'Zor' %}
         {% set diff_bg = 'bg-red-50' %} {% set diff_text = 'text-red-600' %} {% set diff_border = 'border-red-100' %}
-    {% elif question.DifficultyLevel == 'Orta' %}
+    {% elif question.difficulty == 'Orta' %}
         {% set diff_bg = 'bg-amber-50' %} {% set diff_text = 'text-amber-600' %} {% set diff_border = 'border-amber-100' %}
-    {% elif question.DifficultyLevel == 'Kolay' %}
+    {% elif question.difficulty == 'Kolay' %}
         {% set diff_bg = 'bg-emerald-50' %} {% set diff_text = 'text-emerald-600' %} {% set diff_border = 'border-emerald-100' %}
     {% endif %}
 
@@ -262,7 +219,7 @@
         {% endif %}
 
 <div class="absolute top-3 left-3 flex gap-2">
-<span class="px-3 py-1 {{ diff_bg }} {{ diff_text }} text-[10px] font-black uppercase tracking-widest border {{ diff_border }} rounded-full">{{ question.DifficultyLevel or 'Belirsiz' }}</span>
+<span class="px-3 py-1 {{ diff_bg }} {{ diff_text }} text-[10px] font-black uppercase tracking-widest border {{ diff_border }} rounded-full">{{ question.difficulty or 'Belirsiz' }}</span>
 </div>
 <div class="absolute bottom-3 left-3">
 <span class="px-3 py-1 {{ status_bg }} {{ status_text }} text-[10px] font-black uppercase tracking-widest rounded-full flex items-center gap-1 shadow-md">
@@ -273,11 +230,11 @@
 </div>
 <div class="p-5 flex-1 flex flex-col">
 <div class="flex gap-2 mb-3">
-{% if question.Topic %}
-<span class="text-[10px] font-bold text-primary uppercase tracking-wider px-2 py-0.5 bg-primary-fixed rounded">{{ question.Topic }}</span>
+{% if question.topic %}
+<span class="text-[10px] font-bold text-primary uppercase tracking-wider px-2 py-0.5 bg-primary-fixed rounded">{{ question.topic }}</span>
 {% endif %}
 </div>
-<h3 class="font-headline-md text-body-md text-on-background line-clamp-2 mb-4 group-hover:text-primary transition-colors" title="{{ question.Content }}">{{ question.Content }}</h3>
+<h3 class="font-headline-md text-body-md text-on-background line-clamp-2 mb-4 group-hover:text-primary transition-colors" title="{{ question.content }}">{{ question.content }}</h3>
 <div class="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
 <div class="flex items-center gap-2 text-slate-400 text-xs">
 <span class="material-symbols-outlined text-sm" data-icon="schedule">schedule</span>

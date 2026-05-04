@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ReviseMe Shorts - Eğitim Akışı</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #000; 
+            margin: 0; 
+            padding: 0; 
+            overflow: hidden; 
+        }
+        /* Custom Scrollbar Hiding */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Scroll Snapping */
+        .snap-y-mandatory { scroll-snap-type: y mandatory; }
+        .snap-start { scroll-snap-align: start; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Backend'den gelen gerçek soru verilerini React'a aktarıyoruz
+        const VIDEO_DATA = {{ video_data | tojson | safe }};
+        
+        {% raw %}
+        const { useState, useEffect, useRef } = React;
+
+        // --- Reusable React Component: VideoItem ---
+        const VideoItem = ({ data, isActive }) => {
+            const videoRef = useRef(null);
+            const [isPlaying, setIsPlaying] = useState(false);
+            const [isLiked, setIsLiked] = useState(false);
+            const [isBookmarked, setIsBookmarked] = useState(false);
+
+            // Play/Pause logic based on scroll position
+            useEffect(() => {
+                if (isActive) {
+                    videoRef.current.play().then(() => setIsPlaying(true)).catch(e => console.log("Autoplay prevented", e));
+                } else {
+                    videoRef.current.pause();
+                    videoRef.current.currentTime = 0;
+                    setIsPlaying(false);
+                }
+            }, [isActive]);
+
+            const togglePlay = () => {
+                if (isPlaying) {
+                    videoRef.current.pause();
+                } else {
+                    videoRef.current.play();
+                }
+                setIsPlaying(!isPlaying);
+            };
+
+            return (
+                <div className="relative w-full h-[100dvh] snap-start bg-zinc-900 flex justify-center items-center overflow-hidden">
+                    {/* Video Player */}
+                    {/* Video Player Background */}
+                    <video 
+                        ref={videoRef}
+                        className="absolute inset-0 w-full h-full object-cover cursor-pointer opacity-60 blur-md"
+                        src={data.videoUrl}
+                        loop
+                        playsInline
+                        onClick={togglePlay}
+                    />
+
+                    {/* Soru Görseli (Eğer veritabanında varsa) */}
+                    {data.imagePath && (
+                        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none px-4 pb-20 mt-10">
+                            <img 
+                                src={data.imagePath} 
+                                alt="Soru Görseli" 
+                                className="max-w-full max-h-[70%] object-contain rounded-xl shadow-2xl border border-white/20 bg-white/5 backdrop-blur-sm"
+                            />
+                        </div>
+                    )}
+
+                    {/* Play/Pause Overlay Indicator */}
+                    {!isPlaying && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20 transition-opacity">
+                            <div className="w-20 h-20 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center shadow-2xl">
+                                <span className="material-symbols-outlined text-white text-5xl ml-1" style={{fontVariationSettings: "'FILL' 1"}}>play_arrow</span>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Top Gradient for header visibility */}
+                    <div className="absolute top-0 w-full h-32 bg-gradient-to-b from-black/70 to-transparent pointer-events-none z-10"></div>
+                    
+                    {/* Header */}
+                    <div className="absolute top-6 left-5 right-5 flex justify-between items-center z-20">
+                        <div className="flex items-center gap-2">
+                            <button className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 text-white hover:bg-white/20 transition-colors" onClick={() => window.location.href='/'}>
+                                <span className="material-symbols-outlined">arrow_back</span>
+                            </button>
+                            <div className="font-extrabold text-white text-xl tracking-wide drop-shadow-md">ReviseMe <span className="text-purple-400">Shorts</span></div>
+                        </div>
+                        <button className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 text-white hover:bg-white/20 transition-colors">
+                            <span className="material-symbols-outlined">search</span>
+                        </button>
+                    </div>
+
+                    {/* Bottom Gradient for text visibility */}
+                    <div className="absolute bottom-0 w-full h-72 bg-gradient-to-t from-black/90 via-black/50 to-transparent pointer-events-none z-10"></div>
+
+                    {/* Content Overlay */}
+                    <div className="absolute bottom-8 left-5 right-20 z-20 flex flex-col gap-3">
+                        <div className="flex gap-2 items-center flex-wrap">
+                            <span className="px-3 py-1.5 rounded-lg bg-purple-600/80 backdrop-blur-md border border-purple-400/30 text-white text-xs font-bold uppercase tracking-wider shadow-lg">
+                                {data.category}
+                            </span>
+                            <span className={`px-3 py-1.5 rounded-lg backdrop-blur-md border text-white text-xs font-bold uppercase tracking-wider shadow-lg ${
+                                data.difficulty === 'Zor' ? 'bg-red-500/80 border-red-400/30' : 
+                                data.difficulty === 'Orta' ? 'bg-orange-500/80 border-orange-400/30' : 
+                                'bg-emerald-500/80 border-emerald-400/30'
+                            }`}>
+                                {data.difficulty}
+                            </span>
+                        </div>
+                        <h2 className="text-white text-xl md:text-2xl font-bold leading-tight drop-shadow-lg pr-4">
+                            {data.title}
+                        </h2>
+                        <p className="text-zinc-200 text-sm font-medium line-clamp-2 md:line-clamp-3 pr-2 drop-shadow-md">
+                            {data.content}
+                        </p>
+                    </div>
+
+                    {/* Right Floating Actions (Glassmorphism) */}
+                    <div className="absolute bottom-8 right-4 z-20 flex flex-col items-center gap-6">
+                        <button className="flex flex-col items-center gap-1.5 group outline-none" onClick={() => setIsLiked(!isLiked)}>
+                            <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center transition-all group-active:scale-90 hover:bg-white/20">
+                                <span className={`material-symbols-outlined text-3xl transition-colors ${isLiked ? 'text-red-500' : 'text-white'}`} style={{fontVariationSettings: isLiked ? "'FILL' 1" : "'FILL' 0"}}>favorite</span>
+                            </div>
+                            <span className="text-white text-xs font-bold drop-shadow-md">{data.likes}</span>
+                        </button>
+
+                        <button className="flex flex-col items-center gap-1.5 group outline-none" onClick={() => setIsBookmarked(!isBookmarked)}>
+                            <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center transition-all group-active:scale-90 hover:bg-white/20">
+                                <span className={`material-symbols-outlined text-3xl transition-colors ${isBookmarked ? 'text-amber-400' : 'text-white'}`} style={{fontVariationSettings: isBookmarked ? "'FILL' 1" : "'FILL' 0"}}>bookmark</span>
+                            </div>
+                            <span className="text-white text-xs font-bold drop-shadow-md">{data.bookmarks}</span>
+                        </button>
+
+                        <button className="flex flex-col items-center gap-1.5 group outline-none">
+                            <div className="w-12 h-12 rounded-full bg-purple-600/90 backdrop-blur-md border border-purple-400/50 flex items-center justify-center transition-all group-active:scale-90 shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-500">
+                                <span className="material-symbols-outlined text-white text-2xl" style={{fontVariationSettings: "'FILL' 1"}}>all_inclusive</span>
+                            </div>
+                            <span className="text-white text-[10px] font-extrabold text-center leading-tight drop-shadow-md uppercase">Tekrar<br/>Ekle</span>
+                        </button>
+                        
+                        <div className="w-12 h-12 rounded-full border-[3px] border-white overflow-hidden mt-2 animate-[spin_8s_linear_infinite] shadow-lg">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Teacher" className="w-full h-full object-cover bg-zinc-800" />
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Reusable React Component: ShortsFeed ---
+        const ShortsFeed = () => {
+            const [activeIndex, setActiveIndex] = useState(0);
+            const containerRef = useRef(null);
+
+            // Handle scroll to determine the currently active video
+            const handleScroll = () => {
+                if (!containerRef.current) return;
+                // Calculate which video is mostly in view
+                const index = Math.round(containerRef.current.scrollTop / window.innerHeight);
+                if (index !== activeIndex) {
+                    setActiveIndex(index);
+                }
+            };
+
+            return (
+                <div 
+                    ref={containerRef}
+                    className="w-full h-[100dvh] overflow-y-scroll snap-y-mandatory hide-scrollbar bg-black"
+                    onScroll={handleScroll}
+                >
+                    {VIDEO_DATA.map((video, index) => (
+                        <VideoItem key={video.id} data={video} isActive={index === activeIndex} />
+                    ))}
+                </div>
+            );
+        };
+
+        // Render the application
+        ReactDOM.createRoot(document.getElementById('root')).render(<ShortsFeed />);
+        {% endraw %}
+    </script>
+</body>
+</html>

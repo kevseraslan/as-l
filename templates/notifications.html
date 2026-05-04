@@ -67,7 +67,6 @@
                 </p>
                 <div class="mt-4 flex gap-3">
                     <button class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors shadow-sm" onclick="window.location.reload();">Yenile</button>
-                    <button id="clearAllNotifications" class="px-4 py-2 bg-red-50 border border-red-100 rounded-lg text-sm font-bold text-red-600 hover:bg-red-100 transition-colors shadow-sm">Tümünü Temizle</button>
                 </div>
             </div>
             
@@ -103,16 +102,16 @@
                         <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-[0_15px_15px_-5px_rgba(98,0,238,0.04)] hover:shadow-md transition-all group">
                             <div class="flex items-start gap-4">
                                 <div class="w-12 h-12 rounded-xl bg-[#F8F5FF] flex items-center justify-center text-[#6200EE] shrink-0 font-bold text-lg">
-                                    {{ question.Category_Name[0]|upper if question.Category_Name else 'S' }}
+                                    {{ question.category.Name[0]|upper if question.category else 'S' }}
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-2 mb-1">
-                                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">{{ question.Category_Name if question.Category_Name else 'Genel' }}</span>
+                                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">{{ question.category.Name if question.category else 'Genel' }}</span>
                                         <span class="px-2 py-0.5 rounded-full bg-teal-50 text-teal-600 text-[10px] font-bold border border-teal-100">Tekrar {{ question.RepeatCount + 1 }}</span>
                                     </div>
-                                    <h5 class="font-bold text-slate-800 truncate group-hover:text-[#6200EE] transition-colors">{{ question.Content|truncate(40) }}</h5>
+                                    <h5 class="font-bold text-slate-800 truncate group-hover:text-[#6200EE] transition-colors">{{ question.content|truncate(40) }}</h5>
                                 </div>
-                                <a href="{{ url_for('view_today_question', question_id=question.QuestionId) }}" class="bg-[#6200EE] text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:-translate-y-0.5 transition-transform shadow-md shadow-[#6200EE]/30 active:scale-95 shrink-0">Çöz</a>
+                                <a href="{{ url_for('view_question', question_id=question.QuestionId) }}" class="bg-[#6200EE] text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:-translate-y-0.5 transition-transform shadow-md shadow-[#6200EE]/30 active:scale-95 shrink-0">Çöz</a>
                             </div>
                         </div>
                         {% endfor %}
@@ -158,7 +157,7 @@
                                         !
                                     </div>
                                     <div class="min-w-0">
-                                        <h6 class="font-bold text-sm text-slate-800 truncate">{{ question.Content|truncate(35) }}</h6>
+                                        <h6 class="font-bold text-sm text-slate-800 truncate">{{ question.content|truncate(35) }}</h6>
                                         <p class="text-[10px] text-error font-bold uppercase mt-0.5">Acil Tekrar (#{{ question.RepeatCount + 1 }})</p>
                                     </div>
                                 </div>
@@ -197,24 +196,24 @@
                         <circle class="text-[#6200EE]" cx="72" cy="72" fill="transparent" r="65" stroke="currentColor" stroke-dasharray="408.4" stroke-dashoffset="102.1" stroke-linecap="round" stroke-width="12"></circle>
                     </svg>
                     <div class="absolute inset-0 flex flex-col items-center justify-center">
-                        <span class="text-3xl font-black text-[#6200EE]">75%</span>
+                        <span class="text-3xl font-black text-[#6200EE]">{{ completion_rate }}%</span>
                         <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Tamamlama</span>
                     </div>
                 </div>
                 
                 <div class="flex-1 space-y-4 text-center md:text-left">
-                    <h4 class="font-headline-md text-2xl font-bold text-slate-800">Haftalık Performans Analizi</h4>
+                    <h4 class="font-headline-md text-2xl font-bold text-slate-800">Performans Analizi</h4>
                     <p class="text-slate-500 font-medium text-sm leading-relaxed max-w-xl">
-                        Bu hafta planlanan tekrarlarının büyük çoğunluğunu başarıyla erittin. Toplam başarı puanın <span class="bg-emerald-50 text-emerald-600 px-2 rounded font-bold">A+</span> seviyesinde ilerliyor. Bu hızla devam et!
+                        Şu ana kadarki tekrarların doğrultusunda genel tamamlama oranın %{{ completion_rate }}. Toplam başarı notun <span class="bg-emerald-50 text-emerald-600 px-2 rounded font-bold">{{ performance_grade }}</span> seviyesinde ilerliyor. {% if completion_rate >= 80 %}Bu harika tempoyu koru!{% else %}Tekrarlarını hızlandırarak başarı notunu artırabilirsin!{% endif %}
                     </p>
                     <div class="flex gap-6 justify-center md:justify-start pt-2">
                         <div class="flex items-center gap-2">
                             <span class="w-3.5 h-3.5 rounded-full bg-[#6200EE]"></span>
-                            <span class="text-xs font-bold text-slate-500">Yapılan (75%)</span>
+                            <span class="text-xs font-bold text-slate-500">Yapılan ({{ completion_rate }}%)</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="w-3.5 h-3.5 rounded-full bg-[#6200EE]/10"></span>
-                            <span class="text-xs font-bold text-slate-400">Kalan (25%)</span>
+                            <span class="text-xs font-bold text-slate-400">Kalan ({{ 100 - completion_rate }}%)</span>
                         </div>
                     </div>
                 </div>
@@ -226,38 +225,7 @@
     {% include 'components/chatbot_widget.html' ignore missing %}
 </main>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const btnClear = document.getElementById('clearAllNotifications');
-        if(btnClear) {
-            btnClear.addEventListener('click', function() {
-                if (confirm('Tüm bildirimleri temizlemek istediğinize emin misiniz?')) {
-                    this.classList.add('opacity-50', 'pointer-events-none');
-                    this.innerHTML = 'Siliniyor...';
-                    
-                    const csrfTokenObj = document.querySelector('meta[name="csrf-token"]');
-                    const token = csrfTokenObj ? csrfTokenObj.getAttribute('content') : '';
 
-                    fetch('/clear-all-notifications', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': token
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        window.location.reload();
-                    })
-                    .catch(error => {
-                        alert('Hata: ' + error);
-                        window.location.reload();
-                    });
-                }
-            });
-        }
-    });
-</script>
 
 </body>
 </html>

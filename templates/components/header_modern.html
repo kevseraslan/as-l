@@ -1,3 +1,61 @@
+<style id="global-dark-mode-overrides">
+    html.dark body {
+        background-color: #0f172a !important;
+        color: #f8fafc !important;
+    }
+    html.dark .bg-white {
+        background-color: #1e293b !important;
+        border-color: #334155 !important;
+        color: #f8fafc !important;
+    }
+    html.dark .bg-\[\#F8F5FF\] {
+        background-color: #0f172a !important;
+    }
+    html.dark .text-slate-800, 
+    html.dark .text-slate-900,
+    html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5 {
+        color: #f1f5f9 !important;
+    }
+    html.dark .text-slate-700 {
+        color: #e2e8f0 !important;
+    }
+    html.dark .text-slate-500,
+    html.dark .text-slate-600 {
+        color: #94a3b8 !important;
+    }
+    html.dark .border-slate-100,
+    html.dark .border-slate-200 {
+        border-color: #334155 !important;
+    }
+    html.dark .bg-slate-50,
+    html.dark .bg-slate-100 {
+        background-color: #334155 !important;
+        color: #f8fafc !important;
+    }
+    /* Brand Colors */
+    html.dark .text-\[\#6200EE\] {
+        color: #a855f7 !important;
+    }
+    html.dark .bg-purple-50 {
+        background-color: rgba(168, 85, 247, 0.1) !important;
+        border-color: rgba(168, 85, 247, 0.2) !important;
+    }
+    /* Components */
+    html.dark header, 
+    html.dark aside,
+    html.dark nav {
+        background-color: #1e293b !important;
+        border-color: #334155 !important;
+    }
+    html.dark input, 
+    html.dark select, 
+    html.dark textarea {
+        background-color: #0f172a !important;
+        border-color: #334155 !important;
+        color: #f8fafc !important;
+    }
+</style>
+
 <!-- TopAppBar Modern -->
 <header class="sticky top-0 w-full z-30 bg-white/80 backdrop-blur-md border-b border-slate-100 shadow-sm flex items-center justify-between px-6 md:px-8 h-16 shrink-0 transition-all duration-300">
     <div class="flex items-center gap-2 md:gap-4">
@@ -41,6 +99,20 @@
         </div>
     </div>
 </header>
+
+<script>
+    // Global Theme Init (Runs immediately to prevent flash)
+    (function() {
+        const theme = localStorage.getItem('theme') || 'system';
+        if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+        } else {
+            document.documentElement.classList.add('light');
+            document.documentElement.classList.remove('dark');
+        }
+    })();
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -117,6 +189,23 @@ document.addEventListener('DOMContentLoaded', function() {
             this.tick();
         },
         
+        saveSession: function(durationMinutes, type) {
+            fetch('/save_pomodoro', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                },
+                body: JSON.stringify({
+                    duration: durationMinutes,
+                    type: type
+                })
+            })
+            .then(res => res.json())
+            .then(data => console.log("Pomodoro saved:", data))
+            .catch(err => console.error("Error saving pomodoro:", err));
+        },
+        
         tick: function() {
             let state = this.getState();
             let remaining = state.timeLeftWhenPaused;
@@ -125,9 +214,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 remaining = Math.max(0, Math.ceil((state.endTime - Date.now()) / 1000));
                 if (remaining <= 0) {
                     // Timer finished natively
+                    const finishedType = this.timeEl && this.timeEl.nextElementSibling && this.timeEl.nextElementSibling.textContent.includes('Mola') ? 'break' : 'pomodoro';
+                    const durationMins = Math.round(state.totalTime / 60);
+
                     state.isRunning = false;
                     state.timeLeftWhenPaused = 0;
                     this.saveState(state);
+                    
+                    // Veritabanına kaydet
+                    if (finishedType === 'pomodoro') {
+                        this.saveSession(durationMins, 'pomodoro');
+                    }
+                    
                     alert("Tebrikler! Oturumunuz bitti 🎉"); // Simple alert (ideally sound)
                 }
             }
@@ -172,6 +270,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
         if (isCollapsed && sidebar) {
             sidebar.classList.add('collapsed');
+            document.body.classList.add('sidebar-collapsed');
         }
     }
     
@@ -192,6 +291,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 // Desktop behavior: collapse width
                 sidebar.classList.toggle('collapsed');
+                document.body.classList.toggle('sidebar-collapsed');
                 localStorage.setItem('sidebar-collapsed', sidebar.classList.contains('collapsed'));
             }
         });

@@ -215,46 +215,8 @@
 </div>
 
 <!-- SideNavBar Shell -->
-<aside class="fixed left-0 top-0 h-full flex flex-col p-6 space-y-8 bg-white dark:bg-slate-900 h-screen w-72 border-r border-[#F3F4F6] dark:border-gray-800 z-40 hidden md:flex">
-<div class="flex items-center gap-3 px-2">
-<div class="w-10 h-10 bg-[#6200EE] rounded-xl flex items-center justify-center text-white">
-<span class="material-symbols-outlined" data-icon="auto_stories">auto_stories</span>
-</div>
-<a href="{{ url_for('index') }}" style="text-decoration: none;">
-<h1 class="text-lg font-black text-[#6200EE]">ReviseMe</h1>
-<p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">High-Tech Revision</p>
-</a>
-</div>
-<nav class="flex-1 space-y-1">
-<a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-[#6200EE] hover:bg-[#F8F5FF] rounded-lg font-medium transition-all" href="{{ url_for('index') }}">
-<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-<span class="font-label-sm text-label-sm">Dashboard</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 bg-[#F8F5FF] text-[#6200EE] rounded-lg font-medium transition-all" href="{{ url_for('gorevlerim') }}">
-<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
-<span class="font-label-sm text-label-sm">Study Plan</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-[#6200EE] hover:bg-[#F8F5FF] rounded-lg font-medium transition-all" href="{{ url_for('index') }}">
-<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
-<span class="font-label-sm text-label-sm">Question Bank</span>
-</a>
-<!-- Favoriler Menüsü Eklendi -->
-<a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-[#6200EE] hover:bg-[#F8F5FF] rounded-lg font-medium transition-all" href="{{ url_for('favorites') }}">
-<span class="material-symbols-outlined" data-icon="star" style="color: #ffb400;">star</span>
-<span class="font-label-sm text-label-sm">Favorilerim</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-[#6200EE] hover:bg-[#F8F5FF] rounded-lg font-medium transition-all" href="{{ url_for('hedefleyici') }}">
-<span class="material-symbols-outlined" data-icon="insights">insights</span>
-<span class="font-label-sm text-label-sm">Analytics</span>
-</a>
-</nav>
-<div class="pt-6 border-t border-gray-100 flex flex-col gap-3">
-<button onclick="openModal('addTaskDialog')" class="w-full bg-[#6200EE] text-white py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:shadow-lg transition-all active:scale-95">
-<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
-                Yeni Görev Ekle
-</button>
-</div>
-</aside>
+{% set active_page = 'today_questions' %}
+{% include 'components/sidebar_modern.html' %}
 
 <div class="md:ml-72 flex-1">
 <!-- TopAppBar Shell -->

@@ -1,10 +1,14 @@
 <!-- Sidebar Navigation -->
 <aside id="modern-sidebar" class="hidden md:flex flex-col h-screen fixed left-0 top-0 p-4 z-50 bg-white border-r border-slate-100 w-64 shrink-0 shadow-[15px_0_15px_rgba(98,0,238,0.04)] transition-all duration-300">
     <div class="mb-8 mt-2 px-4 whitespace-nowrap overflow-hidden flex items-center justify-between">
-        <div>
+        <div class="sidebar-logo">
             <h1 class="sidebar-text text-2xl font-black text-[#6200EE] tracking-tight transition-opacity duration-200">Akademi Pro</h1>
             <p class="sidebar-text text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 transition-opacity duration-200">Premium Plan</p>
         </div>
+        <!-- Desktop Toggle Button -->
+        <button id="sidebar-toggle" class="hidden md:flex text-slate-400 hover:text-[#6200EE] transition-colors p-1 rounded-lg hover:bg-slate-50">
+            <span class="material-symbols-outlined">menu_open</span>
+        </button>
         <button id="sidebar-close-mobile" class="md:hidden text-slate-500 hover:text-[#6200EE]">
             <span class="material-symbols-outlined">close</span>
         </button>
@@ -16,14 +20,31 @@
             <span class="sidebar-text text-sm font-semibold whitespace-nowrap opacity-100 transition-opacity duration-200">Ana Sayfa</span>
         </a>
         
-        <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:pl-6 group {% if active_page == 'notifications' %}bg-purple-50 text-[#6200EE] border-r-4 border-[#6200EE] font-bold shadow-sm{% endif %}" href="{{ url_for('notifications') }}" title="Bildirimler">
-            <span class="material-symbols-outlined text-[20px] shrink-0 group-hover:text-[#6200EE]">notifications</span>
-            <span class="sidebar-text text-sm font-semibold whitespace-nowrap opacity-100 transition-opacity duration-200">Bildirimler</span>
+        <a class="flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:pl-6 group {% if active_page == 'notifications' %}bg-purple-50 text-[#6200EE] border-r-4 border-[#6200EE] font-bold shadow-sm{% endif %}" href="{{ url_for('notifications') }}" title="Bildirimler">
+            <div class="flex items-center gap-3">
+                <div class="relative shrink-0 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[20px] group-hover:text-[#6200EE]">notifications</span>
+                    {% if today_questions_count and today_questions_count > 0 %}
+                    <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                    {% endif %}
+                </div>
+                <span class="sidebar-text text-sm font-semibold whitespace-nowrap opacity-100 transition-opacity duration-200">Bildirimler</span>
+            </div>
+            {% if today_questions_count and today_questions_count > 0 %}
+            <span class="sidebar-text bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center justify-center animate-pulse">
+                {{ today_questions_count }}
+            </span>
+            {% endif %}
         </a>
 
         <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:pl-6 group {% if active_page == 'add_question' %}bg-purple-50 text-[#6200EE] border-r-4 border-[#6200EE] font-bold shadow-sm{% endif %}" href="{{ url_for('add_question') }}" title="Yeni Soru Ekle">
             <span class="material-symbols-outlined text-[20px] shrink-0 group-hover:text-[#6200EE]">add_circle</span>
             <span class="sidebar-text text-sm font-semibold whitespace-nowrap opacity-100 transition-opacity duration-200">Yeni Soru Ekle</span>
+        </a>
+
+        <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:pl-6 group {% if active_page == 'soru_coz' %}bg-purple-50 text-[#6200EE] border-r-4 border-[#6200EE] font-bold shadow-sm{% endif %}" href="{{ url_for('soru_coz') }}" title="Soru Çöz">
+            <span class="material-symbols-outlined text-[20px] shrink-0 group-hover:text-[#6200EE]">psychology</span>
+            <span class="sidebar-text text-sm font-semibold whitespace-nowrap opacity-100 transition-opacity duration-200">Soru Çöz</span>
         </a>
         
         <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:pl-6 group {% if active_page == 'favorites' %}bg-purple-50 text-[#6200EE] border-r-4 border-[#6200EE] font-bold shadow-sm{% endif %}" href="{{ url_for('favorites') }}" title="Favori Sorularım">
@@ -49,6 +70,16 @@
         <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:pl-6 group {% if active_page == 'timer' %}bg-purple-50 text-[#6200EE] border-r-4 border-[#6200EE] font-bold shadow-sm{% endif %}" href="{{ url_for('timer') }}" title="Sayaç">
             <span class="material-symbols-outlined text-[20px] shrink-0 group-hover:text-[#6200EE]">timer</span>
             <span class="sidebar-text text-sm font-semibold whitespace-nowrap opacity-100 transition-opacity duration-200">Sayaç</span>
+        </a>
+
+        <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:pl-6 group {% if active_page == 'ai_quiz' %}bg-purple-50 text-[#6200EE] border-r-4 border-[#6200EE] font-bold shadow-sm{% endif %}" href="{{ url_for('ai_quiz_home') }}" title="AI Quiz">
+            <span class="material-symbols-outlined text-[20px] shrink-0 group-hover:text-[#6200EE]">quiz</span>
+            <span class="sidebar-text text-sm font-semibold whitespace-nowrap opacity-100 transition-opacity duration-200">AI Quiz (Yeni)</span>
+        </a>
+
+        <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:pl-6 group {% if active_page == 'ai_shorts' %}bg-purple-50 text-[#6200EE] border-r-4 border-[#6200EE] font-bold shadow-sm{% endif %}" href="{{ url_for('ai_shorts') }}" title="AI Shorts">
+            <span class="material-symbols-outlined text-[20px] shrink-0 group-hover:text-[#6200EE]">movie</span>
+            <span class="sidebar-text text-sm font-semibold whitespace-nowrap opacity-100 transition-opacity duration-200">AI Shorts</span>
         </a>
     </nav>
     
@@ -81,4 +112,41 @@
 #modern-sidebar.collapsed a:hover {
     padding-left: 0.75rem; /* prevent hover shifting in collapsed state */
 }
+
+@media (min-width: 768px) {
+    body.sidebar-collapsed .md\:ml-64 {
+        margin-left: 5rem !important; /* 80px */
+    }
+    .md\:ml-64 {
+        transition: margin-left 0.3s ease !important;
+    }
+}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('modern-sidebar');
+    const toggleBtn = document.getElementById('sidebar-toggle');
+    const body = document.body;
+    
+    // Check local storage for preference
+    if (localStorage.getItem('sidebar-collapsed') === 'true') {
+        sidebar.classList.add('collapsed');
+        body.classList.add('sidebar-collapsed');
+        if (toggleBtn) toggleBtn.querySelector('span').textContent = 'menu';
+    }
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+            body.classList.toggle('sidebar-collapsed');
+            
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            localStorage.setItem('sidebar-collapsed', isCollapsed);
+            
+            // Icon change
+            toggleBtn.querySelector('span').textContent = isCollapsed ? 'menu' : 'menu_open';
+        });
+    }
+});
+</script>

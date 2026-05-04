@@ -1,51 +1,116 @@
 <!DOCTYPE html>
-<html class="light" lang="tr">
+<html lang="tr" class="light">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Kayıt Ol - ReviseMe Akademi</title>
+    <title>Kayıt Ol | ReviseMe</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-    
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#4800b2",
-                        "primary-container": "#6200ee",
-                        "on-surface": "#151c27",
-                        "surface-bright": "#f9f9ff",
-                        "outline-variant": "#cbc3d9",
+                        "primary": "#6d23f9",
+                        "primary-dark": "#5a1cd6",
                     },
                     fontFamily: {
-                        "headline-lg": ["Inter"],
-                        "body-md": ["Inter"],
+                        "sans": ["Outfit", "sans-serif"],
                     }
                 }
             }
         }
     </script>
     <style>
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        body { background-color: #F8F5FF; font-family: 'Inter', sans-serif; }
-        .ambient-shadow { box-shadow: 0 15px 30px -5px rgba(98, 0, 238, 0.04); }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        body { 
+            background-color: #ffffff; 
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .split-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        /* Left Side: Background with Color Overlay (Pinterest-y gradient mesh) */
+        .left-side {
+            position: relative;
+            width: 40%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(109, 35, 249, 0.9), rgba(79, 70, 229, 0.95)), 
+                        url('https://images.unsplash.com/photo-1517673132405-a56a62b18caf?q=80&w=2076&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            z-index: 1;
+        }
+        
+        /* SVG Wave Divider (Flipped for right alignment) */
+        .wave-container {
+            position: absolute;
+            top: 0;
+            right: -1px;
+            height: 100%;
+            width: 120px;
+            fill: white;
+            z-index: 10;
+        }
+
+        /* Right Side: Scrollable Form */
+        .right-side {
+            width: 60%;
+            height: 100%;
+            background: white;
+            overflow-y: auto;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 5;
+        }
+
+        /* Custom Scrollbar */
+        .right-side::-webkit-scrollbar { width: 6px; }
+        .right-side::-webkit-scrollbar-track { background: transparent; }
+        .right-side::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+
+        .input-pill {
+            border: 1px solid #f1f5f9;
+            border-radius: 16px;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+        }
+        .input-pill:focus-within {
+            border-color: #6d23f9;
+            background: white;
+            box-shadow: 0 10px 20px -5px rgba(109, 35, 249, 0.1);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float { animation: float 5s ease-in-out infinite; }
+
+        @media (max-width: 1024px) {
+            .left-side { display: none; }
+            .right-side { width: 100%; padding: 40px 20px; }
+        }
     </style>
-    <style> html { font-size: 18px !important; } </style>
-    <style> html { font-size: 18px !important; } </style>
 </head>
-<body class="bg-[#F8F5FF] font-body-md text-on-surface min-h-screen flex flex-col items-center justify-center">
+<body class="min-h-screen">
 
 <!-- Flash Messages -->
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-        <div class="fixed top-0 left-1/2 -translate-x-1/2 z-50 w-full max-w-md">
+        <div class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-full max-w-md px-4">
             {% for category, message in messages %}
-                <div class="bg-{% if category == 'success' %}green{% else %}red{% endif %}-50 border border-{% if category == 'success' %}green{% else %}red{% endif %}-200 text-{% if category == 'success' %}green{% else %}red{% endif %}-700 p-0 rounded-xl shadow-lg mb-2 flex justify-between items-center">
+                <div class="bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-2xl mb-2 flex justify-between items-center border-l-4 {% if category == 'success' %}border-l-green-500 text-green-800{% else %}border-l-red-500 text-red-800{% endif %}">
                     <span class="text-sm font-bold">{{ message }}</span>
                     <button onclick="this.parentElement.style.display='none'" class="opacity-50 hover:opacity-100"><span class="material-symbols-outlined text-[18px]">close</span></button>
                 </div>
@@ -54,209 +119,181 @@
     {% endif %}
 {% endwith %}
 
-<div class="w-full max-w-full px-4 md:px-8 mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 p-6 lg:p-10 h-full min-h-screen">
+<div class="split-container">
     
-    <!-- Sol Sütun (Marketing & Illustration) -->
-    <div class="hidden lg:flex lg:col-span-5 flex-col justify-between p-12 bg-gradient-to-br from-[#4800b2] to-[#6a37b5] rounded-none relative overflow-hidden text-white shadow-xl">
-        <div class="absolute inset-0 opacity-10 pointer-events-none mix-blend-overlay">
-            <!-- Background pattern representation -->
-            <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_TYQOwAJYxZcO0_l5yhIk1st04cx8Q2sEWMHVHhO0yqeBmOozGd7wcAYnBB7ZRyhkYONdeVXOsH5Wzu7O-kAoZlX1XkUYHKwGP1EqOVsLQ88TttuIVs3RKCy60SJs1UpdW49rAowNb8H_qejHQAr4IEfJQyf2FahDF3ovc7wQwVz6ShwA-qkafD-FQNm_aODTKX2nxO0LyRFGq20rCLFhzI-C5AHvYbffZyt0-8paZHboPdIuzyyX2J_70nvvdpHahsXh3H0P9R8"/>
-        </div>
+    <!-- LEFT SIDE: Marketing Content -->
+    <div class="left-side hidden lg:block">
+        <svg class="wave-container" viewBox="0 0 100 1000" preserveAspectRatio="none">
+            <path d="M0,0 Q100,500 0,1000 L100,1000 L100,0 Z" fill="white"></path>
+        </svg>
         
-        <div class="relative z-10">
-            <h1 class="text-4xl font-black mb-4 flex items-center gap-3 tracking-tight">
-                <div class="bg-white/10 p-2 rounded-xl backdrop-blur-sm"><span class="material-symbols-outlined text-3xl">auto_stories</span></div>
-                ReviseMe
-            </h1>
-            <p class="text-lg opacity-90 max-w-sm font-medium leading-relaxed">
-                Yapay zeka destekli akıllı tekrar sistemi ile akademik potansiyelinizin zirvesine ulaşın.
-            </p>
-        </div>
-        
-        <div class="relative z-10 space-y-8 mt-12">
-            <div class="flex items-start gap-0">
-                <div class="bg-white/10 p-3 rounded-xl backdrop-blur-sm shadow-inner group transition-all">
-                    <span class="material-symbols-outlined group-hover:scale-110 transition-transform">auto_graph</span>
-                </div>
-                <div>
-                    <h3 class="text-xl font-bold">Akıllı Analizler</h3>
-                    <p class="opacity-80 text-sm mt-1">Bilgi boşluklarınızı ve güçlü yanlarınızı anlık olarak haritalandırın.</p>
+        <div class="absolute inset-0 flex flex-col justify-between p-16 text-white z-10">
+            <!-- Logo Box -->
+            <div class="bg-white p-4 rounded-[20px] shadow-2xl w-fit animate-float border border-white/50">
+                <img src="{{ url_for('static', filename='images/user_logo_exact.png') }}" class="w-12 h-12 object-contain" alt="Logo">
+            </div>
+
+            <!-- Marketing Copy -->
+            <div class="space-y-8">
+                <h2 class="text-5xl font-black leading-tight tracking-tight">
+                    Başarıya <br/> İlk Adımı <br/> <span class="text-indigo-200">Bugün Atın.</span>
+                </h2>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+                        <span class="material-symbols-outlined text-indigo-200">groups</span>
+                        <p class="font-bold text-sm">10.000+ Aktif Öğrenci</p>
+                    </div>
+                    <div class="flex items-center gap-4 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+                        <span class="material-symbols-outlined text-indigo-200">verified</span>
+                        <p class="font-bold text-sm">Yapay Zeka Destekli Analiz</p>
+                    </div>
                 </div>
             </div>
-            <div class="flex items-start gap-0">
-                <div class="bg-white/10 p-3 rounded-xl backdrop-blur-sm shadow-inner group transition-all">
-                    <span class="material-symbols-outlined group-hover:scale-110 transition-transform">schedule</span>
-                </div>
-                <div>
-                    <h3 class="text-xl font-bold">Dinamik Planlama</h3>
-                    <p class="opacity-80 text-sm mt-1">Performansınıza göre esneyen, tamamen size özel çalışma planları.</p>
-                </div>
-            </div>
-            <div class="flex items-start gap-0">
-                <div class="bg-white/10 p-3 rounded-xl backdrop-blur-sm shadow-inner group transition-all">
-                    <span class="material-symbols-outlined group-hover:scale-110 transition-transform">psychology</span>
-                </div>
-                <div>
-                    <h3 class="text-xl font-bold">Unutma Eğrisi Kırıcı</h3>
-                    <p class="opacity-80 text-sm mt-1">Birebir zamanlamalar ile öğrendiklerinizi kalıcı hafızaya taşıyın.</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="relative z-10 pt-12 mt-auto border-t border-white/10 w-full">
-            <div class="flex items-center gap-3">
-                <div class="flex -space-x-3">
-                    <div class="w-10 h-10 rounded-full bg-blue-400 border-2 border-[#4800b2] flex items-center justify-center text-xs font-black shadow-lg">AY</div>
-                    <div class="w-10 h-10 rounded-full bg-emerald-400 border-2 border-[#4800b2] flex items-center justify-center text-xs font-black shadow-lg">BK</div>
-                    <div class="w-10 h-10 rounded-full bg-fuchsia-400 border-2 border-[#4800b2] flex items-center justify-center text-xs font-black shadow-lg shadow-[#6200EE]/50">+10K</div>
-                </div>
-                <p class="text-xs font-bold opacity-80 uppercase tracking-widest pl-2">Aktif Öğrenci Katıldı</p>
-            </div>
+
+            <!-- Footer Stats -->
+            <p class="text-sm font-medium text-white/60">© 2024 ReviseMe™ - İnovasyon Burada Başlıyor</p>
         </div>
     </div>
-    
-    <!-- Sağ Sütun (Kayıt Formu) -->
-    <div class="lg:col-span-7 flex flex-col bg-white rounded-none ambient-shadow border border-slate-100 p-8 lg:px-16 lg:py-12 overflow-y-auto scrollbar-hide relative z-20">
-        <div class="mb-8">
-            <h2 class="text-3xl font-black text-slate-800 mb-2">Hesabını Oluştur</h2>
-            <p class="text-slate-500 font-medium text-sm">Akademik mükemmellik yolculuğuna bugün başla.</p>
-        </div>
-        
-        <div class="flex flex-col gap-6 w-full">
+
+    <!-- RIGHT SIDE: Register Form -->
+    <div class="right-side">
+        <div class="w-full max-w-[640px]">
             
-            <form method="POST" action="{{ url_for('register') }}" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+            <div class="mb-10 text-center lg:text-left">
+                <div class="lg:hidden flex items-center justify-center gap-3 mb-8">
+                    <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white">
+                        <span class="material-symbols-outlined">psychology</span>
+                    </div>
+                    <span class="text-2xl font-black text-slate-800">ReviseMe</span>
+                </div>
+                <h1 class="text-4xl font-black text-slate-900 mb-2 tracking-tight">Hesabını Oluştur</h1>
+                <p class="text-slate-400 font-semibold">Senin için en iyi çalışma planını hazırlayalım.</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('register') }}" class="space-y-8">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}">
 
-                <!-- Row 1: Ad ve Soyad -->
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Adınız</label>
-                    <input name="name" type="text" required class="px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all placeholder:text-slate-400 text-sm font-medium" placeholder="Örn: Mert"/>
-                </div>
-                
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Soyadınız</label>
-                    <input name="surname" type="text" required class="px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all placeholder:text-slate-400 text-sm font-medium" placeholder="Örn: Yılmaz"/>
-                </div>
-
-                <!-- Row 2: Kullanıcı Adı ve Doğum Yılı -->
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Kullanıcı Adı</label>
-                    <div class="relative">
-                        <span class="absolute left-4 top-[14px] text-slate-400 font-bold">@</span>
-                        <input name="username" type="text" required class="w-full pl-9 pr-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all placeholder:text-slate-400 text-sm font-medium" placeholder="akademik_mert"/>
+                <!-- Section 1: Basic Info -->
+                <div class="space-y-5">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <span class="w-2 h-2 bg-primary rounded-full"></span> Kişisel Bilgiler
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="input-pill flex items-center px-4">
+                            <span class="material-symbols-outlined text-slate-300 ml-2">badge</span>
+                            <input name="name" type="text" required class="w-full bg-transparent border-none py-4 px-4 text-sm font-bold text-slate-700 placeholder-slate-400 focus:ring-0" placeholder="Adınız"/>
+                        </div>
+                        <div class="input-pill flex items-center px-4">
+                            <span class="material-symbols-outlined text-slate-300 ml-2">person</span>
+                            <input name="surname" type="text" required class="w-full bg-transparent border-none py-4 px-4 text-sm font-bold text-slate-700 placeholder-slate-400 focus:ring-0" placeholder="Soyadınız"/>
+                        </div>
+                        <div class="input-pill flex items-center px-4">
+                            <span class="material-symbols-outlined text-slate-300 ml-2">alternate_email</span>
+                            <input name="username" type="text" required class="w-full bg-transparent border-none py-4 px-4 text-sm font-bold text-slate-700 placeholder-slate-400 focus:ring-0" placeholder="Kullanıcı Adı"/>
+                        </div>
+                        <div class="input-pill flex items-center px-4">
+                            <span class="material-symbols-outlined text-slate-300 ml-2">calendar_month</span>
+                            <input name="year_of_birth" type="number" required class="w-full bg-transparent border-none py-4 px-4 text-sm font-bold text-slate-700 placeholder-slate-400 focus:ring-0" placeholder="Doğum Yılı"/>
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Doğum Yılı</label>
-                    <input name="year_of_birth" type="number" min="1990" max="2015" required class="px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all placeholder:text-slate-400 text-sm font-medium" placeholder="YYYY"/>
-                </div>
-                
-                <!-- Row 3: E-Posta -->
-                <div class="md:col-span-2 flex flex-col gap-1.5">
-                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">E-Posta Adresi</label>
-                    <input name="email" type="email" required class="px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all placeholder:text-slate-400 text-sm font-medium" placeholder="mert.yilmaz@okul.edu.tr"/>
-                </div>
-
-                <!-- Row 4: Sınıf Düzeyi ve Hedef Alan (Area) -->
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Sınıf Düzeyi</label>
-                    <div class="relative">
-                        <select name="class_level" required class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all text-sm font-bold text-slate-700 appearance-none cursor-pointer">
-                            <option value="">Seçiniz</option>
-                            <option value="9">9. Sınıf</option>
-                            <option value="10">10. Sınıf</option>
-                            <option value="11">11. Sınıf</option>
-                            <option value="12">12. Sınıf</option>
-                            <option value="mezun">Mezun</option>
-                        </select>
-                        <span class="material-symbols-outlined absolute right-3 top-3.5 text-slate-400 pointer-events-none">expand_more</span>
+                <!-- Section 2: Contact & Academic -->
+                <div class="space-y-5">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <span class="w-2 h-2 bg-primary rounded-full"></span> Akademik Bilgiler
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="md:col-span-2 input-pill flex items-center px-4">
+                            <span class="material-symbols-outlined text-slate-300 ml-2">mail</span>
+                            <input name="email" type="email" required class="w-full bg-transparent border-none py-4 px-4 text-sm font-bold text-slate-700 placeholder-slate-400 focus:ring-0" placeholder="E-posta Adresiniz"/>
+                        </div>
+                        <div class="input-pill flex items-center px-4">
+                            <span class="material-symbols-outlined text-slate-300 ml-2">school</span>
+                            <select name="class_level" required class="w-full bg-transparent border-none py-4 px-4 text-sm font-bold text-slate-700 focus:ring-0 appearance-none cursor-pointer">
+                                <option value="">Sınıf Düzeyi</option>
+                                <option value="9">9. Sınıf</option>
+                                <option value="10">10. Sınıf</option>
+                                <option value="11">11. Sınıf</option>
+                                <option value="12">12. Sınıf</option>
+                                <option value="mezun">Mezun</option>
+                            </select>
+                        </div>
+                        <div class="input-pill flex items-center px-4">
+                            <span class="material-symbols-outlined text-slate-300 ml-2">category</span>
+                            <select name="area" required class="w-full bg-transparent border-none py-4 px-4 text-sm font-bold text-slate-700 focus:ring-0 appearance-none cursor-pointer">
+                                <option value="">Lise Alanı</option>
+                                <option value="sayisal">Sayısal</option>
+                                <option value="sozel">Sözel</option>
+                                <option value="esitagirlik">Eşit Ağırlık</option>
+                                <option value="dil">Dil</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2 input-pill flex items-center px-4">
+                            <span class="material-symbols-outlined text-slate-300 ml-2">target</span>
+                            <input name="aim" type="text" required class="w-full bg-transparent border-none py-4 px-4 text-sm font-bold text-slate-700 placeholder-slate-400 focus:ring-0" placeholder="Kariyer / Üniversite Hedefiniz"/>
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Lise Alanı</label>
-                    <div class="relative">
-                        <select name="area" required class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all text-sm font-bold text-slate-700 appearance-none cursor-pointer">
-                            <option value="">Seçiniz</option>
-                            <option value="sayisal">Sayısal</option>
-                            <option value="sozel">Sözel</option>
-                            <option value="esitagirlik">Eşit Ağırlık</option>
-                            <option value="dil">Dil</option>
-                        </select>
-                        <span class="material-symbols-outlined absolute right-3 top-3.5 text-slate-400 pointer-events-none">expand_more</span>
+                <!-- Section 3: Security -->
+                <div class="space-y-5">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <span class="w-2 h-2 bg-primary rounded-full"></span> Güvenlik
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="input-pill flex items-center px-4">
+                            <span class="material-symbols-outlined text-slate-300 ml-2">security</span>
+                            <select name="security_question" required class="w-full bg-transparent border-none py-4 px-4 text-sm font-bold text-slate-700 focus:ring-0 appearance-none cursor-pointer">
+                                <option value="">Güvenlik Sorusu</option>
+                                <option value="ilk_okul">İlk okulunuzun adı?</option>
+                                <option value="anne_kizlik">Anne kızlık soyadı?</option>
+                                <option value="dogum_yeri">Doğum yeriniz?</option>
+                                <option value="evcil_hayvan">İlk evcil hayvanınız?</option>
+                            </select>
+                        </div>
+                        <div class="input-pill flex items-center px-4">
+                            <span class="material-symbols-outlined text-slate-300 ml-2">key</span>
+                            <input name="security_answer" type="text" required class="w-full bg-transparent border-none py-4 px-4 text-sm font-bold text-slate-700 placeholder-slate-400 focus:ring-0" placeholder="Güvenlik Cevabı"/>
+                        </div>
+                        <div class="input-pill flex items-center px-4">
+                            <span class="material-symbols-outlined text-slate-300 ml-2">lock</span>
+                            <input id="password" name="password" type="password" required class="w-full bg-transparent border-none py-4 px-4 text-sm font-bold text-slate-700 placeholder-slate-400 focus:ring-0" placeholder="Şifre"/>
+                        </div>
+                        <div class="input-pill flex items-center px-4">
+                            <span class="material-symbols-outlined text-slate-300 ml-2">lock_clock</span>
+                            <input id="confirm_password" name="confirm_password" type="password" required class="w-full bg-transparent border-none py-4 px-4 text-sm font-bold text-slate-700 placeholder-slate-400 focus:ring-0" placeholder="Şifre Tekrar"/>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Row 5: Hedef (Aim) -->
-                <div class="md:col-span-2 flex flex-col gap-1.5">
-                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Kariyer / Üniversite Hedefi</label>
-                    <input name="aim" type="text" required class="px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all placeholder:text-slate-400 text-sm font-medium" placeholder="Örn: Hacettepe Tıp, Boğaziçi Bilgisayar..."/>
-                </div>
+                <!-- Terms & Submit -->
+                <div class="pt-4 space-y-6">
+                    <label class="flex items-start gap-4 cursor-pointer group">
+                        <input name="terms" type="checkbox" required class="mt-1 w-5 h-5 rounded-md border-slate-200 text-primary focus:ring-primary/20 cursor-pointer transition-all"/>
+                        <span class="text-[13px] font-medium text-slate-500 leading-relaxed group-hover:text-slate-800 transition-colors">
+                            Bana özel analizleri kabul ediyor, <a href="#" class="text-primary font-black hover:underline">Kullanım Şartları</a>'nı onaylıyorum.
+                        </span>
+                    </label>
 
-                <!-- Row 6: Güvenlik Sorusu ve Cevabı -->
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Güvenlik Sorusu</label>
-                    <div class="relative">
-                        <select name="security_question" required class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all text-sm font-bold text-slate-700 appearance-none cursor-pointer">
-                            <option value="">Seçiniz</option>
-                            <option value="ilk_okul">İlk okulunuzun adı nedir?</option>
-                            <option value="anne_kizlik">Anne kızlık soyadı?</option>
-                            <option value="dogum_yeri">Doğum yeriniz neresidir?</option>
-                            <option value="evcil_hayvan">İlk evcil hayvanınızın adı nedir?</option>
-                        </select>
-                        <span class="material-symbols-outlined absolute right-3 top-3.5 text-slate-400 pointer-events-none">expand_more</span>
-                    </div>
-                </div>
-
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Güvenlik Cevabı</label>
-                    <input name="security_answer" type="text" required class="px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all placeholder:text-slate-400 text-sm font-medium" placeholder="Cevabınız"/>
-                </div>
-
-                <!-- Row 7: Şifreler -->
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Şifre</label>
-                    <div class="relative">
-                        <input id="password" name="password" type="password" required class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all placeholder:text-slate-400 text-sm font-medium" placeholder="••••••••"/>
-                        <span class="material-symbols-outlined absolute right-4 top-3.5 text-slate-400 pointer-events-none">lock</span>
-                    </div>
-                </div>
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 pl-1">Şifre Tekrar</label>
-                    <div class="relative">
-                        <input id="confirm_password" name="confirm_password" type="password" required class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-surface-bright focus:outline-none focus:ring-2 focus:ring-[#6200EE]/30 focus:border-[#6200EE] transition-all placeholder:text-slate-400 text-sm font-medium" placeholder="••••••••"/>
-                        <span class="material-symbols-outlined absolute right-4 top-3.5 text-slate-400 pointer-events-none">lock</span>
-                    </div>
-                </div>
-
-                <!-- Footer & Actions -->
-                <div class="md:col-span-2 mt-4 pt-4 border-t border-slate-100 space-y-5">
-                    <div class="flex items-start gap-3">
-                        <input id="terms" name="terms" type="checkbox" required class="w-5 h-5 rounded border-slate-300 text-[#6200EE] focus:ring-[#6200EE] mt-0.5 cursor-pointer"/>
-                        <label for="terms" class="text-sm font-medium text-slate-500 leading-snug cursor-pointer">
-                            Bana özel akademik analizlerin yapılmasını, <a href="#" class="text-[#6200EE] font-bold hover:underline">Hizmet Şartları</a>'nı ve <a href="#" class="text-[#6200EE] font-bold hover:underline">Gizlilik Politikası</a>'nı okudum ve kabul ediyorum.
-                        </label>
-                    </div>
-                    
-                    <button type="submit" class="w-full bg-[#6200EE] text-white py-4 rounded-xl font-bold text-lg hover:-translate-y-0.5 transition-all shadow-lg shadow-[#6200EE]/30 active:scale-[0.98] flex items-center justify-center gap-2">
-                        Kaydı Tamamla <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+                    <button type="submit" class="w-full py-5 bg-primary text-white rounded-2xl font-black text-lg hover:bg-primary-dark hover:-translate-y-1 transition-all duration-300 shadow-xl shadow-primary/20 active:scale-[0.98]">
+                        Kaydı Tamamla ve Başla
                     </button>
-                    
-                    <p class="text-center text-sm font-medium text-slate-500 mt-6">
-                        Zaten bir efsane misin? <a href="{{ url_for('login') }}" class="text-[#6200EE] font-black hover:underline ml-1">Giriş Yap</a>
+
+                    <p class="text-center text-sm font-bold text-slate-400">
+                        Zaten üye misin? <a href="{{ url_for('login') }}" class="text-primary hover:underline">Giriş Yap</a>
                     </p>
                 </div>
             </form>
         </div>
     </div>
+
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const password = document.getElementById('password');
         const confirmPassword = document.getElementById('confirm_password');
-        
         function validatePassword() {
             if (password.value !== confirmPassword.value) {
                 confirmPassword.setCustomValidity('Şifreler eşleşmiyor');
@@ -264,11 +301,8 @@
                 confirmPassword.setCustomValidity('');
             }
         }
-        
-        if(password && confirmPassword) {
-            password.addEventListener('change', validatePassword);
-            confirmPassword.addEventListener('keyup', validatePassword);
-        }
+        password.addEventListener('change', validatePassword);
+        confirmPassword.addEventListener('keyup', validatePassword);
     });
 </script>
 

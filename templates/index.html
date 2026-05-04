@@ -102,6 +102,35 @@
             background: conic-gradient(#6200ee var(--progress), #f3f4f6 0deg);
         }
         a { text-decoration: none; }
+        
+        /* New Subject Card Styles */
+        .subject-card {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 220px; /* Consistent height */
+        }
+        .subject-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2);
+        }
+        .subject-card-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+        }
+        .subject-card-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.6s ease;
+            z-index: 1;
+            /* Opacity and blend mode are now handled dynamically via inline styles */
+        }
+        .subject-card:hover .subject-card-bg {
+            transform: scale(1.1);
+        }
     </style>
     <style> html { font-size: 18px !important; } </style>
     <style> html { font-size: 18px !important; } </style>
@@ -121,18 +150,24 @@
 <!-- Left/Center Column -->
 <div class="lg:col-span-8 space-y-8">
 <!-- Welcome Hero -->
-<section class="relative overflow-hidden bg-gradient-to-br from-[#6200EE] to-[#7b24dc] rounded-[32px] p-8 text-white shadow-xl">
-<div class="relative z-10 max-w-md">
+<section class="relative overflow-hidden rounded-[32px] p-8 shadow-xl min-h-[300px] flex items-center">
+<!-- Video Background -->
+<div class="absolute inset-0 z-0">
+    <video autoplay loop muted playsinline class="w-full h-full object-cover">
+        <source src="https://v1.pinimg.com/videos/iht/720p/48/97/69/4897697eabb5a1449452d01ca57bc73e.mp4" type="video/mp4">
+    </video>
+</div>
+<!-- Gradient Overlay for Readability -->
+<div class="absolute inset-0 bg-gradient-to-r from-[#6200EE]/95 via-[#7b24dc]/80 to-transparent z-10"></div>
+
+<!-- Content -->
+<div class="relative z-20 max-w-md">
 <h2 class="font-headline-lg text-white mb-2">Welcome back, {{ current_user.Name }}! 👋</h2>
 <p class="text-purple-100 font-body-md mb-6 opacity-90">{{ motivation_message }}</p>
 <div class="flex gap-4">
 <a href="{{ url_for('add_question') }}" class="px-6 py-2.5 bg-white text-[#6200EE] rounded-full font-bold text-sm shadow-lg hover:shadow-xl transition-all inline-block no-underline">Resume Session</a>
 <a href="{{ url_for('hedefleyici') }}" class="px-6 py-2.5 bg-white/20 text-white rounded-full font-bold text-sm backdrop-blur-sm hover:bg-white/30 transition-all border border-white/30 inline-block no-underline">View Plan</a>
 </div>
-</div>
-<!-- Illustration Placeholder -->
-<div class="absolute right-[-20px] bottom-[-20px] w-64 h-64 opacity-20">
-<img class="object-contain w-full h-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYIy_LgKXICig18BdO7zdgk4IjCuZNzpdNWmE5HguL3J47qP1IeZkHP2--_qqpmBTraRSaL_336j3d1C9TXP5eJNAnXFjDeL3Bqof4WlHzHS45AyggAnude0a1IdvdyPIpizlNib08Gu6OxM4X3asRUcX7tnLUHM40OihlOfRGzcg0UmLAyUK0aF0ZpkhCJpQJQNdFe5rYcEN26MDy66ta8PYobvBEjTqfbAw8zWY57TrZyUJXoL2SGh6EhsdeQRpRnZR97dEgBeY"/>
 </div>
 </section>
 <!-- Subjects Grid -->
@@ -147,40 +182,103 @@
 
 {% for category in categories %}
     {% set loop_index = loop.index0 % 4 %}
-    {% set color = 'blue' %}
-    {% if loop_index == 1 %}{% set color = 'purple' %}{% endif %}
-    {% if loop_index == 2 %}{% set color = 'emerald' %}{% endif %}
-    {% if loop_index == 3 %}{% set color = 'orange' %}{% endif %}
     
-    {% set icon = 'menu_book' %}
-    {% if category.Name == 'Matematik' %}{% set icon = 'calculate' %}{% endif %}
-    {% if category.Name == 'Türk Dili ve Edebiyatı' %}{% set icon = 'translate' %}{% endif %}
-    {% if category.Name == 'Fizik' %}{% set icon = 'science' %}{% endif %}
-    {% if category.Name == 'Coğrafya' %}{% set icon = 'public' %}{% endif %}
-    {% if category.Name == 'Tarih' %}{% set icon = 'history_edu' %}{% endif %}
+    {# Default: Purple #}
+    {% set bg_color = 'bg-[#F1EBFF]' %}
+    {% set text_color = 'text-[#6200EE]' %}
+    {% set icon_bg = 'bg-[#E0D1FF]' %}
+    {% set img_url = 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=1000&auto=format&fit=crop' %}
+
+    {% if loop_index == 1 %}
+        {# Teal/Mint #}
+        {% set bg_color = 'bg-[#E1FFF9]' %}
+        {% set text_color = 'text-[#1DE0CC]' %}
+        {% set icon_bg = 'bg-[#B2FFF1]' %}
+        {% set img_url = 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=1000&auto=format&fit=crop' %}
+    {% elif loop_index == 2 %}
+        {# Yellow/Orange #}
+        {% set bg_color = 'bg-[#FFF9E1]' %}
+        {% set text_color = 'text-[#FFB302]' %}
+        {% set icon_bg = 'bg-[#FFEDC1]' %}
+        {% set img_url = 'https://images.unsplash.com/photo-1509228468518-180dd482180c?q=80&w=1000&auto=format&fit=crop' %}
+    {% elif loop_index == 3 %}
+        {# Pink #}
+        {% set bg_color = 'bg-[#FFEBFF]' %}
+        {% set text_color = 'text-[#9547F7]' %}
+        {% set icon_bg = 'bg-[#F4D1FF]' %}
+        {% set img_url = 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=1000&auto=format&fit=crop' %}
+    {% endif %}
+
+    {% set name_lower = category.Name.lower() %}
+    {% set img_opacity = '0.15' %}
+    {% set img_filter = 'grayscale(100%)' %}
+    {% set img_blend = 'luminosity' %}
+    
+    {% if 'matematik' in name_lower %}
+        {% set img_url = 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1000&auto=format&fit=crop' %}
+    {% elif 'fizik' in name_lower %}
+        {% set img_url = url_for('static', filename='images/physics_bg.png') %}
+    {% elif 'kimya' in name_lower %}
+        {% set img_url = url_for('static', filename='images/chemistry_bg.png') %}
+    {% elif 'biyoloji' in name_lower %}
+        {% set img_url = 'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?q=80&w=1000&auto=format&fit=crop' %}
+    {% elif 'edebiyat' in name_lower %}
+        {% set img_url = 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=1000&auto=format&fit=crop' %}
+    {% elif 'felsefe' in name_lower %}
+        {% set img_url = 'https://images.unsplash.com/photo-1549281899-f75600a24107?q=80&w=1000&auto=format&fit=crop' %}
+    {% elif 'tarih' in name_lower %}
+        {% set img_url = 'https://images.unsplash.com/photo-1461360370896-922624d12aa1?q=80&w=1000&auto=format&fit=crop' %}
+    {% elif 'coğrafya' in name_lower %}
+        {% set img_url = 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=80&w=1000&auto=format&fit=crop' %}
+    {% elif 'ingilizce' in name_lower or 'dil' in name_lower %}
+        {% set img_url = 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?q=80&w=1000&auto=format&fit=crop' %}
+    {% elif 'din' in name_lower %}
+        {% set img_url = 'https://images.unsplash.com/photo-1542810634-71277d95dcbb?q=80&w=1000&auto=format&fit=crop' %}
+    {% endif %}
 
 <a href="{{ url_for('category_questions', category_id=category.CategoryId) }}" class="no-underline text-inherit block">
-<div class="bg-white p-6 rounded-2xl shadow-[0_15px_15px_rgba(98,0,238,0.04)] border border-gray-100 hover:border-[#6200EE]/30 transition-all group h-full">
-<div class="flex items-start justify-between mb-6">
-<div class="p-3 bg-{{ color }}-50 text-{{ color }}-600 rounded-xl group-hover:bg-{{ color }}-600 group-hover:text-white transition-colors">
-<span class="material-symbols-outlined" data-icon="{{ icon }}">{{ icon }}</span>
-</div>
-<div class="flex flex-col items-end">
-<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Limit</span>
-<span class="text-xl font-bold text-slate-800">{{ category.question_count }} </span>
-</div>
-</div>
-<h4 class="text-lg font-bold text-slate-900 mb-1">{{ category.Name }}</h4>
-<p class="text-sm text-slate-500 mb-6">{{ category.question_count }} Soru Kapasitesi</p>
-<div class="space-y-3">
-<div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-<div class="h-full bg-{{ color }}-500 rounded-full" style="width: {% if category.question_count > 0 %}100%{% else %}0%{% endif %}"></div>
-</div>
-<div class="flex justify-between text-xs font-medium text-slate-400">
-<span>{{ category.question_count }} Soru eklendi</span>
-</div>
-</div>
-</div>
+    <div class="subject-card rounded-[32px] group border-none {{ bg_color }}">
+        <!-- Background Image Texture -->
+        <div class="subject-card-bg" style="background-image: url('{{ img_url }}'); opacity: {{ img_opacity }}; filter: {{ img_filter }}; mix-blend-mode: {{ img_blend }};"></div>
+        <div class="subject-card-overlay"></div>
+        
+        <!-- Content -->
+        <div class="relative z-10 p-7 h-full flex flex-col justify-between">
+            <div class="flex items-start justify-between">
+                <div class="w-12 h-12 {{ icon_bg }} rounded-2xl flex items-center justify-center {{ text_color }} shadow-sm">
+                    <span class="material-symbols-outlined text-2xl font-bold">
+                        {% if 'matematik' in name_lower %}calculate
+                        {% elif 'fizik' in name_lower %}science
+                        {% elif 'kimya' in name_lower %}experiment
+                        {% elif 'biyoloji' in name_lower %}biology
+                        {% else %}menu_book{% endif %}
+                    </span>
+                </div>
+                <div class="text-right">
+                    <p class="text-[10px] font-black {{ text_color }} opacity-60 uppercase tracking-[0.2em]">Soru Sayısı</p>
+                    <p class="text-3xl font-black {{ text_color }} leading-none mt-1">{{ category.question_count }}</p>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="text-xl font-bold {{ text_color }} mb-1 tracking-tight">{{ category.Name }}</h4>
+                <div class="flex items-end justify-between">
+                    <div>
+                        <p class="text-xs font-bold {{ text_color }} opacity-70 mb-4">{{ category.question_count }} Soru Kapasitesi</p>
+                        <!-- Progress Bar -->
+                        <div class="w-36 h-1.5 bg-white/50 rounded-full overflow-hidden">
+                            <div class="h-full {{ text_color | replace('text-', 'bg-') }} rounded-full" style="width: {% if category.question_count > 0 %}100%{% else %}0%{% endif %}"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Button -->
+                    <div class="w-8 h-8 bg-white/60 rounded-full flex items-center justify-center {{ text_color }} shadow-sm group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-sm font-bold">arrow_forward</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </a>
 {% else %}
 <!-- Statik Placeholder eğer kategori yoksa -->
@@ -220,84 +318,62 @@
 <span class="material-symbols-outlined text-3xl font-bold" data-icon="local_fire_department">local_fire_department</span>
 </div>
 <div>
-<h4 class="font-bold text-slate-900">Daily Streak</h4>
-<p class="text-sm text-slate-500">12 Days Active</p>
+<h4 class="font-bold text-slate-900">Haftalık Aktivite</h4>
+<p class="text-sm text-slate-500">Son 7 Günlük İlerleme</p>
 </div>
 </div>
 <div class="flex justify-between mt-4">
+{% for day in weekly_activity %}
 <div class="flex flex-col items-center gap-1">
-<span class="text-[10px] text-slate-400 font-bold">M</span>
-<div class="w-2 h-8 bg-[#6200EE] rounded-full"></div>
+<span class="text-[10px] text-slate-400 font-bold uppercase">{{ day.day[0] }}</span>
+<div class="w-2 rounded-full bg-[#6200EE]" style="height: {{ (day.count * 10) if day.count < 10 else 100 }}px; min-height: 4px;"></div>
 </div>
-<div class="flex flex-col items-center gap-1">
-<span class="text-[10px] text-slate-400 font-bold">T</span>
-<div class="w-2 h-8 bg-[#6200EE] rounded-full"></div>
-</div>
-<div class="flex flex-col items-center gap-1">
-<span class="text-[10px] text-slate-400 font-bold">W</span>
-<div class="w-2 h-12 bg-[#6200EE] rounded-full"></div>
-</div>
-<div class="flex flex-col items-center gap-1">
-<span class="text-[10px] text-slate-400 font-bold">T</span>
-<div class="w-2 h-6 bg-[#6200EE] rounded-full"></div>
-</div>
-<div class="flex flex-col items-center gap-1">
-<span class="text-[10px] text-slate-400 font-bold">F</span>
-<div class="w-2 h-10 bg-[#6200EE] rounded-full"></div>
-</div>
-<div class="flex flex-col items-center gap-1 text-[#6200EE]">
-<span class="text-[10px] font-bold">S</span>
-<div class="w-2 h-14 bg-[#6200EE] rounded-full"></div>
-</div>
-<div class="flex flex-col items-center gap-1">
-<span class="text-[10px] text-slate-400 font-bold">S</span>
-<div class="w-2 h-4 bg-slate-100 rounded-full"></div>
-</div>
+{% endfor %}
 </div>
 </div>
 <!-- Stats Card -->
 <div class="bg-white p-6 rounded-2xl shadow-[0_15px_15px_rgba(98,0,238,0.04)] border border-gray-100">
-<h4 class="font-bold text-slate-900 mb-6">Performance Stats</h4>
+<h4 class="font-bold text-slate-900 mb-6">Performans İstatistikleri</h4>
 <div class="space-y-6">
 <div class="flex items-center justify-between">
 <div class="flex items-center gap-3">
 <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center">
 <span class="material-symbols-outlined" data-icon="track_changes">track_changes</span>
 </div>
-<span class="text-sm font-medium text-slate-700">Accuracy Rate</span>
+<span class="text-sm font-medium text-slate-700">Başarı Oranı</span>
 </div>
-<span class="font-bold text-slate-900">84.2%</span>
+<span class="font-bold text-slate-900">%{{ accuracy }}</span>
 </div>
 <div class="flex items-center justify-between">
 <div class="flex items-center gap-3">
 <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center">
 <span class="material-symbols-outlined" data-icon="speed">speed</span>
 </div>
-<span class="text-sm font-medium text-slate-700">Avg. Time</span>
+<span class="text-sm font-medium text-slate-700">Toplam Çözülen</span>
 </div>
-<span class="font-bold text-slate-900">42s</span>
+<span class="font-bold text-slate-900">{{ completed_questions }}</span>
 </div>
 </div>
 </div>
 <!-- Countdown Card -->
 <div class="bg-[#F1EBFF] p-6 rounded-2xl border border-purple-100">
 <div class="flex items-center justify-between mb-4">
-<span class="text-[10px] font-bold text-[#6200EE] uppercase tracking-widest">Next Major Exam</span>
+<span class="text-[10px] font-bold text-[#6200EE] uppercase tracking-widest">Sıradaki Büyük Sınav</span>
 <span class="material-symbols-outlined text-purple-400" data-icon="calendar_today">calendar_today</span>
 </div>
-<h4 class="font-headline-md text-[#22005d] mb-4">University Entrance Exam</h4>
+<h4 class="font-headline-md text-[#22005d] mb-4">YKS 2026 Geri Sayım</h4>
 <div class="grid grid-cols-3 gap-2 text-center">
 <div class="bg-white py-3 rounded-xl">
-<p class="text-xl font-bold text-[#6200EE]">42</p>
-<p class="text-[10px] text-slate-500 font-bold uppercase">Days</p>
+<p class="text-xl font-bold text-[#6200EE]">{{ countdown.days }}</p>
+<p class="text-[10px] text-slate-500 font-bold uppercase">Gün</p>
 </div>
 <div class="bg-white py-3 rounded-xl">
-<p class="text-xl font-bold text-[#6200EE]">14</p>
-<p class="text-[10px] text-slate-500 font-bold uppercase">Hrs</p>
+<p class="text-xl font-bold text-[#6200EE]">{{ countdown.hours }}</p>
+<p class="text-[10px] text-slate-500 font-bold uppercase">Saat</p>
 </div>
 <div class="bg-white py-3 rounded-xl">
-<p class="text-xl font-bold text-[#6200EE]">56</p>
-<p class="text-[10px] text-slate-500 font-bold uppercase">Mins</p>
+<p class="text-xl font-bold text-[#6200EE]">{{ countdown.mins }}</p>
+<p class="text-[10px] text-slate-500 font-bold uppercase">Dakika</p>
 </div>
 </div>
 </div>
@@ -341,6 +417,10 @@
 <a class="flex flex-col items-center gap-1 text-slate-400" href="{{ url_for('hedefleyici') }}">
 <span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
 <span class="text-[10px] font-bold">Library</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="{{ url_for('ai_shorts') }}">
+<span class="material-symbols-outlined" data-icon="movie">movie</span>
+<span class="text-[10px] font-bold">Shorts</span>
 </a>
 <a class="flex flex-col items-center gap-1 text-slate-400" href="{{ url_for('settings') }}">
 <span class="material-symbols-outlined" data-icon="settings">settings</span>

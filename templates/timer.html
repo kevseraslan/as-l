@@ -188,27 +188,58 @@
 
 <!-- Focus Tasks Container (Bottom Bento) -->
 <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div class="bg-white p-6 rounded-2xl border border-slate-100 hover:shadow-md transition-shadow">
-        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
-            <span class="material-symbols-outlined">task_alt</span>
+    <!-- Pomodoro History List -->
+    <div class="md:col-span-2 bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[#6200EE]">history</span>
+                <h3 class="font-bold text-slate-800">Oturum Geçmişi</h3>
+            </div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Son 10 Oturum</span>
         </div>
-        <h5 class="font-bold text-slate-800 mb-1">Biyoloji: Hücre Bölünmesi</h5>
-        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Tamamlanan görev</p>
+        
+        <div class="space-y-3">
+            {% for session in pomodoro_history %}
+            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 group hover:border-purple-200 transition-colors">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-purple-100 text-[#6200EE] flex items-center justify-center">
+                        <span class="material-symbols-outlined text-xl">timer</span>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-slate-800">Odaklanma Oturumu</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ session.CreatedAt.strftime('%d %b %Y • %H:%M') }}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="text-sm font-black text-[#6200EE]">{{ session.Duration }} dk</span>
+                </div>
+            </div>
+            {% else %}
+            <div class="py-12 text-center">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Henüz tamamlanmış oturum yok</p>
+            </div>
+            {% endfor %}
+        </div>
     </div>
-    
-    <div class="bg-white p-6 rounded-2xl border border-purple-200 shadow-sm ring-4 ring-purple-50 hover:shadow-md transition-all">
-        <div class="w-10 h-10 rounded-xl bg-purple-50 text-[#6200EE] flex items-center justify-center mb-4">
-            <span class="material-symbols-outlined">pending</span>
+
+    <!-- Right Task Status Area -->
+    <div class="flex flex-col gap-6">
+        {% if active_task %}
+        <div class="bg-white p-6 rounded-3xl border border-purple-200 shadow-sm ring-4 ring-purple-50 hover:shadow-md transition-all">
+            <div class="w-10 h-10 rounded-xl bg-purple-50 text-[#6200EE] flex items-center justify-center mb-4">
+                <span class="material-symbols-outlined">pending</span>
+            </div>
+            <h5 class="font-bold text-slate-800 mb-1">{{ active_task.Title }}</h5>
+            <p class="text-[11px] font-bold text-[#6200EE] uppercase tracking-wide">Sıradaki görev</p>
         </div>
-        <h5 class="font-bold text-slate-800 mb-1">Matematik: Türev</h5>
-        <p class="text-[11px] font-bold text-[#6200EE] uppercase tracking-wide">Şu an çalışılıyor...</p>
-    </div>
-    
-    <div class="bg-slate-50/50 p-6 rounded-2xl border border-dashed border-slate-300 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-slate-50 transition-colors group">
-        <div class="w-10 h-10 rounded-full border-2 border-slate-300 flex items-center justify-center text-slate-400 group-hover:text-[#6200EE] group-hover:border-[#6200EE] transition-colors mb-2 bg-white">
-            <span class="material-symbols-outlined">add</span>
-        </div>
-        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-widest group-hover:text-[#6200EE] transition-colors">Yeni Görev</span>
+        {% endif %}
+        
+        <a href="{{ url_for('gorevlerim') }}" class="bg-slate-50/50 p-6 rounded-3xl border border-dashed border-slate-300 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-slate-50 transition-colors group block h-full" style="text-decoration:none;">
+            <div class="w-10 h-10 rounded-full border-2 border-slate-300 flex items-center justify-center text-slate-400 group-hover:text-[#6200EE] group-hover:border-[#6200EE] transition-colors mb-2 bg-white">
+                <span class="material-symbols-outlined">add</span>
+            </div>
+            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-widest group-hover:text-[#6200EE] transition-colors">Yeni Görev</span>
+        </a>
     </div>
 </div>
 

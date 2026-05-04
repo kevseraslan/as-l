@@ -21,6 +21,11 @@
             </a>
         </li>
         <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'soru_coz' %}active{% endif %}" href="{{ url_for('soru_coz') }}">
+                <i class="fas fa-brain"></i> Soru Çöz
+            </a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" href="{{ url_for('favorites') }}">
                 <i class="fas fa-star"></i> Favorilerim
             </a>

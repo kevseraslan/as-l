@@ -23,7 +23,7 @@
                         <h4 class="mb-0">Soru Detayı</h4>
                         <div>
                             <span class="badge bg-light text-dark me-2">{{ question.Category.Name }}</span>
-                            <span class="badge bg-light text-dark me-2">{{ question.DifficultyLevel }}</span>
+                            <span class="badge bg-light text-dark me-2">{{ question.difficulty }}</span>
                             <span class="badge bg-light text-dark">Tekrar: {{ question.RepeatCount }}</span>
                         </div>
                     </div>
@@ -33,7 +33,7 @@
             <!-- Soru İçeriği -->
             <div class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title mb-3">{{ question.Content }}</h5>
+                    <h5 class="card-title mb-3">{{ question.content }}</h5>
                     {% if question.PhotoPath %}
                     <div class="mb-3">
                         <img src="{{ url_for('static', filename=question.PhotoPath) }}" class="img-fluid rounded" alt="Soru Görseli">

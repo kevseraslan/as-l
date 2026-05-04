@@ -174,15 +174,14 @@
     }
 
     function applyTheme() {
-        const theme = localStorage.getItem('theme') || 'light';
-        if (theme === 'dark') {
+        const theme = localStorage.getItem('theme') || 'system';
+        if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
             document.documentElement.classList.remove('light');
-        } else if (theme === 'light') {
+        } else {
             document.documentElement.classList.add('light');
             document.documentElement.classList.remove('dark');
         }
-        // In "system" logic would be determined by window.matchMedia
     }
 
     document.addEventListener('DOMContentLoaded', function() {

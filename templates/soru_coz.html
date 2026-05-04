@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<title>Soru Çöz | ReviseMe</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#4800b2",
+          "primary-container": "#6200ee",
+          "secondary": "#7b24dc",
+          "background": "#f9f9ff",
+          "surface": "#f9f9ff",
+          "on-surface": "#151c27",
+          "outline": "#7a7488",
+        },
+        fontFamily: { "body": ["Inter"] }
+      }
+    }
+  }
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  html { font-size: 16px !important; }
+
+  /* ── Drop Zone ── */
+  .drop-zone {
+    border: 2.5px dashed #a78bfa;
+    border-radius: 20px;
+    padding: 48px 24px;
+    text-align: center;
+    cursor: pointer;
+    background: linear-gradient(135deg, rgba(98,0,238,0.03), rgba(78,115,223,0.03));
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  .drop-zone.drag-over {
+    border-color: #6200ee;
+    background: rgba(98,0,238,0.07);
+    transform: scale(1.01);
+    box-shadow: 0 8px 30px rgba(98,0,238,0.15);
+  }
+  .drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ── Preview ── */
+  #preview-area { display: none; }
+  #preview-img {
+    width: 100%;
+    max-height: 360px;
+    object-fit: contain;
+    background: #f3f4f6;
+    display: block;
+    border-radius: 16px 16px 0 0;
+  }
+
+  /* ── Loading ── */
+  #loading-area { display: none; }
+  .ai-loader {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #4e73df);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    animation: pulse-ai 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse-ai {
+    0%   { box-shadow: 0 0 0 0 rgba(98,0,238,0.45); transform: scale(1); }
+    50%  { box-shadow: 0 0 0 18px rgba(98,0,238,0); transform: scale(1.05); }
+    100% { box-shadow: 0 0 0 0 rgba(98,0,238,0); transform: scale(1); }
+  }
+  .loading-step {
+    opacity: 0;
+    transform: translateX(-10px);
+    animation: slide-in-step 0.5s ease forwards;
+  }
+  .loading-step:nth-child(1) { animation-delay: 0.1s; }
+  .loading-step:nth-child(2) { animation-delay: 0.8s; }
+  .loading-step:nth-child(3) { animation-delay: 1.5s; }
+  @keyframes slide-in-step {
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ── Result ── */
+  #result-area { display: none; animation: fadeUp 0.5s ease; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+  .step-item { animation: stepAppear 0.4s ease both; }
+  @keyframes stepAppear { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:translateX(0); } }
+
+  /* ── Error ── */
+  #error-area { display: none; }
+</style>
+</head>
+<body class="bg-[#F8F5FF] text-[#151c27] font-body">
+
+{% set active_page = 'soru_coz' %}
+{% include 'components/sidebar_modern.html' %}
+
+<main class="md:ml-64 min-h-screen">
+  {% include 'components/header_modern.html' %}
+
+  <div class="p-6 md:p-8 max-w-3xl mx-auto">
+
+    <!-- Hero -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-2xl mb-4">
+        <span class="material-symbols-outlined text-[#6200EE] text-3xl">psychology</span>
+      </div>
+      <h1 class="text-3xl font-black text-[#22005d] mb-2">Soru Çöz</h1>
+      <p class="text-slate-500 text-sm">Sorunun fotoğrafını yükle — AI saniyeler içinde analiz edip çözsün.</p>
+    </div>
+
+    <!-- Upload Card -->
+    <div class="bg-white rounded-3xl shadow-[0_15px_40px_rgba(98,0,238,0.08)] border border-purple-50 p-6 mb-6">
+
+      <form id="solve-form" enctype="multipart/form-data">
+        <!-- Drop Zone -->
+        <div class="drop-zone" id="drop-zone">
+          <input type="file" name="image" id="image-input" accept="image/*" />
+          <span class="material-symbols-outlined text-5xl text-purple-300 mb-3 block">cloud_upload</span>
+          <p class="font-bold text-slate-700 text-base">Görseli buraya sürükle veya tıkla</p>
+          <p class="text-slate-400 text-sm mt-1">PNG, JPG, WEBP · Maks. 10 MB</p>
+        </div>
+
+        <!-- Preview -->
+        <div id="preview-area" class="mt-4 rounded-2xl overflow-hidden border border-purple-100">
+          <img id="preview-img" src="" alt="Önizleme" />
+          <div class="flex justify-between items-center px-4 py-3 bg-[#22005d] text-white">
+            <span id="preview-filename" class="text-sm font-semibold truncate max-w-[70%]"></span>
+            <button type="button" id="btn-remove-img"
+              class="text-xs bg-white/15 hover:bg-red-400/30 text-red-200 hover:text-white px-3 py-1.5 rounded-lg transition-all font-semibold">
+              <span class="material-symbols-outlined text-sm align-middle">close</span> Kaldır
+            </button>
+          </div>
+        </div>
+
+        <!-- Solve Button -->
+        <button type="submit" id="solve-btn" disabled
+          class="mt-5 w-full py-4 rounded-2xl font-bold text-white text-base tracking-wide transition-all
+                 bg-gradient-to-r from-[#6200EE] to-[#4e73df]
+                 shadow-[0_6px_20px_rgba(98,0,238,0.35)]
+                 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none
+                 enabled:hover:-translate-y-0.5 enabled:hover:shadow-[0_10px_28px_rgba(98,0,238,0.45)]">
+          <span class="material-symbols-outlined align-middle mr-1 text-lg">auto_awesome</span>
+          Soruyu Çöz
+        </button>
+      </form>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading-area" class="bg-white rounded-3xl shadow-[0_15px_40px_rgba(98,0,238,0.08)] border border-purple-50 p-10 text-center mb-6">
+      <div class="ai-loader mx-auto mb-5">🧠</div>
+      <p class="font-bold text-[#22005d] text-lg mb-4">AI soruyu okuyor ve çözüyor…</p>
+      <div class="space-y-2 text-left max-w-xs mx-auto">
+        <div class="loading-step flex items-center gap-2 text-slate-500 text-sm">
+          <span class="material-symbols-outlined text-[#6200EE] text-base">visibility</span> Görsel analiz ediliyor…
+        </div>
+        <div class="loading-step flex items-center gap-2 text-slate-500 text-sm">
+          <span class="material-symbols-outlined text-[#6200EE] text-base">search</span> Soru metni çıkarılıyor…
+        </div>
+        <div class="loading-step flex items-center gap-2 text-slate-500 text-sm">
+          <span class="material-symbols-outlined text-[#6200EE] text-base">calculate</span> Adım adım çözüm hazırlanıyor…
+        </div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div id="error-area" class="mb-6"></div>
+
+    <!-- Result -->
+    <div id="result-area" class="space-y-4">
+
+      <!-- Detected Question -->
+      <div class="bg-gradient-to-br from-[#22005d] to-[#4800b2] rounded-3xl p-6 text-white">
+        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-purple-300 mb-2">Tespit Edilen Soru</p>
+        <p class="text-sm leading-relaxed text-purple-100" id="result-question">—</p>
+      </div>
+
+      <!-- Topic -->
+      <div>
+        <p class="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 mb-2">Konu</p>
+        <span id="result-topic"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm
+                 bg-purple-50 text-[#6200EE] border border-purple-100">
+          <span class="material-symbols-outlined text-base">label</span> —
+        </span>
+      </div>
+
+      <!-- Steps -->
+      <div class="bg-white rounded-3xl shadow-[0_8px_24px_rgba(98,0,238,0.06)] border border-purple-50 overflow-hidden">
+        <div class="px-6 py-4 bg-gradient-to-r from-[#6200EE] to-[#4e73df] flex items-center gap-2">
+          <span class="material-symbols-outlined text-white text-base">format_list_numbered</span>
+          <span class="text-white font-bold text-sm">Adım Adım Çözüm</span>
+        </div>
+        <div id="result-steps" class="divide-y divide-purple-50"></div>
+      </div>
+
+      <!-- Final Answer -->
+      <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-3xl p-6 flex items-center gap-4 shadow-[0_8px_24px_rgba(5,150,105,0.25)]">
+        <div class="w-14 h-14 min-w-14 bg-white/20 rounded-full flex items-center justify-center">
+          <span class="material-symbols-outlined text-white text-2xl">check_circle</span>
+        </div>
+        <div>
+          <p class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100 mb-1">Nihai Cevap</p>
+          <p class="text-white font-bold text-base" id="result-answer">—</p>
+        </div>
+      </div>
+
+      <!-- Save to Pool Button -->
+      <div class="bg-white rounded-3xl shadow-[0_8px_24px_rgba(98,0,238,0.06)] border border-purple-50 p-5">
+        <p class="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 mb-3">Soru Havuzu</p>
+        <button id="btn-save-question"
+          class="w-full py-3.5 rounded-2xl font-bold text-white text-sm tracking-wide transition-all
+                 bg-gradient-to-r from-emerald-500 to-teal-500
+                 shadow-[0_4px_14px_rgba(5,150,105,0.3)]
+                 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(5,150,105,0.4)] active:scale-95">
+          <span class="material-symbols-outlined align-middle mr-1 text-base">playlist_add</span>
+          Soru Havuzuna Ekle
+        </button>
+        <!-- Save loading -->
+        <div id="save-loading" style="display:none" class="mt-3 flex items-center justify-center gap-2 text-slate-400 text-sm">
+          <svg class="animate-spin w-4 h-4 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+          </svg>
+          Soru kaydediliyor…
+        </div>
+        <!-- Save success card -->
+        <div id="save-success" style="display:none" class="mt-3 bg-emerald-50 border border-emerald-200 rounded-2xl p-4">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="material-symbols-outlined text-emerald-600 text-xl">check_circle</span>
+            <p class="font-bold text-emerald-700 text-sm">Soru başarıyla eklendi!</p>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="bg-white rounded-xl p-2.5 border border-emerald-100">
+              <p class="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-1">Ders</p>
+              <p class="text-xs font-bold text-[#6200EE]" id="save-category">—</p>
+            </div>
+            <div class="bg-white rounded-xl p-2.5 border border-emerald-100">
+              <p class="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-1">1. Tekrar</p>
+              <p class="text-xs font-bold text-emerald-600" id="save-r1">—</p>
+            </div>
+            <div class="bg-white rounded-xl p-2.5 border border-emerald-100">
+              <p class="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-1">2. Tekrar</p>
+              <p class="text-xs font-bold text-emerald-600" id="save-r2">—</p>
+            </div>
+          </div>
+          <p class="text-[10px] text-slate-400 mt-2 text-center">3. Tekrar: <span id="save-r3" class="font-bold text-slate-600">—</span></p>
+        </div>
+        <!-- Save error -->
+        <div id="save-error" style="display:none" class="mt-3 bg-red-50 border border-red-200 rounded-2xl p-3">
+          <p class="text-red-600 text-xs" id="save-error-msg"></p>
+        </div>
+      </div>
+
+      <!-- Retry -->
+      <div class="text-center pt-2">
+        <button id="btn-retry"
+          class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-white text-sm
+                 bg-gradient-to-r from-[#6200EE] to-[#4e73df]
+                 hover:-translate-y-0.5 hover:shadow-[0_6px_18px_rgba(98,0,238,0.35)] transition-all">
+          <span class="material-symbols-outlined text-base">refresh</span>
+          Yeni Soru Çöz
+        </button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+{% include 'components/chatbot_widget.html' %}
+
+<script>
+(function () {
+  const imageInput  = document.getElementById('image-input');
+  const dropZone    = document.getElementById('drop-zone');
+  const previewArea = document.getElementById('preview-area');
+  const previewImg  = document.getElementById('preview-img');
+  const previewName = document.getElementById('preview-filename');
+  const btnRemove   = document.getElementById('btn-remove-img');
+  const solveBtn    = document.getElementById('solve-btn');
+  const solveForm   = document.getElementById('solve-form');
+  const loadingArea = document.getElementById('loading-area');
+  const errorArea   = document.getElementById('error-area');
+  const resultArea  = document.getElementById('result-area');
+
+  // Drag & Drop
+  ['dragenter','dragover'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('drag-over'); }));
+  ['dragleave','drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('drag-over'); }));
+  dropZone.addEventListener('drop', e => { if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
+  imageInput.addEventListener('change', () => { if (imageInput.files.length) handleFile(imageInput.files[0]); });
+
+  function handleFile(file) {
+    if (!file.type.startsWith('image/')) { showError('Lütfen yalnızca görsel dosyası (JPG, PNG, WEBP) seçin.'); return; }
+    if (file.size > 10 * 1024 * 1024) { showError("Dosya boyutu 10 MB'ı geçemez."); return; }
+    const dt = new DataTransfer(); dt.items.add(file); imageInput.files = dt.files;
+    const reader = new FileReader();
+    reader.onload = e => {
+      previewImg.src = e.target.result;
+      previewName.textContent = file.name;
+      previewArea.style.display = 'block';
+      dropZone.style.display = 'none';
+      solveBtn.disabled = false;
+      hideResult(); hideError();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  btnRemove.addEventListener('click', () => {
+    imageInput.value = '';
+    previewArea.style.display = 'none';
+    dropZone.style.display = 'block';
+    solveBtn.disabled = true;
+    hideResult(); hideError();
+  });
+
+  solveForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!imageInput.files.length) return;
+    showLoading(); hideResult(); hideError();
+    const formData = new FormData();
+    formData.append('image', imageInput.files[0]);
+    try {
+      const res = await fetch('/api/solve-image', {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.content || '' }
+      });
+      const data = await res.json();
+      hideLoading();
+      if (!res.ok || data.error) { showError(data.error || 'Beklenmeyen bir hata oluştu.'); return; }
+      renderResult(data);
+    } catch (err) {
+      hideLoading();
+      showError('Sunucuya bağlanılamadı. Lütfen internet bağlantınızı kontrol edin.');
+    }
+  });
+
+  // --- Stored result state ---
+  let _lastResult = null;
+
+  document.getElementById('btn-retry').addEventListener('click', () => {
+    btnRemove.click();
+    _lastResult = null;
+    resetSaveArea();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // --- Save to pool ---
+  document.getElementById('btn-save-question').addEventListener('click', async () => {
+    if (!_lastResult) return;
+    if (!imageInput.files.length) {
+      showSaveError('Görsel bulunamadı. Lütfen sayfayı yenileyip tekrar deneyin.');
+      return;
+    }
+
+    showSaveLoading();
+    const fd = new FormData();
+    fd.append('image', imageInput.files[0]);
+    fd.append('detected_text', _lastResult.detected_text || '');
+    fd.append('subject',       _lastResult.subject || 'Genel');
+    fd.append('topic',         _lastResult.topic || '');
+    fd.append('difficulty',    _lastResult.difficulty || 'orta');
+    fd.append('solution_steps', JSON.stringify(_lastResult.solution_steps || []));
+    fd.append('final_answer',  _lastResult.final_answer || '');
+
+    try {
+      const res = await fetch('/api/save-solved-question', {
+        method: 'POST',
+        body: fd,
+        headers: { 'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.content || '' }
+      });
+      const data = await res.json();
+      hideSaveLoading();
+      if (!res.ok || data.error) { showSaveError(data.error || 'Kayıt sırasında hata oluştu.'); return; }
+      showSaveSuccess(data);
+    } catch (e) {
+      hideSaveLoading();
+      showSaveError('Sunucuya bağlanılamadı.');
+    }
+  });
+
+  function showSaveLoading() {
+    document.getElementById('btn-save-question').disabled = true;
+    document.getElementById('save-loading').style.display = 'flex';
+    document.getElementById('save-success').style.display = 'none';
+    document.getElementById('save-error').style.display = 'none';
+  }
+  function hideSaveLoading() {
+    document.getElementById('save-loading').style.display = 'none';
+    document.getElementById('btn-save-question').disabled = false;
+  }
+  function showSaveSuccess(data) {
+    document.getElementById('save-success').style.display = 'block';
+    document.getElementById('btn-save-question').style.display = 'none';
+    document.getElementById('save-category').textContent = data.category || '—';
+    document.getElementById('save-r1').textContent = data.repeat1 || '—';
+    document.getElementById('save-r2').textContent = data.repeat2 || '—';
+    document.getElementById('save-r3').textContent = data.repeat3 || '—';
+  }
+  function showSaveError(msg) {
+    document.getElementById('save-error').style.display = 'block';
+    document.getElementById('save-error-msg').textContent = msg;
+    document.getElementById('btn-save-question').disabled = false;
+  }
+  function resetSaveArea() {
+    document.getElementById('btn-save-question').style.display = 'block';
+    document.getElementById('btn-save-question').disabled = false;
+    document.getElementById('save-loading').style.display = 'none';
+    document.getElementById('save-success').style.display = 'none';
+    document.getElementById('save-error').style.display = 'none';
+  }
+
+  function showLoading() {
+    loadingArea.style.display = 'block';
+    solveBtn.disabled = true;
+    loadingArea.querySelectorAll('.loading-step').forEach(el => {
+      el.style.animation = 'none'; el.offsetHeight; el.style.animation = '';
+    });
+  }
+  function hideLoading() { loadingArea.style.display = 'none'; solveBtn.disabled = false; }
+  function hideResult()  { resultArea.style.display = 'none'; }
+  function hideError()   { errorArea.style.display = 'none'; errorArea.innerHTML = ''; }
+
+  function showError(msg) {
+    errorArea.style.display = 'block';
+    errorArea.innerHTML = `
+      <div class="bg-red-50 border border-red-200 rounded-2xl p-5 flex gap-3">
+        <span class="material-symbols-outlined text-red-500 text-xl mt-0.5 shrink-0">warning</span>
+        <div>
+          <p class="font-bold text-red-700 text-sm mb-1">Bir hata oluştu</p>
+          <p class="text-red-600 text-xs leading-relaxed">${escapeHtml(msg)}</p>
+        </div>
+      </div>`;
+  }
+
+  function renderResult(data) {
+    _lastResult = data;  // Store for save
+    resetSaveArea();
+    document.getElementById('result-question').textContent = data.detected_text || '—';
+
+    const topicEl = document.getElementById('result-topic');
+    const subjectLabel = data.subject ? `${data.subject} · ` : '';
+    topicEl.innerHTML = `<span class="material-symbols-outlined text-base">label</span> ${escapeHtml(subjectLabel + (data.topic || 'Belirsiz'))}`;
+
+    const stepsEl = document.getElementById('result-steps');
+    stepsEl.innerHTML = '';
+    const steps = Array.isArray(data.solution_steps) ? data.solution_steps : [];
+    if (!steps.length) {
+      stepsEl.innerHTML = '<div class="px-6 py-4 text-slate-400 text-sm">Adım bulunamadı.</div>';
+    } else {
+      steps.forEach((step, i) => {
+        const d = document.createElement('div');
+        d.className = 'step-item flex gap-4 px-6 py-4 items-start';
+        d.style.animationDelay = `${i * 0.08}s`;
+        d.innerHTML = `
+          <div class="w-7 h-7 min-w-7 rounded-full bg-gradient-to-br from-[#6200EE] to-[#4e73df] text-white flex items-center justify-center text-xs font-black mt-0.5">${i+1}</div>
+          <p class="text-sm text-slate-700 leading-relaxed pt-0.5">${escapeHtml(step)}</p>`;
+        stepsEl.appendChild(d);
+      });
+    }
+
+    document.getElementById('result-answer').textContent = data.final_answer || '—';
+    resultArea.style.display = 'block';
+    setTimeout(() => resultArea.scrollIntoView({ behavior:'smooth', block:'start' }), 100);
+  }
+
+  function escapeHtml(str) {
+    const d = document.createElement('div');
+    d.appendChild(document.createTextNode(String(str)));
+    return d.innerHTML;
+  }
+})();
+</script>
+</body>
+</html>

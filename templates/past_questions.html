@@ -64,7 +64,7 @@
 {% include 'components/sidebar_modern.html' %}
 
 <!-- Main Content Canvas -->
-<main class="md:ml-64 pt-24 pb-12 px-6 md:px-12 max-w-full px-4 md:px-8 w-full mx-auto">
+<main class="md:ml-64 pt-24 pb-12 px-4 md:px-8 overflow-x-hidden">
 <!-- Summary Panel (Summary Header) -->
 <header class="mb-8">
 <div class="bg-gradient-to-r from-violet-700 to-[#6200EE] rounded-3xl p-8 text-white shadow-xl shadow-violet-500/10 flex flex-col md:flex-row justify-between items-center gap-6">
@@ -111,13 +111,13 @@
     <div class="flex-1 p-6 flex flex-col justify-between">
         <div>
         <div class="flex justify-between items-start mb-3">
-            <span class="text-violet-600 font-bold tracking-wider uppercase text-[10px] bg-violet-50 px-2 py-1 rounded border border-violet-100">{{ question.Topic or 'Soru' }}</span>
+            <span class="text-violet-600 font-bold tracking-wider uppercase text-[10px] bg-violet-50 px-2 py-1 rounded border border-violet-100">{{ question.topic or 'Soru' }}</span>
             <div class="flex items-center text-red-500 font-bold text-xs bg-red-50 px-2 py-1 rounded-md border border-red-100">
                 <span class="material-symbols-outlined text-[14px] mr-1">history</span>
                 Gecikmede
             </div>
         </div>
-        <h3 class="font-bold text-slate-800 text-sm mb-2 line-clamp-2">{{ question.Content or "Görselden çözülecek soru içeriği" }}</h3>
+        <h3 class="font-bold text-slate-800 text-sm mb-2 line-clamp-2">{{ question.content or "Görselden çözülecek soru içeriği" }}</h3>
         <p class="text-slate-500 text-xs font-medium mb-4 flex items-center gap-1">
             <span class="material-symbols-outlined text-[14px]">calendar_month</span>
             Son Tarih: {{ due_date.strftime('%d.%m.%Y') if due_date else 'Bilinmiyor' }}

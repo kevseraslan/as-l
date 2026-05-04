@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+
+<html lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ReviseMe - Öğrenme Yolculuğunuzu Geliştirin</title>
+<!-- Tailwind CSS v3 CDN with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style data-purpose="custom-animations">/* Smooth horizontal scroll for the features carousel */
+    /* Hero Elements Animations */
+    @keyframes hero-slide-in {
+      0% { transform: translateX(120px); opacity: 0; }
+      100% { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes step-flow {
+      0%, 100% { transform: translateX(20px); opacity: 0; }
+      15%, 85% { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes screen-scroll {
+      0% { transform: translateY(10%); }
+      100% { transform: translateY(-110%); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(8deg); }
+    }
+
+    @keyframes bounce-gentle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .animate-hero-slide-in { animation: hero-slide-in 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .animate-step-flow { animation: step-flow 4s ease-in-out infinite; }
+    .animate-screen-scroll { animation: screen-scroll 8s linear infinite; }
+    .animate-float { animation: float 4s ease-in-out infinite; }
+    .animate-float-slow { animation: float 6s ease-in-out infinite; }
+    @keyframes float-reverse { animation: float 5s ease-in-out infinite reverse; }
+    @keyframes bounce-gentle { animation: bounce-gentle 3s ease-in-out infinite; }
+    
+    @keyframes spin-slow {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    .animate-spin-slow { animation: spin-slow 20s linear infinite; }
+
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    
+    .animate-marquee {
+      display: flex;
+      width: max-content;
+      animation: marquee 30s linear infinite;
+    }
+
+    .animate-marquee:hover {
+      animation-play-state: paused;
+    }
+
+    .card-click-effect {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+
+    .card-click-effect:active {
+      transform: scale(0.96) translateY(2px);
+      box-shadow: inset 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      border-color: rgba(79, 70, 229, 0.4);
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+</style>
+</head>
+<body class="bg-gray-50 text-slate-900 font-sans antialiased">
+<!-- BEGIN: Navigation -->
+<nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between h-20 items-center">
+<!-- Logo -->
+<div class="flex-shrink-0 flex items-center">
+<img src="{{ url_for('static', filename='images/user_logo_exact.png') }}" alt="ReviseMe Logo" class="w-24 h-24 lg:w-32 lg:h-32 object-contain"/>
+</div>
+<!-- Desktop Menu -->
+<div class="hidden md:flex space-x-8 text-sm font-medium text-gray-600">
+<a class="hover:text-indigo-600 transition" href="#features" style="">Features</a>
+<a class="hover:text-indigo-600 transition" href="#pricing" style="">Methodology</a>
+<a class="hover:text-indigo-600 transition" href="#pricing" style="">Pricing</a>
+<a class="hover:text-indigo-600 transition" href="#footer" style="">Success Stories</a>
+<a class="hover:text-indigo-600 transition" href="{{ url_for('ai_shorts') }}" style="">AI Shorts</a>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-4">
+<a class="text-sm font-medium text-gray-600 hover:text-indigo-600" href="{{ url_for('login') }}" style="">Sign In</a>
+<a class="bg-indigo-600 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-indigo-700 transition shadow-lg shadow-indigo-200" href="{{ url_for('register') }}" style="">Hadi Başla!</a>
+</div>
+</div>
+</div>
+</nav>
+<!-- END: Navigation -->
+<!-- BEGIN: Hero Section -->
+<section class="relative pt-16 pb-20 lg:pt-24 lg:pb-32 overflow-hidden">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
+<!-- Hero Text -->
+<div class="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 mb-6" style="">
+<span class="mr-2" style="">✨</span> Yapay Zeka Destekli Öğrenme
+          </span>
+<h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl" style="">
+            Öğrenme Yolculuğunuzu <span class="text-indigo-600" style="">Geliştirin</span>
+</h1>
+<p class="mt-6 text-lg text-gray-500 sm:max-w-xl sm:mx-auto lg:mx-0" style="">
+            Bilimsel temelli aralıklı tekrar ve aktif hatırlama yöntemleriyle derslerinize odaklanın. Sınav stresini verimli çalışmayla dönüştürün.
+          </p>
+<div class="mt-10 sm:flex sm:justify-center lg:justify-start gap-4">
+<a href="{{ url_for('register') }}" class="flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10 shadow-xl shadow-indigo-100 transition-all" style="">
+              Hemen Başla 
+              <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</a>
+<a href="{{ url_for('welcome_options') }}" class="mt-3 sm:mt-0 flex items-center justify-center px-8 py-3 border border-gray-200 text-base font-medium rounded-xl text-indigo-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10 transition-all" style="">
+              Nasıl Çalışır?
+            </a>
+</div>
+<!-- Social Proof -->
+<div class="mt-8 flex items-center sm:justify-center lg:justify-start">
+<div class="flex -space-x-2">
+<img alt="Student" class="w-10 h-10 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtitfQBLRfvFMta33MTrdbRJ4dBRTbFXXEqJ07Hl76sTfbX_7NUjVAcSORxap-gMLX03-F0Y2UajzctERXFoDtZOB7-LY2b1hVvZEjQ4pYCaqQmr7-JAtSWUe4mZn_VnBNq0FFG4D34FJByj2M2CLGglI_VpA3B3iiLBaELP2A5TojwnrDsiqhW08vmkigNP6zz7keqU4BupXF0XnIcj939trXrOHzaD7q3ImGLiaFf382zpg2hHWBORxIumEj5Udxd_q4wVhdbqyP" style=""/>
+<img alt="Student" class="w-10 h-10 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHYVMoUmNdgNn_iXj3_lgkH4Ol-jzniwN-toLmWmxyfNok05NGF880ehI17f-F6kbIMAC-oLLJeImsL4QUsavc-D0iJDguyAu8sj2MuUNODV84a81utOZaFliX2Z1IcGK2CPAgyHlkrObB0N7w_J5zVxu0VVaCkBjwuAwWLznlIUCSW-mjxDcjEE8SF0KrdwuGEc1p7x7Kay7bhCjP7OCk2a42Is3OwKBjEFiUpQlDsz4l8X6fvTYDod3SEGxBJlzJ2lianLjGn-He" style=""/>
+<img alt="Student" class="w-10 h-10 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgD7Jsfym_MoSp-AH26WsPMSMF5P3rX4F5oakvR0r6dH4RAkWW9w_HSTsoFmVVOBj8g6qsG0BW6p-Ip-3seXZFQw1oMb9czND7aRjFc1JASNcxsgI_KaGh3muhQndu1IzzNM40wLp8dskUgp7ISrVr0mWh92R4bn1Kki0OtNxOiouTaojDgeMuJ9sdChQa0TrsBlQ5jwEBpV-TDlOUJCbd3amtzwRJE-kNy6jsuAi1Peoo4E1mS-2Gz8S15u5yJpOYJeezVi0aIAyU" style=""/>
+</div>
+<p class="ml-4 text-sm text-gray-500 font-medium" style="">
+<span class="text-indigo-600" style="">10,000+</span> Öğrenci ReviseMe ile Kazanıyor
+            </p>
+</div>
+</div>
+<!-- Hero Visual -->
+                <!-- Final Hero Visual Recreation -->
+                <div class="relative lg:col-span-6 flex items-center justify-center lg:justify-end mt-20 lg:mt-0">
+                    <!-- Main Container sliding from right -->
+                    <div class="relative animate-hero-slide-in opacity-0 pr-12 lg:pr-24">
+                        <!-- Background Glow -->
+                        <div class="absolute -inset-20 bg-indigo-600/20 rounded-full blur-[120px]"></div>
+
+                        <!-- Mobile Promo Text -->
+                        <div class="absolute -top-16 left-1/2 -translate-x-1/2 w-full text-center z-50 pointer-events-none">
+                            <div class="inline-block bg-white/90 backdrop-blur px-6 py-2 rounded-full shadow-2xl border border-indigo-100 animate-bounce-gentle">
+                                <p class="text-sm font-black text-indigo-900 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-indigo-600 text-lg">smartphone</span>
+                                    ReviseMe Artık Cebinde!
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Phone & Steps Wrapper -->
+                        <div class="relative z-20 flex items-center">
+                            <!-- Floating Text Steps on the Left -->
+                            <div class="hidden xl:flex flex-col gap-12 mr-[-60px] z-30 pointer-events-none relative top-10">
+                                <div class="bg-white/95 backdrop-blur p-4 rounded-2xl shadow-xl border border-white animate-step-flow" style="animation-delay: 0s;">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-2 h-2 bg-indigo-600 rounded-full"></div>
+                                        <p class="text-[13px] font-extrabold text-indigo-950">Sorularını Kaydet</p>
+                                    </div>
+                                </div>
+                                <div class="bg-white/95 backdrop-blur p-4 rounded-2xl shadow-xl border border-white animate-step-flow" style="animation-delay: 1.5s;">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-2 h-2 bg-indigo-600 rounded-full"></div>
+                                        <p class="text-[13px] font-extrabold text-indigo-950">Yapay Zeka Analizi</p>
+                                    </div>
+                                </div>
+                                <div class="bg-white/95 backdrop-blur p-4 rounded-2xl shadow-xl border border-white animate-step-flow" style="animation-delay: 3s;">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-2 h-2 bg-indigo-600 rounded-full"></div>
+                                        <p class="text-[13px] font-extrabold text-indigo-950">Başarıyı Yakala</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Phone Frame -->
+                            <div class="relative w-[280px] sm:w-[320px] aspect-[9/18.5] bg-slate-900 rounded-[3.5rem] p-3 shadow-2xl border-4 border-slate-800 transform -rotate-2">
+                                <div class="w-full h-full bg-[#F8F9FF] rounded-[2.8rem] overflow-hidden relative flex flex-col pt-4">
+                                    <!-- Mobile Status Bar -->
+                                    <div class="px-8 flex justify-between items-center mb-4">
+                                        <span class="text-[10px] font-bold text-slate-400">9:41</span>
+                                        <div class="flex gap-1.5">
+                                            <div class="w-3 h-3 bg-slate-300 rounded-full"></div>
+                                            <div class="w-3 h-3 bg-slate-300 rounded-full"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Mock App Dashboard Scrolling -->
+                                    <div class="flex flex-col gap-6 animate-screen-scroll px-5">
+                                        <!-- Profile Header -->
+                                        <div class="bg-indigo-600 p-5 rounded-3xl text-left text-white shadow-lg">
+                                            <p class="text-[10px] opacity-80">Hoş Geldin,</p>
+                                            <p class="text-sm font-bold">Kevser Aslan 👋</p>
+                                        </div>
+
+                                        <!-- Progress Ring Mock -->
+                                        <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between">
+                                            <div>
+                                                <p class="text-[10px] text-slate-400 font-bold uppercase">Günün Hedefi</p>
+                                                <p class="text-lg font-black text-indigo-900">12 / 20 Soru</p>
+                                            </div>
+                                            <div class="w-12 h-12 rounded-full border-4 border-indigo-100 border-t-indigo-600 flex items-center justify-center">
+                                                <span class="text-[10px] font-bold text-indigo-600">60%</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Feature Cards -->
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <div class="bg-purple-50 p-4 rounded-2xl border border-purple-100 text-left">
+                                                <span class="material-symbols-outlined text-purple-600 text-xl">psychology</span>
+                                                <p class="text-[10px] font-bold text-purple-950 mt-2">AI Analiz</p>
+                                            </div>
+                                            <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100 text-left">
+                                                <span class="material-symbols-outlined text-blue-600 text-xl">event_repeat</span>
+                                                <p class="text-[10px] font-bold text-blue-950 mt-2">Tekrar Günü</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Bottom Large Button -->
+                                        <div class="bg-indigo-600 p-4 rounded-2xl text-white font-bold text-sm shadow-xl shadow-indigo-100">
+                                            Revizyona Başla
+                                        </div>
+
+                                        <!-- Repeat for seamless scroll -->
+                                        <div class="bg-indigo-950 p-5 rounded-3xl text-left text-white opacity-40">
+                                            <p class="text-sm font-bold">Yeni Havuz Oluştur</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Bottom Bar -->
+                                    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-slate-200 rounded-full"></div>
+                                </div>
+                                <!-- Dynamic Island -->
+                                <div class="absolute top-6 left-1/2 -translate-x-1/2 w-28 h-7 bg-black rounded-full flex items-center justify-center px-4">
+                                    <div class="w-2 h-2 bg-blue-500 rounded-full blur-[2px]"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Floating Icons (Like, Emoji) -->
+                        <div class="absolute bottom-10 left-[-60px] animate-float z-50">
+                            <div class="bg-blue-500 p-4 rounded-full shadow-2xl -rotate-12 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-white text-3xl" style="font-variation-settings: 'FILL' 1">thumb_up</span>
+                            </div>
+                        </div>
+                        <div class="absolute top-1/2 right-[-80px] animate-float-reverse z-50">
+                            <div class="bg-white p-2 rounded-full shadow-2xl text-4xl animate-bounce-gentle">😊</div>
+                        </div>
+                    </div>
+                </div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Hero Section -->
+<!-- BEGIN: Features Section (Infinite Marquee) -->
+<section id="features" class="py-16 bg-white overflow-hidden">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center mb-12">
+<h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl" style="">Eğitimin Geleceği Burada</h2>
+<p class="mt-4 text-lg text-gray-500 max-w-2xl mx-auto" style="">
+          Geleneksel yöntemleri bir kenara bırakın. ReviseMe'nin sunduğu modern araçlarla potansiyelinizi açığa çıkarın.
+        </p>
+</div>
+</div>
+<!-- Infinite Marquee Container -->
+<div class="relative w-full overflow-hidden">
+    <div class="animate-marquee flex gap-6 py-4">
+        <!-- Original Set (6 unique cards) --><div class="w-[280px] md:w-[320px] aspect-square rounded-2xl p-6 card-shadow border border-gray-100 flex flex-col items-center text-center justify-center card-gradient card-hover border-t-4 border-t-indigo-600 card-click-effect overflow-hidden">
+<div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 mb-6">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<h3 class="text-xl font-bold text-gray-900 mb-3" style="">Akıllı Tekrar Sistemi</h3>
+<p class="text-gray-600 mb-6 flex-grow" style="">Unutma eğrisi algoritması ile bilgileri tam unutmaya başladığınız anda hatırlatarak kalıcı hafızaya aktarın.</p>
+<a class="text-indigo-600 font-semibold flex items-center gap-1 hover:gap-2 transition-all" href="{{ url_for('welcome_options') }}" style="">Detayları Gör <span class="text-lg" style="">→</span></a>
+</div>
+<div class="w-[280px] md:w-[320px] aspect-square rounded-2xl p-6 card-shadow border border-gray-100 flex flex-col items-center text-center justify-center card-gradient card-hover border-t-4 border-t-indigo-600 card-click-effect overflow-hidden">
+<div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600 mb-6">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<h3 class="text-xl font-bold text-gray-900 mb-3" style="">İlerleme Takibi</h3>
+<p class="text-gray-600 mb-6 flex-grow" style="">Öğrenme hızınızı ve ustalık seviyenizi detaylı grafiklerle analiz edin. Hangi konularda zayıf olduğunuzu anında görün.</p>
+<a class="text-indigo-600 font-semibold flex items-center gap-1 transition-all" href="{{ url_for('welcome_options') }}" style="">Verileri İncele <span class="text-lg" style="">→</span></a>
+</div>
+<div class="w-[280px] md:w-[320px] aspect-square rounded-2xl p-6 card-shadow border border-gray-100 flex flex-col items-center text-center justify-center card-gradient card-hover border-t-4 border-t-indigo-600 card-click-effect overflow-hidden">
+<div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600 mb-6">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<h3 class="text-xl font-bold text-gray-900 mb-3" style="">Her Yerde Erişim</h3>
+<p class="text-gray-600 mb-6 flex-grow" style="">Kütüphanede, otobüste veya yolda. Tüm cihazlarınız arasında anlık senkronizasyon ile çalışmaya her yerden devam edin.</p>
+<a class="text-indigo-600 font-semibold flex items-center gap-1 transition-all" href="{{ url_for('register') }}" style="">Uygulamayı İndir <span class="text-lg" style="">→</span></a>
+</div>
+<div class="w-[280px] md:w-[320px] aspect-square rounded-2xl p-6 card-shadow border border-gray-100 flex flex-col items-center text-center justify-center card-gradient card-hover border-t-4 border-t-indigo-600 card-click-effect overflow-hidden">
+<div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 mb-6">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<h3 class="text-xl font-bold text-gray-900 mb-3" style="">Kişiselleştirilmiş Çalışma Planı</h3>
+<p class="text-gray-600 mb-6 flex-grow" style="">Hedeflerinize ve sınav tarihlerinize göre size özel oluşturulan dinamik çalışma takvimleri ile zamanı yönetin.</p>
+<a class="text-indigo-600 font-semibold flex items-center gap-1 transition-all" href="{{ url_for('welcome_options') }}" style="">Planını Oluştur <span class="text-lg" style="">→</span></a>
+</div>
+<div class="w-[280px] md:w-[320px] aspect-square rounded-2xl p-6 card-shadow border border-gray-100 flex flex-col items-center text-center justify-center card-gradient card-hover border-t-4 border-t-indigo-600 card-click-effect overflow-hidden">
+<div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-6">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<h3 class="text-xl font-bold text-gray-900 mb-3" style="">Akıllı Hatırlatıcılar</h3>
+<p class="text-gray-600 mb-6 flex-grow" style="">Çalışma alışkanlıklarınızı analiz eden akıllı bildirimler sayesinde disiplininizi asla kaybetmeyin.</p>
+<a class="text-indigo-600 font-semibold flex items-center gap-1 transition-all" href="{{ url_for('welcome_options') }}" style="">Detayları Gör <span class="text-lg" style="">→</span></a>
+</div>
+<div class="w-[280px] md:w-[320px] aspect-square rounded-2xl p-6 card-shadow border border-gray-100 flex flex-col items-center text-center justify-center card-gradient card-hover border-t-4 border-t-indigo-600 card-click-effect overflow-hidden">
+<div class="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center text-pink-600 mb-6">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<h3 class="text-xl font-bold text-gray-900 mb-3" style="">Topluluk Desteği</h3>
+<p class="text-gray-600 mb-6 flex-grow" style="">Diğer öğrencilerle notlarınızı paylaşın, birlikte çalışma grupları kurun ve motivasyonunuzu yüksek tutun.</p>
+<a class="text-indigo-600 font-semibold flex items-center gap-1 transition-all" href="{{ url_for('welcome_options') }}" style="">Topluluğa Katıl <span class="text-lg" style="">→</span></a>
+</div>
+<!-- Duplicate Set for Seamless Loop -->
+<div class="w-[280px] md:w-[320px] aspect-square rounded-2xl p-6 card-shadow border border-gray-100 flex flex-col items-center text-center justify-center card-gradient card-hover border-t-4 border-t-indigo-600 card-click-effect overflow-hidden">
+<div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 mb-6">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<h3 class="text-xl font-bold text-gray-900 mb-3" style="">Akıllı Tekrar Sistemi</h3>
+<p class="text-gray-600 mb-6 flex-grow" style="">Unutma eğrisi algoritması ile bilgileri tam unutmaya başladığınız anda hatırlatarak kalıcı hafızaya aktarın.</p>
+<a class="text-indigo-600 font-semibold flex items-center gap-1 hover:gap-2 transition-all" href="{{ url_for('welcome_options') }}" style="">Detayları Gör <span class="text-lg" style="">→</span></a>
+</div>
+<div class="w-[280px] md:w-[320px] aspect-square rounded-2xl p-6 card-shadow border border-gray-100 flex flex-col items-center text-center justify-center card-gradient card-hover border-t-4 border-t-indigo-600 card-click-effect overflow-hidden">
+<div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600 mb-6">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<h3 class="text-xl font-bold text-gray-900 mb-3" style="">İlerleme Takibi</h3>
+<p class="text-gray-600 mb-6 flex-grow" style="">Öğrenme hızınızı ve ustalık seviyenizi detaylı grafiklerle analiz edin. Hangi konularda zayıf olduğunuzu anında görün.</p>
+<a class="text-indigo-600 font-semibold flex items-center gap-1 transition-all" href="{{ url_for('welcome_options') }}" style="">Verileri İncele <span class="text-lg" style="">→</span></a>
+</div>
+<div class="w-[280px] md:w-[320px] aspect-square rounded-2xl p-6 card-shadow border border-gray-100 flex flex-col items-center text-center justify-center card-gradient card-hover border-t-4 border-t-indigo-600 card-click-effect overflow-hidden">
+<div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600 mb-6">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<h3 class="text-xl font-bold text-gray-900 mb-3" style="">Her Yerde Erişim</h3>
+<p class="text-gray-600 mb-6 flex-grow" style="">Kütüphanede, otobüste veya yolda. Tüm cihazlarınız arasında anlık senkronizasyon ile çalışmaya her yerden devam edin.</p>
+<a class="text-indigo-600 font-semibold flex items-center gap-1 transition-all" href="{{ url_for('register') }}" style="">Uygulamayı İndir <span class="text-lg" style="">→</span></a>
+</div>
+<div class="min-w-[300px] md:min-w-[350px] rounded-2xl p-8 card-shadow border border-gray-100 flex flex-col h-full card-gradient card-hover border-t-4 border-t-indigo-600 card-click-effect">
+<div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 mb-6">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<h3 class="text-xl font-bold text-gray-900 mb-3" style="">Kişiselleştirilmiş Çalışma Planı</h3>
+<p class="text-gray-600 mb-6 flex-grow" style="">Hedeflerinize ve sınav tarihlerinize göre size özel oluşturulan dinamik çalışma takvimleri ile zamanı yönetin.</p>
+<a class="text-indigo-600 font-semibold flex items-center gap-1 transition-all" href="{{ url_for('welcome_options') }}" style="">Planını Oluştur <span class="text-lg" style="">→</span></a>
+</div>
+<div class="min-w-[300px] md:min-w-[350px] rounded-2xl p-8 card-shadow border border-gray-100 flex flex-col h-full card-gradient card-hover border-t-4 border-t-indigo-600">
+<div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-6">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<h3 class="text-xl font-bold text-gray-900 mb-3" style="">Akıllı Hatırlatıcılar</h3>
+<p class="text-gray-600 mb-6 flex-grow" style="">Çalışma alışkanlıklarınızı analiz eden akıllı bildirimler sayesinde disiplininizi asla kaybetmeyin.</p>
+<a class="text-indigo-600 font-semibold flex items-center gap-1 transition-all" href="{{ url_for('welcome_options') }}" style="">Detayları Gör <span class="text-lg" style="">→</span></a>
+</div>
+<div class="min-w-[300px] md:min-w-[350px] rounded-2xl p-8 card-shadow border border-gray-100 flex flex-col h-full card-gradient card-hover border-t-4 border-t-indigo-600">
+<div class="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center text-pink-600 mb-6">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<h3 class="text-xl font-bold text-gray-900 mb-3" style="">Topluluk Desteği</h3>
+<p class="text-gray-600 mb-6 flex-grow" style="">Diğer öğrencilerle notlarınızı paylaşın, birlikte çalışma grupları kurun ve motivasyonunuzu yüksek tutun.</p>
+<a class="text-indigo-600 font-semibold flex items-center gap-1 transition-all" href="{{ url_for('welcome_options') }}" style="">Topluluğa Katıl <span class="text-lg" style="">→</span></a>
+</div></div></div>
+</section>
+<!-- END: Features Section -->
+<!-- BEGIN: CTA Section -->
+<section id="pricing" class="py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto bg-gradient-to-br from-indigo-900 via-indigo-700 to-purple-800 rounded-[3rem] overflow-hidden shadow-2xl relative border border-white/10">
+        <!-- Abstract Background Graphics -->
+        <div class="absolute top-0 right-0 w-1/2 h-full opacity-30 pointer-events-none overflow-hidden">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border-[1px] border-white/20 rounded-full"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border-[1px] border-white/30 rounded-full border-dashed animate-spin-slow"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border-[1px] border-white/40 rounded-full"></div>
+        </div>
+
+        <div class="relative px-10 py-20 md:py-28 text-white z-10">
+            <div class="grid gap-12 items-center md:grid-cols-2">
+                <!-- Left Column: Content -->
+                <div class="text-center md:text-left">
+                    <h2 class="text-4xl md:text-5xl font-black mb-8 leading-tight tracking-tight">
+                        Başarıya Giden <br class="hidden lg:block"/> En Kısa Yol
+                    </h2>
+                    <p class="text-xl text-indigo-100/90 max-w-xl mb-12 mx-auto md:mx-0 leading-relaxed">
+                        ReviseMe sadece bir uygulama değil, akademik başarınızın dijital mimarıdır. Binlerce başarılı öğrenci gibi siz de verimliliğinizi ikiye katlayın.
+                    </p>
+                    <a href="{{ url_for('register') }}" class="inline-flex items-center bg-white text-indigo-700 px-10 py-5 rounded-2xl font-black text-lg hover:scale-105 transition-all shadow-2xl shadow-indigo-950/20 active:scale-95">
+                        Ücretsiz Hesabını Oluştur
+                    </a>
+                </div>
+                <!-- Right Column: Abstract Graphic -->
+                <div class="hidden md:flex justify-end relative">
+                    <div class="relative p-12 bg-white/5 rounded-full backdrop-blur-sm border border-white/10 animate-float">
+                        <img alt="ReviseMe Logo" class="w-48 h-48 lg:w-64 lg:h-64 object-contain drop-shadow-[0_0_30px_rgba(255,255,255,0.3)]" src="{{ url_for('static', filename='images/user_logo_exact.png') }}"/>
+                        <!-- Orbital dots -->
+                        <div class="absolute -top-4 left-1/2 w-4 h-4 bg-indigo-400 rounded-full blur-sm"></div>
+                        <div class="absolute top-1/2 -right-4 w-3 h-3 bg-purple-400 rounded-full blur-sm"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- END: CTA Section -->
+<!-- BEGIN: Footer -->
+<footer id="footer" class="bg-gray-50 border-t border-gray-200 pt-20 pb-10">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+<!-- Brand Info -->
+<div>
+<div class="flex items-center gap-2 mb-6">
+<div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+<span class="text-white font-bold" style="">R</span>
+</div>
+<span class="text-xl font-bold" style="">ReviseMe</span>
+</div>
+<p class="text-gray-500 text-sm leading-relaxed mb-6" style="">
+            ReviseMe, öğrencilerin öğrenme potansiyellerini maksimize etmeyi amaçlayan bilimsel ve yapay zeka destekli bir eğitim teknolojisi platformudur.
+          </p>
+</div>
+<!-- Mission & Vision -->
+<div>
+<h4 class="font-bold text-gray-900 mb-6 flex items-center gap-2" style="">
+<span class="w-2 h-2 bg-indigo-600 rounded-full"></span> Misyon
+          </h4>
+<p class="text-gray-500 text-sm mb-8" style="">Yüksek performanslı öğrenme ve kalıcı bilgiyi herkes için ulaşılabilir kılmak.</p>
+<h4 class="font-bold text-gray-900 mb-6 flex items-center gap-2" style="">
+<span class="w-2 h-2 bg-indigo-600 rounded-full"></span> Vizyon
+          </h4>
+<p class="text-gray-500 text-sm" style="">Kişiselleştirilmiş yapay zeka destekli eğitimin geleceğini inşa ederek öğrenmeyi bir zorunluluktan tutkuya dönüştürmek.</p>
+</div>
+<!-- Quick Links -->
+<div>
+<h4 class="font-bold text-gray-900 mb-6" style="">KAYNAKLAR</h4>
+<ul class="space-y-4 text-sm text-gray-500">
+<li class="" style=""><a class="hover:text-indigo-600 transition" href="{{ url_for('privacy') }}" style="">Gizlilik Politikası</a></li>
+<li class="" style=""><a class="hover:text-indigo-600 transition" href="{{ url_for('terms') }}" style="">Kullanım Şartları</a></li>
+<li class="" style=""><a class="hover:text-indigo-600 transition" href="{{ url_for('support') }}" style="">Destek Merkezi</a></li>
+<li class="" style=""><a class="hover:text-indigo-600 transition" href="{{ url_for('research') }}" style="">Araştırmalarımız</a></li>
+</ul>
+</div>
+<!-- Contact Card -->
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+<h4 class="font-bold text-gray-900 mb-4" style="">İletişim</h4>
+<div class="flex items-center gap-3 mb-3">
+  <div class="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+  </div>
+  <span class="text-sm font-medium text-gray-700" style="">inforeviseme@gmail.com</span>
+</div>
+<div class="flex items-center gap-3 mb-3">
+  <div class="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 5.75C3 4.784 3.784 4 4.75 4h14.5C20.716 4 21.5 4.784 21.5 5.75v12.5c0 .966-.784 1.75-1.75 1.75H4.75A1.75 1.75 0 013 18.25V5.75zM8 9h8M8 13h5" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+  </div>
+  <span class="text-sm font-medium text-gray-700" style="">0553 355 34 06</span>
+</div>
+<div class="space-y-2 text-xs text-gray-500">
+  <a class="flex items-center gap-3 hover:text-indigo-600 transition-colors" href="https://instagram.com/revisemee" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+    <div class="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600">
+      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M7 2C4.243 2 2 4.243 2 7v10c0 2.757 2.243 5 5 5h10c2.757 0 5-2.243 5-5V7c0-2.757-2.243-5-5-5H7zm10 2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h10zm-5 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 2a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm5.25-3.25a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+      </svg>
+    </div>
+    <span class="text-sm font-medium text-gray-700">revıseme</span>
+  </a>
+  <div class="flex items-center gap-3">
+    <div class="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600">
+      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M20.45 20.45h-3.554v-5.57c0-1.328-.027-3.037-1.852-3.037-1.852 0-2.136 1.446-2.136 2.945v5.662H7.349V9h3.414v1.561h.046c.476-.9 1.637-1.852 3.368-1.852 3.6 0 4.266 2.37 4.266 5.455v6.285zM5.337 7.433c-1.106 0-2-.895-2-2s.894-2 2-2c1.105 0 2 .895 2 2s-.895 2-2 2zM6.889 20.45H3.785V9h3.104v11.45z"/>
+      </svg>
+    </div>
+    <div><span class="font-semibold text-gray-700">LinkedIn:</span> revıseme</div>
+  </div>
+</div>
+<p class="text-xs text-gray-400 mt-4" style="">Sorularınız, işbirliği talepleriniz veya destek ihtiyaçlarınız için bize her zaman ulaşabilirsiniz.</p>
+</div>
+</div>
+<!-- Bottom Footer -->
+<div class="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-xs text-gray-400" style="">© 2024 ReviseMe. Tüm Hakları Saklıdır. Precision Measure for High Performance.</p>
+<p class="text-xs text-gray-400 flex items-center gap-1" style="">MADE WITH <span class="text-red-400" style="">❤</span> IN PRECISION</p>
+</div>
+</div>
+</footer>
+<!-- END: Footer -->
+</body></html>

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>ReviseMe Shorts – 1 Dk'da 1 Soru</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --mat: #6C3AFA;
+    --geo: #0EA5E9;
+    --fiz: #E34040;
+    --kim: #17A779;
+    --bio: #F4A019;
+  }
+
+  html, body {
+    font-family: 'Inter', sans-serif;
+    background: #000;
+    overflow: hidden;
+    height: 100dvh;
+    width: 100vw;
+  }
+
+  /* ── Feed ─────────────────────────────────── */
+  #feed {
+    height: 100dvh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none;
+  }
+  #feed::-webkit-scrollbar { display: none; }
+
+  /* ── Card ─────────────────────────────────── */
+  .card {
+    height: 100dvh;
+    scroll-snap-align: start;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0d0d0d;
+    cursor: pointer;
+  }
+
+  /* Thumbnail full-bleed */
+  .thumb {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(.55);
+    transition: filter .35s;
+  }
+  .card:hover .thumb { filter: brightness(.45); }
+
+  /* Subtle animated gradient bg fallback */
+  .thumb-fallback {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #1a0533 0%, #0d0d1a 50%, #001a0a 100%);
+  }
+
+  /* Gradients */
+  .g-top {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 180px;
+    background: linear-gradient(to bottom, rgba(0,0,0,.88) 0%, transparent 100%);
+    z-index: 10; pointer-events: none;
+  }
+  .g-bot {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 260px;
+    background: linear-gradient(to top, rgba(0,0,0,.96) 0%, rgba(0,0,0,.6) 60%, transparent 100%);
+    z-index: 10; pointer-events: none;
+  }
+
+  /* ── Header ───────────────────────────────── */
+  .hdr {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    padding: 18px 16px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 20;
+  }
+  .hdr-left { display: flex; align-items: center; gap: 10px; }
+  .ibtn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(0,0,0,.4);
+    backdrop-filter: blur(16px);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; cursor: pointer;
+    transition: background .2s;
+    text-decoration: none; flex-shrink: 0;
+  }
+  .ibtn:hover { background: rgba(255,255,255,.18); }
+  .brand { font-size: 17px; font-weight: 900; color: #fff; letter-spacing: -.3px; line-height: 1; }
+  .brand em { color: #a78bfa; font-style: normal; }
+  .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #f43f5e; margin-left: 5px; animation: pulse 1.4s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.65)} }
+
+  /* ── Badge ────────────────────────────────── */
+  .badge {
+    position: absolute;
+    top: 70px; left: 16px;
+    padding: 5px 14px;
+    border-radius: 10px;
+    font-size: 10px; font-weight: 900;
+    text-transform: uppercase; letter-spacing: 1.4px;
+    color: #fff; z-index: 20;
+    box-shadow: 0 4px 18px rgba(0,0,0,.5);
+  }
+
+  /* ── Big play overlay (center) ────────────── */
+  .play-cta {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 15;
+    gap: 14px;
+    text-decoration: none;
+  }
+  .play-ring {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.12);
+    backdrop-filter: blur(12px);
+    border: 2px solid rgba(255,255,255,.35);
+    display: flex; align-items: center; justify-content: center;
+    transition: all .25s;
+    box-shadow: 0 0 40px rgba(255,255,255,.08);
+  }
+  .play-cta:hover .play-ring {
+    background: rgba(255,255,255,.22);
+    transform: scale(1.08);
+    box-shadow: 0 0 60px rgba(255,255,255,.15);
+  }
+  .play-ring .material-symbols-outlined { font-size: 40px !important; color: #fff; margin-left: 4px; }
+  .play-label {
+    color: rgba(255,255,255,.75);
+    font-size: 12px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    text-shadow: 0 2px 8px rgba(0,0,0,.8);
+  }
+
+  /* ── Bottom info ──────────────────────────── */
+  .info {
+    position: absolute;
+    bottom: 30px; left: 16px; right: 72px;
+    z-index: 20;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .vt { color: #fff; font-size: 16px; font-weight: 800; line-height: 1.35; text-shadow: 0 2px 8px rgba(0,0,0,.7); }
+  .vt small { display: block; font-size: 11px; font-weight: 600; color: rgba(255,255,255,.5); margin-top: 3px; }
+  .row { display: flex; gap: 8px; }
+  .gbtn {
+    flex: 1; height: 46px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.14);
+    background: rgba(255,255,255,.1);
+    backdrop-filter: blur(16px);
+    color: #fff; font-size: 11px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: .8px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    transition: all .2s; text-decoration: none;
+  }
+  .gbtn:active { transform: scale(.96); }
+  .gbtn.accent {
+    border-color: transparent;
+    box-shadow: 0 0 24px rgba(var(--accent-rgb,.5));
+  }
+  .material-symbols-outlined { font-size: 17px !important; }
+
+  /* ── Right actions ────────────────────────── */
+  .right {
+    position: absolute;
+    bottom: 30px; right: 12px;
+    z-index: 20;
+    display: flex; flex-direction: column; align-items: center; gap: 18px;
+  }
+  .act { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+  .aic {
+    width: 46px; height: 46px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.16);
+    background: rgba(0,0,0,.45);
+    backdrop-filter: blur(14px);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; transition: all .2s;
+    text-decoration: none;
+  }
+  .aic:active { transform: scale(.88); }
+  .aic.liked { color: #f43f5e; border-color: #f43f5e33; background: rgba(244,63,94,.15); }
+  .aic.saved { color: #fbbf24; border-color: #fbbf2433; background: rgba(251,191,36,.15); }
+  .albl { color: rgba(255,255,255,.55); font-size: 10px; font-weight: 700; letter-spacing: .5px; }
+
+  /* ── Filter bar ───────────────────────────── */
+  #fbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 0; overflow: hidden;
+    z-index: 50;
+    background: rgba(6,6,10,.92);
+    backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(255,255,255,.07);
+    transition: height .28s cubic-bezier(.4,0,.2,1);
+  }
+  #fbar.open { height: 108px; }
+  .finner { padding: 20px 16px 14px; display: flex; flex-direction: column; gap: 12px; }
+  .flbl { color: rgba(255,255,255,.4); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    padding: 7px 15px; border-radius: 40px;
+    border: 1.5px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.05);
+    color: rgba(255,255,255,.55); font-size: 12px; font-weight: 700;
+    white-space: nowrap; cursor: pointer; transition: all .18s; flex-shrink: 0;
+  }
+  .chip.on { color: #fff; border-color: transparent; }
+  .chip[data-t="Tümü"].on    { background: rgba(255,255,255,.16); }
+  .chip[data-t="Matematik"].on { background: var(--mat); }
+  .chip[data-t="Geometri"].on  { background: var(--geo); }
+  .chip[data-t="Fizik"].on   { background: var(--fiz); }
+  .chip[data-t="Kimya"].on   { background: var(--kim); }
+  .chip[data-t="Biyoloji"].on { background: var(--bio); }
+
+  /* ── Loader overlay ───────────────────────── */
+  #global-loader {
+    position: fixed; inset: 0; background: #000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 100; gap: 16px; transition: opacity .4s;
+  }
+  #global-loader.gone { opacity: 0; pointer-events: none; }
+  .sp {
+    width: 52px; height: 52px;
+    border: 4px solid rgba(108,58,250,.2);
+    border-top-color: #6C3AFA; border-radius: 50%;
+    animation: spin .75s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #global-loader p { color: rgba(255,255,255,.45); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; }
+
+  /* ── Progress ──────────────────────────────── */
+  #pbar {
+    position: fixed; top: 0; left: 0; width: 0%;
+    height: 2.5px; background: linear-gradient(90deg, #6C3AFA, #a78bfa);
+    z-index: 60; transition: width .25s;
+    border-radius: 0 2px 2px 0;
+  }
+
+  /* ── Video Modal ─────────────────────────────── */
+  #video-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(0,0,0,.88);
+    backdrop-filter: blur(12px);
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    animation: fadein .25s;
+  }
+  #video-modal.open { display: flex; }
+  @keyframes fadein { from{opacity:0} to{opacity:1} }
+  #video-modal .modal-inner {
+    position: relative;
+    width: min(420px, 95vw);
+    aspect-ratio: 9/16;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 0 80px rgba(108,58,250,.5);
+    border: 1px solid rgba(255,255,255,.15);
+    background: #000;
+  }
+  #video-modal iframe {
+    width: 100%; height: 100%; border: none;
+  }
+  #modal-close {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.12);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,.2);
+    color: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s;
+    flex-shrink: 0;
+  }
+  #modal-close:hover { background: rgba(255,255,255,.22); }
+</style>
+</head>
+<body>
+
+<!-- Inline Video Modal -->
+<div id="video-modal">
+  <div class="modal-inner">
+    <iframe id="modal-iframe" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  </div>
+  <button id="modal-close" onclick="closeModal()">
+    <span class="material-symbols-outlined" style="font-size:22px!important">close</span>
+  </button>
+</div>
+
+<div id="global-loader">
+  <div class="sp"></div>
+  <p>Videolar Yükleniyor…</p>
+</div>
+
+<div id="pbar"></div>
+
+<!-- Filter bar -->
+<div id="fbar">
+  <div class="finner">
+    <div class="flbl">Konu Filtrele</div>
+    <div class="chips">
+      <div class="chip on" data-t="Tümü">🎯 Tümü</div>
+      <div class="chip" data-t="Matematik">📐 Matematik</div>
+      <div class="chip" data-t="Geometri">📏 Geometri</div>
+      <div class="chip" data-t="Fizik">⚡ Fizik</div>
+      <div class="chip" data-t="Kimya">🧪 Kimya</div>
+      <div class="chip" data-t="Biyoloji">🧬 Biyoloji</div>
+    </div>
+  </div>
+</div>
+
+<!-- Feed -->
+<div id="feed"></div>
+
+<script>
+const feed    = document.getElementById('feed');
+const fbar    = document.getElementById('fbar');
+const pbar    = document.getElementById('pbar');
+const loader  = document.getElementById('global-loader');
+
+const ACCENT = { Matematik:'#6C3AFA', Geometri:'#0EA5E9', Fizik:'#E34040', Kimya:'#17A779', Biyoloji:'#F4A019' };
+const EMOJI  = { Matematik:'📐', Geometri:'📏', Fizik:'⚡', Kimya:'🧪', Biyoloji:'🧬' };
+
+let activeTopic = 'Tümü';
+let filterOpen  = false;
+let loading     = false;
+let loaded      = 0;
+
+/* ── Fetch one video from backend ────────────── */
+async function fetchVideo() {
+  const r = await fetch('/api/generate_shorts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ topic: activeTopic })
+  });
+  return r.json();
+}
+
+/* ── Build & append one card ─────────────────── */
+function addCard(data) {
+  const accent   = ACCENT[data.topic] || '#6C3AFA';
+  const emoji    = EMOJI[data.topic]  || '📖';
+  const thumbHQ  = `https://img.youtube.com/vi/${data.video_id}/maxresdefault.jpg`;
+  const thumbHD  = `https://img.youtube.com/vi/${data.video_id}/hqdefault.jpg`;
+
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.id = `c-${data.video_id}`;
+
+  card.innerHTML = `
+    <div class="thumb-fallback"></div>
+    <img class="thumb" src="${thumbHQ}"
+         onerror="this.src='${thumbHD}'"
+         alt="${data.title}" loading="lazy"/>
+
+    <div class="g-top"></div>
+    <div class="g-bot"></div>
+
+    <!-- Header -->
+    <div class="hdr">
+      <div class="hdr-left">
+        <a class="ibtn" href="/">
+          <span class="material-symbols-outlined" style="font-size:20px!important">arrow_back</span>
+        </a>
+        <div class="brand">ReviseMe <em>Shorts</em><span class="dot"></span></div>
+      </div>
+      <div class="ibtn" id="filter-btn-${data.video_id}" onclick="toggleFilter(event)">
+        <span class="material-symbols-outlined" style="font-size:20px!important">tune</span>
+      </div>
+    </div>
+
+    <!-- Topic badge -->
+    <div class="badge" style="background:${accent}">${emoji} ${data.topic}</div>
+
+    <!-- Central play CTA → opens inline modal -->
+    <div class="play-cta" onclick="openModal('${data.video_id}')" style="cursor:pointer">
+      <div class="play-ring">
+        <span class="material-symbols-outlined" style="font-size:42px!important;margin-left:5px">play_arrow</span>
+      </div>
+      <div class="play-label">İzle</div>
+    </div>
+
+    <!-- Bottom info -->
+    <div class="info">
+      <div class="vt">
+        📖 ${data.title}
+        <small>1 Dakikada 1 Soru • Site içinde izle</small>
+      </div>
+      <div class="row">
+        <button class="gbtn" onclick="scrollNext()">
+          <span class="material-symbols-outlined">skip_next</span> Sonraki
+        </button>
+        <button class="gbtn accent" onclick="openModal('${data.video_id}')"
+           style="background:${accent};box-shadow:0 0 24px ${accent}66;border:none">
+          <span class="material-symbols-outlined">play_circle</span> İzle
+        </button>
+      </div>
+    </div>
+
+    <!-- Right side actions -->
+    <div class="right">
+      <div class="act" onclick="toggleLike(this)">
+        <div class="aic"><span class="material-symbols-outlined" style="font-size:22px!important">favorite</span></div>
+        <span class="albl">Beğen</span>
+      </div>
+      <div class="act" onclick="toggleSave(this, '${data.video_id}', '${(data.title || '').replace(/'/g, "\\'")}', '${data.topic}')">
+        <div class="aic"><span class="material-symbols-outlined" style="font-size:22px!important">bookmark</span></div>
+        <span class="albl">Kaydet</span>
+      </div>
+      <div class="act" onclick="openModal('${data.video_id}')">
+        <div class="aic">
+          <span class="material-symbols-outlined" style="font-size:22px!important">smart_display</span>
+        </div>
+        <span class="albl">İzle</span>
+      </div>
+    </div>
+  `;
+
+  feed.appendChild(card);
+  loaded++;
+  updateProgress();
+
+  // Hide global loader after first card
+  if (loaded === 1) {
+    setTimeout(() => loader.classList.add('gone'), 300);
+  }
+}
+
+/* ── Modal open/close ───────────────────────── */
+const modal       = document.getElementById('video-modal');
+const modalIframe = document.getElementById('modal-iframe');
+
+function openModal(videoId) {
+  // Use YouTube nocookie embed URL for privacy; autoplay=1 starts immediately
+  modalIframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  modal.classList.remove('open');
+  modalIframe.src = '';  // stop video
+  document.body.style.overflow = '';
+}
+
+// Close modal on backdrop click
+modal.addEventListener('click', e => {
+  if (e.target === modal) closeModal();
+});
+
+// Close on Escape key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+/* ── Load N videos ───────────────────────────── */
+async function load(n = 1) {
+  if (loading) return;
+  loading = true;
+  for (let i = 0; i < n; i++) {
+    try {
+      const r = await fetchVideo();
+      if (r.success && r.data) addCard(r.data);
+    } catch(e) { console.error(e); }
+  }
+  loading = false;
+}
+
+/* ── Scroll to next card ─────────────────────── */
+function scrollNext() {
+  const idx = Math.round(feed.scrollTop / window.innerHeight);
+  feed.scrollTo({ top: (idx + 1) * window.innerHeight, behavior: 'smooth' });
+}
+
+/* ── Progress bar ────────────────────────────── */
+function updateProgress() {
+  const total   = feed.querySelectorAll('.card').length;
+  const current = Math.round(feed.scrollTop / window.innerHeight) + 1;
+  pbar.style.width = total > 1 ? (current / total * 100) + '%' : '0%';
+}
+
+/* ── Like / Save ─────────────────────────────── */
+function toggleLike(item) { item.querySelector('.aic').classList.toggle('liked'); }
+async function toggleSave(item, videoId, title, topic) { 
+  const aic = item.querySelector('.aic');
+  if (aic.classList.contains('saved')) return; // Zaten eklendi
+  
+  aic.classList.add('saved');
+  const lbl = item.querySelector('.albl');
+  const oldText = lbl.innerText;
+  lbl.innerText = 'Eklendi';
+  
+  try {
+    const r = await fetch('/api/save_short_to_pool', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ video_id: videoId, title: title, topic: topic })
+    });
+    const data = await r.json();
+    if (!data.success) {
+      aic.classList.remove('saved');
+      lbl.innerText = oldText;
+      console.error(data.error);
+    }
+  } catch (e) {
+    aic.classList.remove('saved');
+    lbl.innerText = oldText;
+    console.error(e);
+  }
+}
+
+/* ── Filter bar ──────────────────────────────── */
+function toggleFilter(e) {
+  if (e) e.stopPropagation();
+  filterOpen = !filterOpen;
+  fbar.classList.toggle('open', filterOpen);
+}
+
+document.querySelectorAll('.chip').forEach(c => {
+  c.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(x => x.classList.remove('on'));
+    c.classList.add('on');
+    activeTopic = c.dataset.t;
+    feed.innerHTML = '';
+    loaded = 0;
+    fbar.classList.remove('open');
+    filterOpen = false;
+    load(5);
+  });
+});
+
+/* ── Scroll handler ──────────────────────────── */
+feed.addEventListener('scroll', () => {
+  const rem = feed.scrollHeight - feed.scrollTop - feed.clientHeight;
+  if (rem < window.innerHeight * 2) load(3);
+  updateProgress();
+});
+
+/* ── Close filter on feed tap ────────────────── */
+feed.addEventListener('click', e => {
+  if (filterOpen && !fbar.contains(e.target)) toggleFilter();
+});
+
+/* ── Boot ────────────────────────────────────── */
+load(5);
+</script>
+</body>
+</html>

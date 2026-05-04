@@ -29,13 +29,13 @@
                         {% endif %}
                         <div class="card-body">
                             <h5 class="card-title">Soru İçeriği</h5>
-                            <p class="card-text">{{ question.Content }}</p>
+                            <p class="card-text">{{ question.content }}</p>
                             
                             <div class="d-flex justify-content-between align-items-center mt-3">
                                 <div>
                                     <span class="badge bg-primary">{{ question.category.Name if question.category else 'Kategorisiz' }}</span>
-                                    {% if question.DifficultyLevel %}
-                                    <span class="badge bg-secondary">{{ question.DifficultyLevel }}</span>
+                                    {% if question.difficulty %}
+                                    <span class="badge bg-secondary">{{ question.difficulty }}</span>
                                     {% endif %}
                                 </div>
                                 <div class="btn-group">

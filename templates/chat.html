@@ -49,54 +49,8 @@
 <body class="bg-[#F8F5FF] text-slate-800 antialiased h-screen overflow-hidden flex flex-col md:flex-row">
 
 <!-- Sidebar Navigation Shell (Chat Specific) -->
-<aside class="hidden md:flex flex-col h-full p-4 z-40 bg-white border-r border-slate-100 w-64 shrink-0 shadow-sm">
-    <div class="mb-4 mt-2 px-2 flex items-center gap-3">
-        <div class="h-10 w-10 bg-[#6200EE] rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
-            <span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
-        </div>
-        <div>
-            <h1 class="text-lg font-black text-[#6200EE] tracking-tight">EduAI Chat</h1>
-            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Academic Assistant</p>
-        </div>
-    </div>
-    
-    <nav class="flex-1 space-y-1 mt-4 overflow-y-auto">
-        <button class="w-full flex items-center gap-3 px-3 py-3 mb-4 bg-purple-50 text-[#6200EE] font-bold rounded-xl active:translate-x-1 transition-transform border border-purple-100 shadow-sm hover:shadow-md">
-            <span class="material-symbols-outlined">add_box</span>
-            <span class="text-xs tracking-wide">Yeni Sohbet</span>
-        </button>
-        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 mb-2 mt-6">Geçmiş</p>
-        <a class="w-full flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-[#6200EE] rounded-xl transition-all duration-200" href="#">
-            <span class="material-symbols-outlined text-[18px]">history</span>
-            <span class="text-xs font-semibold truncate">Hücre Bölünmesi Özeti</span>
-        </a>
-        <a class="w-full flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-[#6200EE] rounded-xl transition-all duration-200" href="#">
-            <span class="material-symbols-outlined text-[18px]">history</span>
-            <span class="text-xs font-semibold truncate">Türev Formülleri</span>
-        </a>
-        <a class="w-full flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-[#6200EE] rounded-xl transition-all duration-200" href="#">
-            <span class="material-symbols-outlined text-[18px]">history</span>
-            <span class="text-xs font-semibold truncate">Tarih: 1. Dünya Savaşı</span>
-        </a>
-    </nav>
-    
-    <div class="mt-auto space-y-4 pt-6 border-t border-slate-100">
-        <div class="p-4 bg-gradient-to-br from-[#6200EE] to-[#8451D1] rounded-2xl text-white shadow-lg relative overflow-hidden group hover:shadow-xl transition-shadow cursor-pointer">
-            <div class="absolute -right-4 -top-4 w-16 h-16 bg-white/20 rounded-full blur-xl group-hover:bg-white/30 transition-colors"></div>
-            <p class="text-[10px] font-black uppercase tracking-widest mb-1 opacity-80 flex items-center gap-1">
-                <span class="material-symbols-outlined text-[12px]">bolt</span> Pro Plan
-            </p>
-            <p class="text-xs font-bold mb-3">Sınırsız yapay zeka deneyimini kilidini aç.</p>
-            <button class="w-full bg-white text-[#6200EE] py-2 rounded-xl text-xs font-black tracking-wide hover:bg-opacity-90 transition-colors">Yükselt</button>
-        </div>
-        <div class="space-y-1">
-            <a class="flex items-center gap-3 px-3 py-2 text-red-500 hover:bg-red-50 rounded-xl text-xs font-bold transition-colors" href="{{ url_for('logout') if 'logout' in active_endpoints else '#' }}">
-                <span class="material-symbols-outlined text-[18px]">logout</span>
-                Çıkış Yap
-            </a>
-        </div>
-    </div>
-</aside>
+{% set active_page = 'chat' %}
+{% include 'components/sidebar_modern.html' %}
 
 <!-- Main Chat Canvas -->
 <main class="flex-1 flex flex-col md:ml-64 relative bg-[#F8F5FF] h-screen w-full">

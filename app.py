@@ -945,8 +945,10 @@ def reminders():
 # ... existing code ...
 
 @app.route('/')
-@login_required
 def index():
+    if not current_user.is_authenticated:
+        return redirect(url_for('welcome'))
+    
     from datetime import datetime, timedelta
     
     # 1. Genel İstatistikler
@@ -1107,6 +1109,9 @@ def index():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('welcome_options'))
+
     if request.method == 'POST':
         try:
             # Form verilerini al
@@ -1178,6 +1183,9 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('welcome_options'))
+
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -1589,7 +1597,7 @@ def profile():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('welcome'))
 
 @app.route('/add_question', methods=['GET', 'POST'])
 @login_required

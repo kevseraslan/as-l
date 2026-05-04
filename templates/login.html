@@ -205,7 +205,30 @@
         </div>
     </div>
 
-</div>
+<!-- Remember Me Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const usernameInput = document.querySelector('input[name="username"]');
+        const rememberCheckbox = document.getElementById('remember');
+        const loginForm = document.querySelector('form');
+
+        // Sayfa yüklendiğinde hafızadaki kullanıcı adını getir
+        const savedUsername = localStorage.getItem('reviseme_saved_username');
+        if (savedUsername) {
+            usernameInput.value = savedUsername;
+            rememberCheckbox.checked = true;
+        }
+
+        // Form gönderildiğinde onay kutusuna göre hafızaya al veya sil
+        loginForm.addEventListener('submit', function() {
+            if (rememberCheckbox.checked) {
+                localStorage.setItem('reviseme_saved_username', usernameInput.value);
+            } else {
+                localStorage.removeItem('reviseme_saved_username');
+            }
+        });
+    });
+</script>
 
 </body>
 </html>

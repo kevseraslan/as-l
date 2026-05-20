@@ -111,7 +111,7 @@
                     <div class="space-y-4">
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tekrar Aralığı (gün)</label>
                         <div class="relative">
-                            <input id="repeatInterval" class="w-full bg-surface-container-low border border-slate-200 rounded-xl py-3 px-4 focus:ring-2 focus:ring-[#6200EE]/20 focus:border-[#6200EE] outline-none transition-all text-sm font-bold text-slate-700" type="number" value="7" min="1" max="30"/>
+                            <input id="repeatInterval" class="w-full bg-surface-container-low border border-slate-200 rounded-xl py-3 px-4 focus:ring-2 focus:ring-[#6200EE]/20 focus:border-[#6200EE] outline-none transition-all text-sm font-bold text-slate-700" type="number" value="1" min="1" max="30"/>
                             <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">Gün</span>
                         </div>
                         <p class="text-[11px] text-slate-400 font-medium leading-relaxed mt-2">Bu ayar, bir konunun ne sıklıkla tekrar listesine düşeceğini belirler.</p>
@@ -161,16 +161,33 @@
 </div>
 
 <script>
-    function saveSettings() {
+    async function saveSettings() {
         const theme = document.getElementById('theme').value;
         const repeat = document.getElementById('repeatInterval').value;
+        const emailNotifications = document.getElementById('emailNotifications').checked;
         
-        localStorage.setItem('theme', theme);
-        localStorage.setItem('repeatInterval', repeat);
-        
-        // Alert substitution for better UX could be added here
-        alert('Ayarlarınız başarıyla kayıt edilmiştir!');
-        applyTheme();
+        // Backend'e kaydet
+        try {
+            const response = await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    theme: theme,
+                    repeat_interval: repeat,
+                    email_notifications: emailNotifications
+                })
+            });
+            const data = await response.json();
+            if (data.success) {
+                localStorage.setItem('theme', theme);
+                localStorage.setItem('repeatInterval', repeat);
+                alert('Ayarlarınız buluta kaydedildi ve tüm cihazlarınızda güncellendi!');
+                applyTheme();
+            }
+        } catch (error) {
+            console.error('Save Settings Error:', error);
+            alert('Ayarlar kaydedilirken bir hata oluştu.');
+        }
     }
 
     function applyTheme() {
@@ -184,13 +201,31 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
+        // Önce LocalStorage'dan hızlıca yükle
         const _theme = localStorage.getItem('theme') || 'system';
-        const _repeat = localStorage.getItem('repeatInterval') || '7';
-        
+        const _repeat = localStorage.getItem('repeatInterval') || '1';
         document.getElementById('theme').value = _theme;
         document.getElementById('repeatInterval').value = _repeat;
         applyTheme();
+
+        // Sonra Backend'den güncel veriyi çek
+        try {
+            const response = await fetch('/api/settings');
+            const data = await response.json();
+            if (data.success && data.settings) {
+                document.getElementById('theme').value = data.settings.theme;
+                document.getElementById('emailNotifications').checked = data.settings.email_notifications;
+                if (data.settings.repeat_interval) {
+                    document.getElementById('repeatInterval').value = data.settings.repeat_interval;
+                    localStorage.setItem('repeatInterval', data.settings.repeat_interval);
+                }
+                localStorage.setItem('theme', data.settings.theme);
+                applyTheme();
+            }
+        } catch (error) {
+            console.error('Fetch Settings Error:', error);
+        }
     });
 </script>
 

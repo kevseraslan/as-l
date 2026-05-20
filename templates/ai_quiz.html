@@ -86,7 +86,7 @@
                 <p class="text-slate-500" id="analysis-text"></p>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl mx-auto text-left" id="result-summary">
+            <div class="space-y-6 text-left max-w-2xl mx-auto" id="result-summary">
                 <!-- Summary of questions and answers here -->
             </div>
 
@@ -143,6 +143,12 @@
         }
     });
 
+    function cleanLetter(answer) {
+        if (!answer) return '';
+        const clean = answer.toString().trim().replace(/[^a-zA-Z]/g, '').toUpperCase();
+        return clean.charAt(0);
+    }
+
     function showQuestion(index) {
         const q = quizData[index];
         document.getElementById('current-q-index').textContent = index + 1;
@@ -155,9 +161,16 @@
         
         const letters = ['A', 'B', 'C', 'D'];
         q.options.forEach((opt, i) => {
+            // Strip any prefix like "A) ", "A. " from display option if it exists
+            let displayOpt = opt;
+            const prefixRegex = /^[A-D][\s\.\)\-:]+/i;
+            if (prefixRegex.test(displayOpt)) {
+                displayOpt = displayOpt.replace(prefixRegex, '').trim();
+            }
+
             const btn = document.createElement('button');
-            btn.className = 'option-btn flex items-center gap-4 p-5 rounded-2xl border-2 border-slate-100 text-left font-bold';
-            btn.innerHTML = `<span class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-white">${letters[i]}</span> <span>${opt}</span>`;
+            btn.className = 'option-btn flex items-center gap-4 p-5 rounded-2xl border-2 border-slate-100 text-left font-bold w-full bg-white';
+            btn.innerHTML = `<span class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-white flex-shrink-0">${letters[i]}</span> <span class="text-slate-700 font-medium">${displayOpt}</span>`;
             btn.onclick = () => selectOption(btn, letters[i]);
             grid.appendChild(btn);
         });
@@ -189,7 +202,9 @@
 
         let score = 0;
         quizData.forEach((q, i) => {
-            if (userAnswers[i] === q.correct_answer) score++;
+            const userAns = cleanLetter(userAnswers[i]);
+            const correctAns = cleanLetter(q.correct_answer);
+            if (userAns === correctAns) score++;
         });
 
         document.getElementById('score-text').textContent = `Skor: ${score} / ${quizData.length}`;
@@ -209,6 +224,73 @@
 
         document.getElementById('result-emoji').textContent = emoji;
         document.getElementById('analysis-text').textContent = analysis;
+
+        // Detailed Summary
+        const summary = document.getElementById('result-summary');
+        summary.innerHTML = '';
+        
+        quizData.forEach((q, i) => {
+            const userAns = cleanLetter(userAnswers[i]);
+            const correctAns = cleanLetter(q.correct_answer);
+            const isCorrect = userAns === correctAns;
+            
+            const card = document.createElement('div');
+            card.className = `p-6 rounded-3xl border-2 transition-all bg-white shadow-sm space-y-4 ${isCorrect ? 'border-emerald-100 bg-emerald-50/20' : 'border-rose-100 bg-rose-50/20'}`;
+            
+            const letters = ['A', 'B', 'C', 'D'];
+            const userAnsIdx = letters.indexOf(userAns);
+            const correctAnsIdx = letters.indexOf(correctAns);
+            
+            let userAnsText = userAnsIdx !== -1 ? q.options[userAnsIdx] : (userAnswers[i] || 'Cevaplanmadı');
+            let correctAnsText = correctAnsIdx !== -1 ? q.options[correctAnsIdx] : (q.correct_answer || '');
+
+            // Strip prefix from texts for clean display
+            const prefixRegex = /^[A-D][\s\.\)\-:]+/i;
+            if (prefixRegex.test(userAnsText)) userAnsText = userAnsText.replace(prefixRegex, '').trim();
+            if (prefixRegex.test(correctAnsText)) correctAnsText = correctAnsText.replace(prefixRegex, '').trim();
+            
+            card.innerHTML = `
+                <div class="flex items-start gap-4">
+                    <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center font-black text-xs ${isCorrect ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}">
+                        ${i + 1}
+                    </div>
+                    <div class="space-y-4 flex-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-[#6200EE] bg-purple-50 px-2.5 py-1 rounded-lg">${q.topic}</span>
+                            <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-lg">${q.difficulty}</span>
+                        </div>
+                        <p class="font-bold text-slate-800 leading-relaxed">${q.question}</p>
+                        
+                        <div class="space-y-2 border-t border-slate-100/50 pt-3">
+                            <div class="flex items-center gap-2 text-sm ${isCorrect ? 'text-emerald-600' : 'text-rose-600'} font-bold">
+                                <span class="material-symbols-outlined text-[18px]">${isCorrect ? 'check_circle' : 'cancel'}</span>
+                                <span>Senin Cevabın:</span>
+                                <span class="px-2 py-0.5 rounded-md ${isCorrect ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">${userAns}</span>
+                                <span class="font-medium text-slate-600">${userAnsText}</span>
+                            </div>
+                            ${!isCorrect ? `
+                            <div class="flex items-center gap-2 text-sm text-emerald-600 font-bold">
+                                <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                                <span>Doğru Cevap:</span>
+                                <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700">${correctAns}</span>
+                                <span class="font-medium text-slate-600">${correctAnsText}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+
+                        ${q.explanation ? `
+                        <div class="p-4 bg-purple-50/50 rounded-2xl border border-purple-100/30">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-[#6200EE] mb-1.5 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[14px]">auto_awesome</span> Çözüm Açıklaması
+                            </p>
+                            <p class="text-xs text-slate-600 leading-relaxed font-medium">${q.explanation}</p>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            summary.appendChild(card);
+        });
     }
 </script>
 

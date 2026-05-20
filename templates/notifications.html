@@ -193,7 +193,9 @@
                 <div class="relative w-36 h-36 shrink-0">
                     <svg class="w-full h-full transform -rotate-90">
                         <circle class="text-[#6200EE]/10" cx="72" cy="72" fill="transparent" r="65" stroke="currentColor" stroke-width="12"></circle>
-                        <circle class="text-[#6200EE]" cx="72" cy="72" fill="transparent" r="65" stroke="currentColor" stroke-dasharray="408.4" stroke-dashoffset="102.1" stroke-linecap="round" stroke-width="12"></circle>
+                        {% set dash_array = 408.4 %}
+                        {% set dash_offset = dash_array - (dash_array * completion_rate / 100) %}
+                        <circle class="text-[#6200EE]" cx="72" cy="72" fill="transparent" r="65" stroke="currentColor" stroke-dasharray="{{ dash_array }}" stroke-dashoffset="{{ dash_offset }}" stroke-linecap="round" stroke-width="12"></circle>
                     </svg>
                     <div class="absolute inset-0 flex flex-col items-center justify-center">
                         <span class="text-3xl font-black text-[#6200EE]">{{ completion_rate }}%</span>
